@@ -1,0 +1,16 @@
+# 2015-10-29 Gitignore file developed from previous.
+# 2014-01-03 GitIgnore file
+
+*.pyc
+*~
+*.bak
+*.sqlite
+*.sql
+*.pdf
+*.PDF
+*.tif
+*.data
+static/
+static/*
+test/
+test/*
