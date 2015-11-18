@@ -21,17 +21,20 @@ INDEX = {
 
 DC_elements = (
     'DC.Title',
-    'DC.Subject',
     'DC.Creator',
+    'DC.Date',
+    'DC.Subject',
     'DC.Description',
     'DC.Contributor',
-    'DC.Date',
-    'DC.Type',
-    'DC.Format',
-    'DC.Source',
-    'DC.Relation',
     'DC.Coverage',
-    'DC.',
+    'DC.Format',
+    'DC.Identifier',
+    'DC.Language',
+    'DC.Publisher',
+    'DC.Relation',
+    'DC.Rights',
+    'DC.Source',
+    'DC.Type',
 )
 
 SUFFIX = {
@@ -50,4 +53,4 @@ SUFFIX = {
     'meta': ('.meta'),
     'text': ('.txt', '.mkd',),
 }
-SUFFIX['page'] = SUFFIX['html'] + SUFFIX['text']
+SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html']

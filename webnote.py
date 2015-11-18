@@ -34,8 +34,7 @@ class Webnote():
             print "--> webnote.Webnote.parse_directory"
 
         if not os.path.isdir(directory):
-            self.warnings.append('Directory not found: ' + directory)
-            return None
+            raise self.ParseDirNotFound(directory)
 
         output = {
             'dirs': [],
@@ -51,10 +50,13 @@ class Webnote():
         for item in listing:
             if item[0] == '.':
                 output['hidden'].append(item)
+
             elif item[-1] == '~':
                 output['temp'].append(item)
+
             elif os.path.isdir(os.path.join(directory, item)):
                 output['dirs'].append(item)
+
             else:
                 basename, ext = os.path.splitext(item)
 
@@ -66,13 +68,19 @@ class Webnote():
 
         return output
 
+    class ParseDirNotFound(Exception):
+        def __init__(self, value):
+            self.value = value
+        def __str__(self):
+            return repr(self.value)
+
     def reference_figures(self, source, directory, prefix, figures=None):
         """Convert coded references to figures in a text into HTML.
 
         Given a source text containing references to image files in
         the simple syntax format of:
 
-            [[image.jpg Anything following the first space is a caption]]
+            [[image.jpg Anything following the first space is a caption.]]
  
         And the name of a dirtectory in which to find the image files,
         return a copy of the text with figure/caption references
@@ -81,7 +89,10 @@ class Webnote():
         The prefix is appended to the <img src> attribute to complete
         the link.
 
-        Optionally, the figures 
+        Optionally, the figures can be supplied as a list of filenames
+        -- as found in the webnote parsed directory
+        structure['figures'] structure. Supplying this lise will
+        suppress calling the parse_directory method.
 
         """
 
@@ -159,7 +170,6 @@ class Webnote():
         html += "alt='" + filename + "' />\n"
         html += "    <p class='caption'>" + caption
         html += "</p>\n"
-        html += ""
         html += '</div>\n\n'
 
         return (link, html)
@@ -202,21 +212,27 @@ class Page(Webnote):
 
     parent_dirname = None
     paired_dirname = None
+    
+    # These are stored webnote directory structures.
     parent_directory = None
-    paired_direcotry = None
+    paired_directory = None
 
+    # The name and contents of the target file.
     filename = None
     filecontent = None
-    store_title = None
-    store_content = None
 
-    store_parent = None
-    store_files = None
-    store_children = None
-    store_siblings = None
-    store_previous = None
-    store_nextpage = None
-    store_unref_figs = None
+    # These are internal (link, text) tuples, and lists of same.
+    _store_title = None
+    _store_content = None
+    _store_parent = None
+    _store_files = None
+    _store_children = None
+    _store_siblings = None
+    _store_previous = None
+    _store_nextpage = None
+    _store_unref_figs = None
+    _store_docs = None
+    _store_img_hires = None
 
     warnings = []
 
@@ -224,11 +240,20 @@ class Page(Webnote):
         """Instantiating without an address will return the index file.
 
         Do the minimum necessary computations. 
-
         - Set globals for input variables.
         - Determine the docroot exists. Exit with exception if not.
         - Compute the addressed file & read it.
-        - Compute the parent directory.
+        - Compute the parent and paired directories.
+
+        Special case: no address = docroot index.
+
+            Instantiate without an address, and it will default to the
+            docroot index.
+
+            This looks for a file called 'index' with one of the
+            values in settings.SUFFIX['page']. If it doesn't find one,
+            it addeds a line to the warnings list.
+
         """
 
         if settings.DEBUG:
@@ -239,6 +264,7 @@ class Page(Webnote):
 
         self.warnings = []
         self.docroot = docroot
+        self.address = address
         self.prefix = prefix
 
         if not address:
@@ -248,63 +274,39 @@ class Page(Webnote):
         else:
             (self.paired_dirname, self.parent_dirname) = self._find_directories()
 
-        self.parent_directory = self.parse_directory(self.parent_dirname)
-
-        if self.parent_dirname == self.paired_dirname:
+        try:
+            self.parent_directory = self.parse_directory(self.parent_dirname)
+        except self.ParseDirNotFound:
+            self.warnings.append(
+                'Parent directory not found: ' +
+                self.parent_dirname)
+            
+        if self.paired_dirname == self.parent_dirname:
             self.paired_directory = self.parent_directory
+
         else:
-            self.paired_directory = self.parse_directory(self.paired_dirname)
+            try:
+                self.paired_directory = self.parse_directory(self.paired_dirname)
+            except self.ParseDirNotFound:
+                self.warnings.append(
+                    'Paired directory not found: ' + self.paired_dirname)
 
         filename = self._find_file()
-
+        
         try:
             f = open(filename, 'r')
             self.filecontent = f.read()
             self.filename = filename
         except IOError:
-            if not address == 'index':
-                raise self.PagefileNotFound(address)
-
-
-    def _find_file(self):
-        """Finding the filename, either text or html. 
-
-        Will only return a filename if the file can be found.
-
-        This is an ugly hack and will have to be replaced. 2015-07-13.
-        It doesn't cope with any suffix other than '.txt' or '.html'.
-        """
+            self.warnings.append('Page not found: ' + self.address)
 
         if settings.DEBUG:
-            print "--> webnote.Page.find_file"
-
-        filename = ''
-
-        if self.address:
-            filename = os.path.join(self.docroot, self.address) + '.txt'
-
-        if os.path.isfile(filename):
-            self.filename = filename
-            return filename
-
-        if self.address:
-            filename = os.path.join(self.docroot, self.address) + '.html'
-            if os.path.isfile(filename):
-                self.filename = filename
-
-        return filename
-
-    def _find_directories(self):
-        if settings.DEBUG:
-            print "--> webnote.Page._find_directories"
-
-        paired_dirname = ''
-        parent_dirname = ''
-
-        if self.address:
-            print "Address", self.address
-            
-        return paired_dirname, parent_dirname
+            if self.warnings:
+                idx = 1
+                print "WARNINGS"
+                for warning in self.warnings:
+                    print idx, warning
+                    idx +1
 
     class DocrootNotFound(Exception):
         def __init__(self, value):
@@ -312,29 +314,100 @@ class Page(Webnote):
         def __str__(self):
             return repr(self.value)
 
-    class PagefileNotFound(Exception):
-        def __init__(self, value):
-            self.value = value
-        def __str__(self):
-            return repr(self.value)
+    def _find_directories(self):
+        """Find the parent and paired directories.
+
+        """
+        if settings.DEBUG:
+            print "--> webnote.Page._find_directories"
+
+        paired_dirname = 'paired'
+        parent_dirname = 'parent'
+
+        split_addr = self.address.split('/')
+        split_parent = split_addr
+        paired = split_parent.pop()
+
+        parent = self.docroot + '/'.join(split_parent)
+        paired = os.path.join(parent, paired)
+
+        return paired, parent
+
+    def _find_file(self):
+        """Find the page file.
+
+        Return a string containing the filename for the page requested
+        by the address. This will first try looking for the address
+        with a lowercase extension in the SUFFIX['page'] list. 
+
+        If not found there, scan the page files in the parent
+        directory for files with basename == address
+
+        """
+
+        if settings.DEBUG:
+            print "--> webnote.Page._find_file"
+
+        filename = ''
+        address = ''
+        if self.address:
+            address = self.address
+
+        # Check the suffixes 
+        for item in settings.SUFFIX['page']:
+            filename = os.path.join(self.docroot, address) + item
+
+            if os.path.isfile(filename):
+                self.filename = filename
+                return filename
+
+        # Scan through the page files.
+        pagename = address.split('/')[-1]
+        if self.parent_directory:
+            for item in self.parent_directory['page']:
+                
+                (basename, ext) = os.path.splitext(item)
+                    
+                if (basename == pagename and
+                    ext.lower() in settings.SUFFIX['page']):
+
+                    filename = os.path.join(self.parent_dirname, item)
+                    return filename
+
+        return filename
 
     def _get_title(self):
+        """Compute the title as a string.
 
-        if self.store_title:
-            return self.store_title
+        This will be either:
+        -   The H1 line in the content string,
+        -   The filename made nice.
+        """
+
+        if self._store_title:
+            return self._store_title
 
         if settings.DEBUG:
              print "--> webnote.Page._get_title"   
         
         fname = os.path.basename(self.filename)
         basename, ext = os.path.splitext(fname)
-        self.store_title = basename.replace('_', ' ')
+        self._store_title = basename.replace('_', ' ')
 
-        return self.store_title
+        return self._store_title
+
+    title = property(_get_title)    
     
     def _get_content(self):
-        if self.store_content:
-            return self.store_content
+        """Compute the content string.
+
+        This will be returned a HTML code, either direct from an HTML
+        page or as the product of parsing the contents of a text
+        file.
+
+        """
+        if self._store_content:
+            return self._store_content
 
         if settings.DEBUG:
              print "--> webnote.Page._get_content"   
@@ -344,10 +417,15 @@ class Page(Webnote):
         if self.filecontent:
             content = self.filecontent
         
-        self.store_content = content
+        self._store_content = content
         return content
 
-    def _get_unref_figs(self):        
+    content = property(_get_content)
+
+    def _get_unref_figs(self):
+        """List of (link, text) tuples representing unreferenced figures.
+        """
+        
         if self.store_unref_figs:
             return self.store_unref_figs
         
@@ -355,24 +433,14 @@ class Page(Webnote):
         if settings.DEBUG:
              print "--> webnote.Page._get_unref_figs"   
 
-        self.store_unref_figs = unref_figs
+        self._store_unref_figs = unref_figs
         return unref_figs
-    
-    def _get_files(self):
-        if self.store_files:
-            return self.store_files
 
-        if settings.DEBUG:
-             print "--> webnote.Page._get_files"   
-        
-        files = self.analyse_directory(self.paired_dir)
-
-        self.store_files = files
-        return files
+    unref_figs = property(_get_unref_figs)
     
     def _get_previous(self):
-        if self.store_previous:
-            return self.store_previous
+        if self._store_previous:
+            return self._store_previous
 
         if settings.DEBUG:
              print "--> webnote.Page._get_previous"   
@@ -382,23 +450,29 @@ class Page(Webnote):
         
         previous = (link, text)
 
-        self.store_previous = previous
+        self._store_previous = previous
         return previous
     
+    previous = property(_get_previous)
+
     def _get_nextpage(self):
-        if self.store_nextpage:
-            return self.store_nextpage
+        if self._store_nextpage:
+            return self._store_nextpage
 
         if settings.DEBUG:
              print "--> webnote.Page._get_nextpage"   
         
         nextpage = []
 
-        self.store_nextpage = nextpage
+        self._store_nextpage = nextpage
         return nextpage
     
+    nextpage = property(_get_nextpage)
+
     def _get_parent(self):
-        """The parent directory is found by cutting the last item off the
+        """Compute a (link, text) tuble identifying the parent
+
+        The parent directory is found by cutting the last item off the
         address.
         """
 
@@ -415,184 +489,73 @@ class Page(Webnote):
 
         self.parent_dir = parent_dir
         return parent_dir
+
+    parent = property(_get_parent)
     
     def _get_siblings(self):
-        if self.store_siblings:
-            return self.store_siblings
+        """Return a list of (link, text) tuples identifying siblings."""
+        
+        if self._store_siblings:
+            return self._store_siblings
 
         if settings.DEBUG:
              print "--> webnote.Page._get_siblings"   
         
         siblings = []
         
-        self.store_siblings = siblings
+        self._store_siblings = siblings
         return siblings
-    
+
+    siblings = property(_get_siblings)
+        
     def _get_children(self):
-        if self.store_children:
-            return self.store_children
+        """Return a list of (link, text) tuples identifying siblings."""
+
+        if self._store_children:
+            return self._store_children
 
         if settings.DEBUG:
              print "--> webnote.Page._get_children"   
         
         children  = []
 
-        self.store_children = children
+        self._store_children = children
         return children
     
+    children = property(_get_children)
+
     def _get_docs(self):
-        if self.store_docs:
-            return self.store_docs
+        """Return a list of (link, text) tuples identifying document files."""
+
+        if self._store_docs:
+            return self._store_docs
 
         if settings.DEBUG:
              print "--> webnote.Page._get_docs"   
         
         docs = []
 
-        self.store_docs = docs
+        self._store_docs = docs
         return docs
     
+    docs = property(_get_docs)
+
     def _get_img(self):
-        if self.store_img_hires:
-            return self.store_img_hires
+        """Return a list of (link, text) tuples identifying document files."""
+
+        if self._store_img_hires:
+            return self._store_img_hires
 
         if settings.DEBUG:
              print "--> webnote.Page._get_img"   
         
         img_hires = []
 
-        self.store_img_hires = img_hires
+        self._store_img_hires = img_hires
         return img_hires
-    
 
-    title = property(_get_title)
-    content = property(_get_content)
-    unref_figs = property(_get_unref_figs)
-    files = property(_get_files)
-    previous = property(_get_previous)
-    nextpage = property(_get_nextpage)
-    parent = property(_get_parent)
-    siblings = property(_get_siblings)
-    children = property(_get_children)
-    docs = property(_get_docs)
     img_hires = property(_get_img)
-
-
-            
-    def find_pages_dep(self, webindex, parent):
-        """Return a list of pages for the given address.
-
-        The list will be link tuples: (target, text), relative to the
-        docroot.
-
-        Consumes a webindex structure, as created by
-        self.parse_directory(), and a string filepath ending in slash
-        '/' as parent. The parent is prepended to the link.
-        """
-
-        pages = webindex['page']
-        pagelist = []        
-
-        for page in pages:
-            basename, ext = os.path.splitext(page)
-            if basename.lower() == 'index':
-                pass
-            else: 
-                if parent:
-                    target = parent + basename 
-                else:
-                    target = basename
-
-                text = basename.replace('_', ' ')
-                pagelist.append((target, text))
-
-        return pagelist
-
-    def get_page_dep(self, address):
-        """Pull all the data about a page together.
-
-        We start by looking for the 
-
-        """
-
-        if address[-1] == '/':
-            address = address[:-1]
-
-        addresspath = os.path.join(self.docroot, address)
-
-        filepath = self._find_file(addresspath)
-        self.filepath = filepath
-        
-        if os.path.isdir(addresspath):
-            self.dirlist = self.get_directory(addresspath)
-
-        if self.dirlist:
-            self.children = self.dirlist['pages']
-
-        parentdir = os.path.dirname(addresspath)
-        parentdir = os.path.join(parentdir, '')
-
-        self.parentdir = parentdir 
-        self.parent_dirlist = self.get_directory(parentdir)
-
-        if not self.siblings:
-            if self.parent_dirlist:
-                self.siblings = self.parent_dirlist['pages']
-
-        if filepath:
-            (self.parent, self.previous, self.nextpage) = self._find_relations()
-
-            f = open(filepath, 'r')
-            self.filecontent = f.read()
- 
-    def _find_relations_dep(self):
-        """Get the related pages: parent, previous and next.
-        """
-
-        parent = ''
-        previous = None
-        nextpage = None
-        thispage = None
-
-        filepath = self.filepath
-        basename = os.path.basename(filepath)
-
-        pages = sorted(self.parent_dirlist['pages'])
-
-        if self.docroot == self.parentdir:
-            bits = self.docroot.split('/')
-            parent = (self.url, 'up')
-        else:
-            parent = (self.parentdir.replace(self.docroot, self.url), 'up')
-
-        if self.address:
-            thispage = self.clean_link(os.path.join(self.url, self.address))
-
-        if thispage in pages:
-            index = pages.index(thispage)
-            if index > 0:
-                previous = pages[index-1]
-            print len(pages), index
-            if index < len(pages)-1:
-                nextpage = pages[index+1]
-            
-        return parent, previous, nextpage
-
-    def _find_file_dep(self, address):
-        """Return a filepath to a known file or None.
-        """
-
-        if os.path.isfile(address):
-            return address
-
-        if os.path.isfile(address + '.html'):
-            return address + '.html'        
-
-        if os.path.isfile(address + '.txt'):
-            return address + '.txt'
-
-        return None
-
+                
 
 class Metadata():
     """Deal with metadata files.
