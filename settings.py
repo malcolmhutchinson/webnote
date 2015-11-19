@@ -54,3 +54,22 @@ SUFFIX = {
     'text': ('.txt', '.mkd',),
 }
 SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html']
+
+CREATIVE_COMMONS = {
+    'cc-by': 'http://creativecommons.org/licenses/by/3.0/',
+    'cc-by-nc': 'http://creativecommons.org/licenses/by-nc/3.0/',
+    'cc-by-sa': 'http://creativecommons.org/licenses/by-sa/3.0/',
+    'cc-by-nc-sa': 'http://creativecommons.org/licenses/by-nc-sa/3.0/',
+    'cc-by-nd': 'http://creativecommons.org/licenses/by-nd/3.0/',
+    'cc-by-nc-nd': 'http://creativecommons.org/licenses/by-nc-nd/3.0/',
+
+    'cc-by-nz': 'http://creativecommons.org/licenses/by/3.0/nz/',
+    'cc-by-nc-nz': 'http://creativecommons.org/licenses/by-nc/3.0/nz/',
+    'cc-by-sa-nz': 'http://creativecommons.org/licenses/by-sa/3.0/nz/',
+    'cc-by-nc-sa-nz': 'http://creativecommons.org/licenses/by-nc-sa/3.0/nz/',
+    'cc-by-nd-nz': 'http://creativecommons.org/licenses/by-nd/3.0/nz/',
+    'cc-by-nc-nd-nz': 'http://creativecommons.org/licenses/by-nc-nd/3.0/nz/',
+
+}
+
+LICENSES = CREATIVE_COMMONS

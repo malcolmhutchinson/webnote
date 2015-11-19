@@ -200,7 +200,7 @@ class Page(Webnote):
         children   List of link tuples to pages in the paired directory.
 
     A link tuple has the form (link, text), and is intended to go into
-    a template like this:
+    a Django template like this:
 
         <a href ='{{ link }}'>{{ text }}</a>
 
@@ -263,8 +263,15 @@ class Page(Webnote):
             raise self.DocrootNotFound(docroot)
 
         self.warnings = []
+
         self.docroot = docroot
+        if docroot[-1] != '/':
+            self.docroot = docroot + '/'
+
         self.address = address
+        if address[-1] == '/':
+            self.address = address[:-1]
+
         self.prefix = prefix
 
         if not address:
@@ -274,39 +281,8 @@ class Page(Webnote):
         else:
             (self.paired_dirname, self.parent_dirname) = self._find_directories()
 
-        try:
-            self.parent_directory = self.parse_directory(self.parent_dirname)
-        except self.ParseDirNotFound:
-            self.warnings.append(
-                'Parent directory not found: ' +
-                self.parent_dirname)
-            
-        if self.paired_dirname == self.parent_dirname:
-            self.paired_directory = self.parent_directory
-
-        else:
-            try:
-                self.paired_directory = self.parse_directory(self.paired_dirname)
-            except self.ParseDirNotFound:
-                self.warnings.append(
-                    'Paired directory not found: ' + self.paired_dirname)
-
-        filename = self._find_file()
-        
-        try:
-            f = open(filename, 'r')
-            self.filecontent = f.read()
-            self.filename = filename
-        except IOError:
-            self.warnings.append('Page not found: ' + self.address)
-
-        if settings.DEBUG:
-            if self.warnings:
-                idx = 1
-                print "WARNINGS"
-                for warning in self.warnings:
-                    print idx, warning
-                    idx +1
+        self._parse_directories()
+        self._read_target_file()
 
     class DocrootNotFound(Exception):
         def __init__(self, value):
@@ -328,10 +304,54 @@ class Page(Webnote):
         split_parent = split_addr
         paired = split_parent.pop()
 
-        parent = self.docroot + '/'.join(split_parent)
-        paired = os.path.join(parent, paired)
+        parent = self.docroot + '/'.join(split_parent) +'/'
+        paired = os.path.join(parent, paired) +'/'
 
         return paired, parent
+
+    def _parse_directories(self):
+
+        if settings.DEBUG:
+            print "--> webnote.Page._parse_directories"
+            
+        try:
+            self.parent_directory = self.parse_directory(self.parent_dirname)
+        except self.ParseDirNotFound:
+            self.warnings.append(
+                'Parent directory not found: ' +
+                self.parent_dirname)
+            
+        if self.paired_dirname == self.parent_dirname:
+            self.paired_directory = self.parent_directory
+
+        else:
+            try:
+                self.paired_directory = self.parse_directory(self.paired_dirname)
+            except self.ParseDirNotFound:
+                self.warnings.append(
+                    'Paired directory not found: ' + self.paired_dirname)
+ 
+    def _read_target_file(self):
+
+        if settings.DEBUG:
+            print "--> webnote.Page._read_target_file"
+
+        filename = self._find_file()
+        
+        try:
+            f = open(filename, 'r')
+            self.filecontent = f.read()
+            self.filename = filename
+        except IOError:
+            self.warnings.append('Page not found: ' + self.address)
+
+        if settings.DEBUG:
+            if self.warnings:
+                idx = 1
+                print "WARNINGS"
+                for warning in self.warnings:
+                    print idx, warning
+                    idx +1
 
     def _find_file(self):
         """Find the page file.
@@ -380,6 +400,7 @@ class Page(Webnote):
         """Compute the title as a string.
 
         This will be either:
+        -   The title line from the metadata field.
         -   The H1 line in the content string,
         -   The filename made nice.
         """
@@ -472,28 +493,48 @@ class Page(Webnote):
     def _get_parent(self):
         """Compute a (link, text) tuble identifying the parent
 
-        The parent directory is found by cutting the last item off the
-        address.
+        The parent is found by this process:
+
+        -   if it's the index, return ('/', 'index')
+        -   if the page is in the docroot, return the same thing.
+        -   Otherwise, return the address with the last element chopped off.
         """
 
-        if self.parent_dir:
-            return self.parent_dir
+        if self._store_parent:
+            return self._store_parent
         
-        if settings/DEBUG:
+        if settings.DEBUG:
             print "--> webnote.Page._get_parent"
-            
-        parent_dir = os.path.join(self.docroot, self.address)
-        tmp = parent_dir.split('/') 
-        tmp = tmp[:-1]
-        parent_dir = '/'.join(tmp) + '/'
 
-        self.parent_dir = parent_dir
-        return parent_dir
+        link = 'link'
+        text = 'text'
+
+        if self.address == 'index':
+            self._store_parent = self.prefix + '/', 'Index'
+            return self.prefix + '/', 'Index'
+
+        steps = self.address.split('/')
+
+        if len(steps) == 1:
+            self._store_parent = self.prefix + '/', 'Index'
+            return self.prefix + '/', 'Index'
+        
+        junk = steps.pop()
+        link = self.prefix + "/" + '/'.join(steps) + '/'
+        text = steps[-1]
+        
+        parent = (link, text)
+        self._store_parent = parent
+        return parent
 
     parent = property(_get_parent)
     
     def _get_siblings(self):
-        """Return a list of (link, text) tuples identifying siblings."""
+        """Return a list of (link, text) tuples identifying siblings.
+
+        Siblings are pages in the parent directory -- that is, the
+        direcotry the target page is in.
+        """
         
         if self._store_siblings:
             return self._store_siblings
@@ -502,6 +543,13 @@ class Page(Webnote):
              print "--> webnote.Page._get_siblings"   
         
         siblings = []
+        parent = self._get_parent_address()
+
+        for item in self.parent_directory['page']:
+            (basename, ext) = os.path.splitext(item)
+            link = self.prefix + '/' + parent +'/' + basename + '/'
+            text = basename
+            siblings.append((link, text))
         
         self._store_siblings = siblings
         return siblings
@@ -511,6 +559,9 @@ class Page(Webnote):
     def _get_children(self):
         """Return a list of (link, text) tuples identifying siblings."""
 
+        if not self.paired_directory:
+            return None
+
         if self._store_children:
             return self._store_children
 
@@ -518,6 +569,13 @@ class Page(Webnote):
              print "--> webnote.Page._get_children"   
         
         children  = []
+        parent = self._get_parent_address()
+
+        for item in self.paired_directory['page']:
+            (basename, ext) = os.path.splitext(item)
+            link = self.prefix + '/' + parent +'/' + basename + '/'
+            text = basename
+            children.append((link, text))
 
         self._store_children = children
         return children
@@ -534,6 +592,14 @@ class Page(Webnote):
              print "--> webnote.Page._get_docs"   
         
         docs = []
+        parent = self._get_parent_address()
+
+        for item in self.parent_directory['docs']:
+            print item
+            (basename, ext) = os.path.splitext(item)
+            link = self.prefix + '/' + parent +'/' + basename + '/'
+            text = basename
+            docs.append((link, text))
 
         self._store_docs = docs
         return docs
@@ -541,7 +607,7 @@ class Page(Webnote):
     docs = property(_get_docs)
 
     def _get_img(self):
-        """Return a list of (link, text) tuples identifying document files."""
+        """Return a list of (link, text) tuples identifying image files."""
 
         if self._store_img_hires:
             return self._store_img_hires
@@ -555,10 +621,16 @@ class Page(Webnote):
         return img_hires
 
     img_hires = property(_get_img)
+
+    def _get_parent_address(self):
+        steps = self.address.split('/')
+        parent = steps[:-1]
+        parent = '/'.join(parent)
+        return parent
                 
 
 class Metadata():
-    """Deal with metadata files.
+    """Provide services for dealing with metadata.
 
     This class knows all about the metadata files. Give it an address,
     and it will determine where the file is, read it and return a
@@ -576,19 +648,24 @@ class Metadata():
         DC.Subject:     Filesystem syntax, information systems, Django, Python
         DC.Description: Filesystem services implimenting the simple syntax.
         DC.Contributor: 
+        DC.Coverage:    New Zealand
         DC.Date:        2015-04-03
         DC.Type:        
         DC.Format:      text/html
         DC.Source:      
         DC.Language:    en
+        DC.Identifier:
+        DC.Publisher:   archaeography.co.nz
+        DC.Publisher:   Malcolm Hutchinson
         DC.Relation:    
-        DC.Coverage:    
+        DC.Rights:      cc-by
         # END DC metadata
 
     This class takes a page address, which is the address generated by
     a Webnote object, pointing to a page (text or HTML file).
     """
-
+    
+    address = None
     fileLines = []
 
     dc_metadata = {
@@ -597,14 +674,16 @@ class Metadata():
         "DC.Subject": [],
         "DC.Description": [],
         "DC.Contributor": [],
+        "DC.Coverage": [],
         "DC.Date": [],
         "DC.Type": [],
         "DC.Format": [],
         "DC.Source": [],
         "DC.Language": [],
         "DC.Relation": [],
-        "DC.Coverage": [],
         "DC.Identifier": [],
+        "DC.Rights": [],
+        "DC.Publisher": [],
         }
 
     meta_commands = []
@@ -613,108 +692,29 @@ class Metadata():
     address = None
     metafile = None
 
-    def __init__(self, address):
+    def __init__(self, address=None):
         """Accept an address, which is a pointer to a page within the
         filesystem.
         """
         self.address = address
 
+    def create_empty_metafile(self):
+        """Return a string containing an empty metadata record.
+        """
+        metafile = ''
+        return metafile
 
+    def read_metafile(self):
+        """Return a metadata structure from a text file.
+        """
+        pass
 
+    def locate_metafile(self, filename):
+        """Locate the metafile for the given filename.
 
+        This follows this process:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class Catalogue(Webnote):
-    """Return files and associated metadata from collections of file types. 
-
-    Instantiate with a directory name. This will catalogue the files
-    in that directory. It returns a structure which you can use to
-    index the directory, including examining the contents of any data
-    files it finds in the given directory.
-
-    First you give it a directory, which is the collection of files
-    you wish to catalogue. Later, you can give it a file within the
-    directory, and it will do all sorts of things for you.
-
-    Global variables intended for use:
-
-        index           } These all come from the datafile. The index
-        missing_files   } is a reading of the CSV file rendered into 
-        unindexed_files } a Python list containing lists of the field 
-                          values. The first item in the list is a list 
-                          of the column names.  
-
-    The derived lists missing_files and unindexed_files are lists of
-    the same structure. Missing files are mentioned in the index file
-    but can't be found in a directory search, and unindexed files are
-    files which appear in the directory but are not listed in the
-    index.
-
-    If there is no CSV index file in the directory, you get only the
-    unindexed files list.
-    """
-
-    directory = None
-    ftype = None
-    structure = None    # Directory parsed into file types.
-    datafile = None
-    index = None
-    missing_files = None
-    unindexed_files = None
-
-    def __init__(self, directory, ftype='all'):
-        self.directory = directory
-        self.ftype = ftype
-
-        structure = self.parse_directory(directory)
-        self.structure = structure
-
-        if structure:
-            if len(structure['data']) > 0:
-                datafile = os.path.join(directory, structure['data'][0])
-                self.datafile = datafile
-                (self.index, self.missing_files, self.unindexed_files
-                ) = self.process_datafile(datafile, ftype)
-            else:
-                self.unindexed_files = structure['all']
-
-    def index_files(self, ftype):
-        """Provide an index by file type."""
-
-        
-
-class Collection(Webnote):
-    """Index a directory according to the rules of the collection syntax.
-    """
-
-    directory = None
-    index = None
-    missing_files = None
-    unindexed_files = None
-
-    def __init__(self, directory):
-        self.directory = directory
-
-        structure = self.parse_directory(directory)
-        self.structure = structure
-
+        -   metafile in the parent directory.
+        -   metafile in the meta directory.
+        """
+        pass
