@@ -1,4 +1,4 @@
-"""Webnote. Classes to implement the simple filesystem syntax.
+"""Classes to implement the simple filesystem syntax.
 
 This module provides a Page, Directory and Metadata classes. Objects
 from the Page class process individual page files, providing links to
@@ -16,7 +16,7 @@ import os
 import settings
 import re
 import cgi
-from markdown2 import markdown
+
 
 
 class Webnote():
