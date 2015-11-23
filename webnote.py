@@ -344,7 +344,7 @@ class Directory():
 
         return targets
 
-    def _link_hidden(self, prefix):
+    def link_hidden(self, prefix):
         """Return a list of (link, text) tuples identifying hidden files."""
 
         if settings.DEBUG:
@@ -359,7 +359,7 @@ class Directory():
 
         return targets
 
-    def _link_html(self, prefix):
+    def link_html(self, prefix):
         """Return a list of (link, text) tuples identifying all html files."""
 
         if settings.DEBUG:
@@ -374,7 +374,7 @@ class Directory():
 
         return targets
 
-    def _link_image(self, prefix):
+    def link_image(self, prefix):
         """Return a list of (link, text) tuples identifying image files."""
 
         if settings.DEBUG:
@@ -389,7 +389,7 @@ class Directory():
 
         return images
 
-    def _link_meta(self, prefix):
+    def link_meta(self, prefix):
         """Return a list of (link, text) tuples identifying meta files."""
 
         if settings.DEBUG:
@@ -404,7 +404,7 @@ class Directory():
 
         return targets
 
-    def _link_temp(self, prefix):
+    def link_temp(self, prefix):
         """Return a list of (link, text) tuples identifying temporary files."""
 
         if settings.DEBUG:
@@ -419,7 +419,7 @@ class Directory():
 
         return targets
 
-    def _link_text(self, prefix):
+    def link_text(self, prefix):
         """Return a list of (link, text) tuples identifying text files."""
 
         if settings.DEBUG:

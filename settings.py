@@ -1,7 +1,29 @@
 """Settings for the webnote application.
 
-Dublin Core list of elements from:
+The SUFFIX structure captures file format extensions into a dictionary
+with keys reflecting file type. It is this structure which provides
+for the lists inside the directory object. 
+
+
+References
+----------
+
+Dublin Core list of elements from
 http://dublincore.org/documents/usageguide/elements.shtml
+
+List of image format file extensions from 
+http://en.wikipedia.org/wiki/Raw_image_format
+
+Lists of Microsoft file formats from
+https://en.wikipedia.org/wiki/List_of_Microsoft_Office_filename_extensions
+https://en.wikipedia.org/wiki/Microsoft_Access#File_extensions
+
+List of OpenDocument file format extensions from
+https://en.wikipedia.org/wiki/OpenDocument
+
+And a most comprehensive list of file formats at
+https://en.wikipedia.org/wiki/List_of_file_formats
+
 """
 
 DEBUG = True
@@ -9,11 +31,11 @@ DEBUG = True
 META = ('meta/', )
 
 THUMBNAILS = (
-    'img_128/',
+    'px128/',
     'thb',
 )
 
-INDEX = {
+INDEX_depreciated = {
     'filename': 'filename',
     'caption': 'caption',
     'description': 'description',
@@ -38,12 +60,17 @@ DC_elements = (
 )
 
 SUFFIX = {
-    'data': ('.csv', '.data', '.dat'),
+    'archive': ('.gz','.tar', '.zip', ),
+    'audio': ('.flac', '.mp2', '.mp3', '.wav', '.wma', ),
+    'code': ('.c', '.cpp', '.py', ),
+    'data': ('.csv', '.data', '.dat', '.dbf', ),
     'docs': ('.pdf',),
     'figs': ('.png', '.jpg', '.jpeg', '.gif', '.svg',),
+    'geovector': (
+        '.gml', '.gpx', '.kml', '.shp', '.tab',
+    ),
     'html': ('.html', '.htm', '.xhtml',),
     'image': (
-        # This list taken from http://en.wikipedia.org/wiki/Raw_image_format
         '.3fr', '.ari', '.arw', '.bay', '.cap', '.cr2', '.crw', '.dcr',
         '.dcs', '.dng', '.drf', '.eip', '.erf', '.fff', '.iiq', '.k25',
         '.kdc', '.mdc', '.mef', '.mos', '.mrw', '.nef', '.nrw', '.orf',
@@ -51,47 +78,76 @@ SUFFIX = {
         '.rzw', '.sr2'  '.srf', '.srw', '.tif', '.tiff', '.x3f',
     ),
     'meta': ('.meta'),
+
+    'ms_access': (
+        '.ade', '.adp', '.adn', '.accdb', '.accdr', '.accdt',
+        '.accda', '.mdb', '.cdb', '.cdb', '.mda', '.mdn', '.mdt',
+        '.mdw', '.mdf', '.mde', '.accde', '.mam', '.maq', 
+        '.mar', '.mat', '.maf', '.ldb', '.laccdb', 
+    ),
+    'ms_excel': (
+        'xlsx', '.xlsm', '.xltx', '.xltm', '.xls', '.xlt', '.xlm',
+        '.xlsb', '.xla', '.xlam', '.xll', '.xlw',  
+    ),
+    'ms_word': (
+        '.doc', '.dot', '.docx', '.docm', '.dotx', '.dotm', '.docb',
+    ),
+    'opendoc_base': ('.odb',),
+    'opendoc_formulae': ('.odf', ),
+    'opendoc_graphics': ( '.odg', '.fodg', ),
+    'opendoc_presentation': ('.opd', '.fodp', ),
+    'opendoc_spreadsheet': ('.ods', '.fods', ),
+    'opendoc_writer': ('.odt', '.fodt', ),
+
+
     'text': ('.txt', '.mkd',),
 }
 SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html']
+SUFFIX['microsoft_office'] = (
+    SUFFIX['ms_access'] + SUFFIX['ms_excel'] + SUFFIX['ms_word'] )
+SUFFIX['opendocument'] = (
+    SUFFIX['opendoc_base'] +  SUFFIX['opendoc_formulae'] +
+    SUFFIX['opendoc_graphics'] +  SUFFIX['opendoc_presentation'] +
+    SUFFIX['opendoc_spreadsheet'] +  SUFFIX['opendoc_writer']
+    )
 
 CREATIVE_COMMONS = {
     'cc-by': (
         'http://creativecommons.org/licenses/by/4.0/',
-        'Creative Commons Attribution'),
+        'Creative Commons Attribution 4.0'),
     'cc-by-nc': (
         'http://creativecommons.org/licenses/by-nc/4.0/',
-        'Creative Commons Attribution-NonCommercial'),
+        'Creative Commons Attribution-NonCommercial 4.0'),
     'cc-by-sa': (
         'http://creativecommons.org/licenses/by-sa/4.0/',
-        'Creative Commons Attribution-ShareAlike'),
+        'Creative Commons Attribution-ShareAlike 4.0'),
     'cc-by-nc-sa': (
         'http://creativecommons.org/licenses/by-nc-sa/4.0/',
-        'Creative Commons Attribution-NonCommercial-ShareAlike'),
+        'Creative Commons Attribution-NonCommercial-ShareAlike 4.0'),
     'cc-by-nd': (
         'http://creativecommons.org/licenses/by-nd/4.0/',
-        'Creative Commons Attribution-NoDerivs'),
+        'Creative Commons Attribution-NoDerivs 4.0'),
     'cc-by-nc-nd': (
         'http://creativecommons.org/licenses/by-nc-nd/4.0/',
-        'Creative Commons Attribution-NonCommercial-NoDerivs'),
+        'Creative Commons Attribution-NonCommercial-NoDerivs 4.0'),
 
     'cc-by-nz': (
         'http://creativecommons.org/licenses/by/3.0/nz/',
-        'Creative Commons Attribution New Zealand'),
+        'Creative Commons Attribution New Zealand 3.0'),
     'cc-by-nc-nz': (
         'http://creativecommons.org/licenses/by-nc/3.0/nz/',
-        'Creative Commons Attribution-NonCommercial New Zealand'),
+        'Creative Commons Attribution-NonCommercial New Zealand 3.0'),
     'cc-by-sa-nz': (
         'http://creativecommons.org/licenses/by-sa/3.0/nz/',
-        'Creative Commons Attribution-NonCommercial-ShareAlike New Zealand'),
+        'Creative Commons Attribution-NonCommercial-ShareAlike New Zealand 3.0'),
     'cc-by-nc-sa-nz': (
         'http://creativecommons.org/licenses/by-nc-sa/3.0/nz/',
-        'Creative Commons Attribution-NonCommercial-ShareAlike New Zealand'),
+        'Creative Commons Attribution-NonCommercial-ShareAlike New Zealand 3.0'),
     'cc-by-nd-nz': (
         'http://creativecommons.org/licenses/by-nd/3.0/nz/',
-        'Creative Commons Attribution-NoDerivs New Zealand'),
+        'Creative Commons Attribution-NoDerivs New Zealand 3.0'),
     'cc-by-nc-nd-nz': (
-        'http://creativecommons.org/licenses/by-nc-nd/3.0/nz/',
+        'http://creativecommons.org/licenses/by-nc-nd/3.0/nz/ 3.0',
         'Creative Commons Attribution-NonCommercial-NoDerivs New Zealand'),
 
 }
