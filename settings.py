@@ -111,6 +111,18 @@ SUFFIX['opendocument'] = (
     SUFFIX['opendoc_spreadsheet'] +  SUFFIX['opendoc_writer']
     )
 
+TRUE = (
+    'affirmative', 'affirm', 'aye', 'agree', 'agreed',
+    'good', 'go',
+    'indeed',
+    'ok', 'okay', 'on',
+    'right', 
+    'sure',
+    'true', 't',
+    'up', 'white',
+    'y', 'ya', 'yah', 'yeah', 'yes', 'yip', 'yep',
+)
+
 CREATIVE_COMMONS = {
     'cc-by': (
         'http://creativecommons.org/licenses/by/4.0/',

@@ -16,6 +16,8 @@ import os
 import settings
 import re
 import cgi
+#import pypandoc
+import markdown2 as markdown
 
 
 
@@ -434,7 +436,7 @@ class Directory():
 
         return targets
 
-    def link_pages(self, prefix):
+    def link_pages(self, prefix, suffix=False):
         """Return a list of (link, text) tuples identifying page files."""
 
         if settings.DEBUG:
@@ -445,7 +447,11 @@ class Directory():
         for item in self.model['page']:
             (basename, ext) = os.path.splitext(item)
             link = os.path.join(prefix, basename) + '/'
-            text = item
+            if suffix:
+                text = item
+            else:
+                text = basename.replace('_', ' ')
+                
             targets.append((link, text))
 
         return targets
@@ -733,16 +739,21 @@ class Page(Webnote):
         file.
 
         """
-        if self._store_content:
-            return self._store_content
-
         if settings.DEBUG:
             print "--> webnote.Page._get_content"
 
-        content = ''
+        if self._store_content:
+            return self._store_content
 
-        if self.filecontent:
+        content = ''
+        (basename, ext) = os.path.splitext(self.filename)
+
+        if ext in settings.SUFFIX['text']:
+            content = markdown.markdown(self.filecontent)
+            #content = pypandoc.convert(self.filecontent, 'md', format='md')
+        else:
             content = self.filecontent
+
 
         self._store_content = content
         return content
@@ -827,24 +838,23 @@ class Page(Webnote):
         if settings.DEBUG:
             print "--> webnote.Page._get_parent"
 
-        link = 'link'
-        text = 'text'
+        link = ''
+        text = ''
         prefix = ''
         if self.prefix:
             prefix = self.prefix
 
         if self.address == 'index':
-            self._store_parent = prefix + '/', 'Index'
-            return prefix + '/', 'Index'
+            self._store_parent = (prefix , 'Index') 
+            return self._store_parent
 
         steps = self.address.split('/')
-
         if len(steps) == 1:
-            self._store_parent = str(self.prefix) + '/', 'Index'
-            return str(self.prefix) + '/', 'Index'
+            self._store_parent = (self.prefix, 'Index')
+            return self._store_parent
 
         junk = steps.pop()
-        link = prefix + "/" + '/'.join(steps) + '/'
+        link = os.path.join(prefix, '/'.join(steps))
         text = steps[-1]
 
         parent = (link, text)
@@ -1016,21 +1026,28 @@ class Metadata():
 
     def create_empty_metafile(self):
         """Return a string containing an empty metadata record.
+
+        This produces a string containing a record suitable for filing
+        with pages in the document archive. It is intended to be
+        written to a text file with a .meta suffix.
+
         """
-        metafile = ''
-        return metafile
+        metarecord = ''
+        return metarecord
 
     def read_metafile(self):
         """Return a metadata structure from a text file.
         """
-        pass
+        filecontent = ''
+        return filecontent
 
-    def locate_metafile(self, filename):
-        """Locate the metafile for the given filename.
+    def locate_metafile(self, address):
+        """Locate the metafile for the given address.
 
         This follows this process:
 
         -   metafile in the parent directory.
         -   metafile in the meta directory.
         """
-        pass
+        filename = ''
+        return filename
