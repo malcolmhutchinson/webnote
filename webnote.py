@@ -425,7 +425,7 @@ class Directory():
         """Return a list of (link, text) tuples identifying text files."""
 
         if settings.DEBUG:
-            print "--> webnote.Directory._link_"
+            print "--> webnote.Directory.link_text"
 
         targets = []
 
@@ -440,7 +440,7 @@ class Directory():
         """Return a list of (link, text) tuples identifying page files."""
 
         if settings.DEBUG:
-            print "--> webnote.Directory._link_page"
+            print "--> webnote.Directory.link_pages"
 
         targets = []
 
@@ -460,7 +460,7 @@ class Directory():
         """Return a list of (link, text) tuples identifying  files."""
 
         if settings.DEBUG:
-            print "--> webnote.Directory._link_unknown"
+            print "--> webnote.Directory.link_unknown"
 
         targets = []
 
@@ -490,7 +490,7 @@ class Page(Webnote):
 
         title      A computed title for the page.
         content    Marked-up text content of the file.
-        parent     Link tuple to the parent page.
+        parent     Page object to the parent page.
         previous   Link tuple to the Previous page in a series.
         nextpage   Link tuple to the Next page in a series.
         siblings   List of link tuples to other pages in the same directory.
@@ -615,10 +615,17 @@ class Page(Webnote):
         return paired, parent
 
     def _parse_directories(self):
-        """Create webnote directory structures for parent and paired directories.
+        """Create webnote directory structures for parent and paired dirs.
 
-        Set global variables with webnote structures. Don't return
-        anything.
+        Set global variables with Directory objects.
+
+        Sets:
+
+            self.parent_directory as a webnote.Directory object.
+            self.paired_directory as a webnote.Directory object.
+
+        Depends on the self.parent_dirname and self.paired_dirname
+        directory pathnames having already been set.
 
         """
         if settings.DEBUG:
@@ -653,14 +660,6 @@ class Page(Webnote):
             self.filename = filename
         except IOError:
             self.warnings.append('Page not found: ' + self.address)
-
-        if settings.DEBUG:
-            if self.warnings:
-                idx = 1
-                print "WARNINGS"
-                for warning in self.warnings:
-                    print idx, warning
-                    idx + 1
 
     def _find_file(self):
         """Find the page file.
@@ -738,7 +737,13 @@ class Page(Webnote):
         page or as the product of parsing the contents of a text
         file.
 
+        If no file is found, or it is otherwise unreadable, return an
+        empty string.
+
         """
+        if not self.filename:
+            return ''
+            
         if settings.DEBUG:
             print "--> webnote.Page._get_content"
 
@@ -857,9 +862,11 @@ class Page(Webnote):
         link = os.path.join(prefix, '/'.join(steps))
         text = steps[-1]
 
-        parent = (link, text)
-        self._store_parent = parent
-        return parent
+        print "parent_link", link
+
+        par = (link, text)
+        self._store_parent = par
+        return par
 
     parent = property(_get_parent)
 
@@ -876,13 +883,13 @@ class Page(Webnote):
         if settings.DEBUG:
             print "--> webnote.Page._get_siblings"
 
-        siblings = []
+        sibs = []
         parent = self._get_parent_address()
         prefix = os.path.join(self.prefix, parent)
-        siblings = self.parent_directory.link_pages(prefix)
+        sibs = self.parent_directory.link_pages(prefix)
 
-        self._store_siblings = siblings
-        return siblings
+        self._store_siblings = sibs
+        return sibs
 
     siblings = property(_get_siblings)
 
@@ -890,15 +897,16 @@ class Page(Webnote):
         """Return a list of (link, text) tuples identifying children."""
 
         if not self.paired_directory:
+            print "HERE"
             return None
-
-        if self._store_children:
-            return self._store_children
 
         if settings.DEBUG:
             print "--> webnote.Page._get_children"
 
-        children = []
+        if self._store_children:
+            return self._store_children
+
+        kids = []
         
         if self.address == 'index':
             address = ''
@@ -906,10 +914,10 @@ class Page(Webnote):
             address = self.address
             
         prefix = os.path.join(self.prefix, address)
-        children = self.paired_directory.link_pages(prefix)
+        kids = self.paired_directory.link_pages(prefix)
 
-        self._store_children = children
-        return children
+        #self._store_children = kids
+        return kids
 
     children = property(_get_children)
 

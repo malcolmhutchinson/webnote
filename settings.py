@@ -111,6 +111,18 @@ SUFFIX['opendocument'] = (
     SUFFIX['opendoc_spreadsheet'] +  SUFFIX['opendoc_writer']
     )
 
+DOCTYPE = (
+    ('report', 'report'),
+    ('note', 'note'),
+    ('letter', 'letter'),
+)
+
+PAGE_STATUS = (
+    ('working', 'working'),
+    ('standing', 'standing'),
+    ('PUBLIC', 'PUBLIC'),
+)
+
 TRUE = (
     'affirmative', 'affirm', 'aye', 'agree', 'agreed',
     'good', 'go',
