@@ -41,7 +41,7 @@ INDEX_depreciated = {
     'description': 'description',
 }
 
-DC_elements = (
+DC_ELEMENTS = (
     'DC.Title',
     'DC.Creator',
     'DC.Date',
@@ -58,6 +58,15 @@ DC_elements = (
     'DC.Source',
     'DC.Type',
 )
+
+CONTROL_ELEMENTS = (
+    'sort-reverse',
+    'allow',
+    'deny',
+    'status',
+)
+
+
 
 SUFFIX = {
     'archive': ('.gz','.tar', '.zip', ),
