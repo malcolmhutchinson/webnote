@@ -133,7 +133,7 @@ class Webnote():
 
         return (link, html)
 
-
+            
 class Directory():
     """Provide directory services.
 
@@ -705,6 +705,22 @@ class Page(Webnote):
                     return filename
 
         return filename
+
+    def _breadcrumbs(self):
+
+        link = self.prefix
+        text = self.prefix.replace('/', '')
+        crumbs = [(link, text)]
+
+        steps = self.address.split('/')
+
+        for item in steps:
+            link = os.path.join(link, item)
+            crumbs.append((link, item))
+
+        return crumbs
+
+    breadcrumbs = property(_breadcrumbs)
 
     def _get_title(self):
         """Compute the title as a string.
