@@ -150,6 +150,7 @@ class Directory():
         if not os.path.isdir(directory):
             raise self.ParseDirNotFound(directory)
 
+        self.directory = directory
         self.sort = sort
         self.model = self.parse_directory(directory)
 
@@ -220,6 +221,11 @@ class Directory():
 
         return output
 
+    def _get_link(self):
+        return self.directory
+
+    link = property(_get_link)
+
     def _get_all(self):
         return self.model['all']
 
@@ -285,6 +291,21 @@ class Directory():
 
     unknown = property(_get_unknown)
 
+    def link_self(self, prefix):
+
+        link = os.path.join(prefix, self.directory)
+        text = self.clean_name()
+        return (link, text)
+
+    def clean_name(self):
+
+        steps = self.directory.split('/')
+        last = steps.pop()
+
+        name = last.replace('_', '')
+        
+        return name
+    
     def link_all(self, prefix):
         """Return a list of (link, text) tuples identifying all files."""
 
