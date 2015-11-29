@@ -603,6 +603,7 @@ class Page(Webnote):
 
         self._parse_directories()
         self._read_target_file()
+        self.link = self._get_link()
 
         self.metadata = Metadata(self.filename)
 
@@ -691,7 +692,7 @@ class Page(Webnote):
         with a lowercase extension in the SUFFIX['page'] list.
 
         If not found there, scan the page files in the parent
-        directory for files with basename == address
+        directory for files with basename == address.
 
         """
 
@@ -725,6 +726,12 @@ class Page(Webnote):
                     return filename
 
         return filename
+
+    def _get_link(self):
+        link = os.path.join(self.prefix, self.address)
+        text = os.path.basename(self.filename)
+        (basename, ext) = os.path.splitext(text)
+        return (link, basename)
 
     def _breadcrumbs(self):
 
@@ -902,6 +909,8 @@ class Page(Webnote):
 
         par = (link, text)
         self._store_parent = par
+
+        print ":: parent", par
         return par
 
     parent = property(_get_parent)
