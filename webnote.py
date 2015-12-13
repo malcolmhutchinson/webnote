@@ -66,9 +66,14 @@ class Webnote():
         p = re.compile(expression)
         result = p.findall(source)
 
+        # This stanza is wrong. There is no parse_directory method in
+        # a webnote object.
         if not figures:
-            d = self.parse_directory(directory)
-            figures = d['figure']
+            if self.figs:
+                figures = self.figs
+            else:
+                d = self.parse_directory(directory)
+                figures = d['figure']
 
         for figure in figures:
             link = os.path.join(prefix, figure)
@@ -133,7 +138,7 @@ class Webnote():
         return (link, html)
 
             
-class Directory():
+class Directory(Webnote):
     """Provide directory services.
 
     Services include generating lists of files by type as (link, text)
@@ -147,6 +152,10 @@ class Directory():
     sort = None
 
     def __init__(self, directory, sort=True):
+
+        if settings.DEBUG:
+            print "--> webnote.Directory.__init__"
+        
         if not os.path.isdir(directory):
             raise self.ParseDirNotFound(directory)
 
