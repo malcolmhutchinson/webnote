@@ -121,9 +121,10 @@ SUFFIX['opendocument'] = (
     )
 
 DOCTYPE = (
-    ('report', 'report'),
-    ('note', 'note'),
     ('letter', 'letter'),
+    ('manual', 'manual'),
+    ('note', 'note'),
+    ('report', 'report'),
 )
 
 PAGE_STATUS = (
@@ -184,8 +185,8 @@ CREATIVE_COMMONS = {
         'Creative Commons Attribution-NonCommercial-NoDerivs New Zealand'),
 
 }
-
-LICENSES = CREATIVE_COMMONS
+LICENSES = {'unlicensed': ('', '')}
+LICENSES.update(CREATIVE_COMMONS)
 
 dc_metadata = {
     "dc.title": [],

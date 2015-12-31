@@ -6,38 +6,42 @@ import settings
 
 rights = []
 
-for license in settings.LICENSES.keys():
-    rights.append(('license', 'license'))
+for license in sorted(settings.LICENSES.keys()):
+    rights.append((license, license))
 
     
 
-class PageForm(forms.Form):
+class PageMetadataForm(forms.Form):
     dc_title = forms.CharField(
-        label='title')
+        label='title', required=False)
     dc_creator = forms.CharField(
-        label='Author (semicolon separated)')
+        label='Author (semicolon separated)', required=False)
     dc_date = forms.DateField(
-        label='date')
+        label='date', required=False)
     dc_subject = forms.CharField(
-        label='subject (comma separated)', max_length=255)
+        label='subject (comma separated)', max_length=255, required=False)
     dc_description = forms.CharField(
-        label='description', widget=forms.Textarea)
+        label='description', widget=forms.Textarea, required=False)
     dc_contributor = forms.CharField(
-        label='contributors', max_length=255)
+        label='contributors', max_length=255, required=False)
     dc_coverage = forms.CharField(
-        label='location', max_length=255)
+        label='location', max_length=255, required=False)
     dc_rights = forms.ChoiceField(
-        label='rights', choices=rights)
+        label='rights', choices=rights, required=False)
     dc_source = forms.CharField(
-        label='source', max_length=255)
+        label='source', max_length=255, required=False)
     dc_type = forms.ChoiceField(
-        label='type', choices=settings.DOCTYPE)
+        label='type', choices=settings.DOCTYPE, required=False)
     dc_publisher = forms.CharField(
-        label='type', max_length=255)
+        label='publisher', max_length=255, required=False)
     doc_status = forms.ChoiceField(
-        label='status', choices=settings.PAGE_STATUS)
+        label='status', choices=settings.PAGE_STATUS, required=False)
     deny = forms.CharField(
-        label='deny', max_length=255)
+        label='deny', max_length=255, required=False)
     allow = forms.CharField(
-        label='allow', max_length=255)
-    
+        label='allow', max_length=255, required=False)
+
+class PageEditForm(forms.Form):
+    filecontent = forms.CharField(
+        widget=forms.Textarea(attrs={'cols': 80, 'rows': 15,}))
+

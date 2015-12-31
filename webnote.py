@@ -50,8 +50,14 @@ class Webnote():
 
         Optionally, the figures can be supplied as a list of filenames
         -- as found in the webnote parsed directory
-        structure['figures'] structure. Supplying this lise will
+        structure['figures'] structure. Supplying this list will
         suppress calling the parse_directory method.
+
+        ### Unimplemented
+
+        We should be able to skip the image tagline if it has four
+        spaces before it. This would be in keeping with the markdown
+        syntax.
 
         """
 
@@ -66,14 +72,12 @@ class Webnote():
         p = re.compile(expression)
         result = p.findall(source)
 
-        # This stanza is wrong. There is no parse_directory method in
-        # a webnote object.
         if not figures:
             if self.figs:
                 figures = self.figs
             else:
-                d = self.parse_directory(directory)
-                figures = d['figure']
+                d = Directory(directory)
+                figures = d.figs
 
         for figure in figures:
             link = os.path.join(prefix, figure)
@@ -256,7 +260,12 @@ class Directory(Webnote):
     docs = property(_get_docs)
 
     def _get_figs(self):
-        return self.model['figs']
+
+        if settings.DEBUG:
+            print "--> webnote.Directory._get_figs"
+        if self.model['figs']:
+            return self.model['figs']
+        return []
 
     figs = property(_get_figs)
 
@@ -588,6 +597,7 @@ class Page(Webnote):
             raise self.DocrootNotFound(docroot)
 
         self.warnings = []
+        self.figs = None
 
         self.docroot = docroot
         if docroot[-1] != '/':
@@ -614,7 +624,8 @@ class Page(Webnote):
         self._read_target_file()
         self.link = self._get_link()
 
-        self.metadata = Metadata(self.filename)
+        if self.filename:
+            self.metadata = Metadata(self.filename)
 
     class DocrootNotFound(Exception):
         def __init__(self, value):
@@ -627,7 +638,7 @@ class Page(Webnote):
         """Find the parent and paired directory path names.
 
         Return a tuple containing (paired, parent) tuples. These two
-        values are the pathname to the directory.
+        values are the pathnames to those two directories.
 
         """
 
@@ -737,6 +748,9 @@ class Page(Webnote):
         return filename
 
     def _get_link(self):
+        if not self.filename:
+            return ('', '')
+        
         link = os.path.join(self.prefix, self.address)
         text = os.path.basename(self.filename)
         (basename, ext) = os.path.splitext(text)
@@ -807,14 +821,32 @@ class Page(Webnote):
         content = ''
         (basename, ext) = os.path.splitext(self.filename)
 
+        source = self.filecontent
+        directory = self.parent_dirname
+
+        # Prefix needs to be:
+        #     /static/test/good_data/flowers.jpg
+        
+        # And it is. We seem to be producing the correct link, but
+        # it's not working for some reason.
+
+        prefix = ('/static' + self.prefix + self.address)
+
+        figures = None
+        if self.paired_directory:
+            figures = self.paired_directory.figs
+
         if ext in settings.SUFFIX['text']:
-            content = markdown.markdown(self.filecontent)
+            content, unref_figs = self.reference_figures(
+                source, directory, prefix, figures)
+            content = markdown.markdown(content)
             #content = pypandoc.convert(self.filecontent, 'md', format='md')
         else:
             content = self.filecontent
 
-
+        
         self._store_content = content
+
         return content
 
     content = property(_get_content)
@@ -919,7 +951,6 @@ class Page(Webnote):
         par = (link, text)
         self._store_parent = par
 
-        print ":: parent", par
         return par
 
     parent = property(_get_parent)
@@ -1015,6 +1046,24 @@ class Page(Webnote):
             
         return parent
 
+    def get_form_data(self):
+        """Return a dictionary suitable for populating the page forms."""
+
+        data = {
+            'filecontent': self.filecontent,
+            'dc_title': self.metadata.title,
+            'dc_creator': self.metadata.author,
+            'dc_date': self.metadata.date,
+            'dc_subject': self.metadata.subject,
+            'dc_description': self.metadata.description,
+            #'dc_contributor': self.metadata.contributor,
+            'dc_coverage': self.metadata.location,
+            'dc_rights': self.metadata.rights,
+            'dc_source': self.metadata.source,
+            #'dc_type': self.metadata.type,
+        }
+
+        return data
 
 class Metadata():
     """Provide services for dealing with metadata.
