@@ -24,7 +24,6 @@ import cgi
 import markdown2 as markdown
 
 
-
 class Webnote():
     """Base class for the webnote application.
 
@@ -81,7 +80,6 @@ class Webnote():
             if self.figs:
                 figures = self.figs
             else:
-                print "HERE"
                 d = Directory(directory)
                 figures = d.figs
 
@@ -97,6 +95,7 @@ class Webnote():
             links.append(link)
 
             for fig in unref:
+                print fig
                 if fig[1] == link[0]:
                     unref.pop(unref.index(fig))
 
