@@ -1,6 +1,6 @@
 """Classes to implement the simple filesystem syntax.
 
-This module provides a Page, Directory and Metadata classes. Objects
+This module provides Page, Directory and Metadata classes. Objects
 from the Page class process individual page files, providing links to
 parents, siblings and children, and processing test strings for image
 references.
@@ -8,6 +8,10 @@ references.
 The directory class will analyse a directory listing, providing lists
 of files sorted by type. It has methods for computing lists of links
 to files within the given directory.
+
+The Metadata class performs all functions on a page's metadata,
+including locating files, reading them into memory structures, and
+providing standard outputs.
 
 """
 
@@ -33,7 +37,7 @@ class Webnote():
 
     warnings = []
 
-    def reference_figures(self, source, directory, prefix, figures=None):
+    def reference_figures(self, source, prefix, directory=None, figures=None):
         """Convert coded references to figures in a text into HTML.
 
         Given a source text containing references to image files in
@@ -73,9 +77,11 @@ class Webnote():
         result = p.findall(source)
 
         if not figures:
+
             if self.figs:
                 figures = self.figs
             else:
+                print "HERE"
                 d = Directory(directory)
                 figures = d.figs
 
@@ -159,6 +165,8 @@ class Directory(Webnote):
 
         if settings.DEBUG:
             print "--> webnote.Directory.__init__"
+
+        #print "Directory:", directory
         
         if not os.path.isdir(directory):
             raise self.ParseDirNotFound(directory)
@@ -578,6 +586,7 @@ class Page(Webnote):
         - Determine the docroot exists. Exit with exception if not.
         - Compute the addressed file & read it.
         - Compute the parent and paired directories.
+        - Create a Metadata object.
 
         Special case: no address = docroot index.
 
@@ -633,6 +642,28 @@ class Page(Webnote):
 
         def __str__(self):
             return repr(self.value)
+
+    def save(self, data):
+        """Replace the contents of the file with the supplied data.
+
+        Call the metadata object and update or create a metafile with
+        the supplied data.
+
+        Return True if everything goes according to plan.        
+
+        """
+        if settings.DEBUG:
+            print "--> webnote.Page.save"
+
+        self.filecontent = data['filecontent']
+        
+        f = open(self.filename, 'w')
+        f.write(data['filecontent'])
+ 
+        self.warnings.append("Saving file " + self.filename)
+        self.metadata.save(data)
+        return True
+        
 
     def _find_directories(self):
         """Find the parent and paired directory path names.
@@ -734,11 +765,12 @@ class Page(Webnote):
 
         # Scan through the page files.
         pagename = address.split('/')[-1]
+
         if self.parent_directory:
             for item in self.parent_directory.pages:
 
                 (basename, ext) = os.path.splitext(item)
-
+                print item
                 if (basename == pagename and
                         ext.lower() in settings.SUFFIX['page']):
 
@@ -818,11 +850,11 @@ class Page(Webnote):
         if self._store_content:
             return self._store_content
 
-        content = ''
+        content = self.filecontent
         (basename, ext) = os.path.splitext(self.filename)
 
-        source = self.filecontent
-        directory = self.parent_dirname
+        source = content
+        directory = None #self.parent_dirname
 
         # Prefix needs to be:
         #     /static/test/good_data/flowers.jpg
@@ -833,14 +865,17 @@ class Page(Webnote):
         prefix = ('/static' + self.prefix + self.address)
 
         figures = None
+
         if self.paired_directory:
             figures = self.paired_directory.figs
-
+            directory = None
+            
         if ext in settings.SUFFIX['text']:
-            content, unref_figs = self.reference_figures(
-                source, directory, prefix, figures)
+            if figures:
+                content, unref_figs = self.reference_figures(
+                    source, prefix, directory, figures)
+
             content = markdown.markdown(content)
-            #content = pypandoc.convert(self.filecontent, 'md', format='md')
         else:
             content = self.filecontent
 
@@ -1065,6 +1100,7 @@ class Page(Webnote):
 
         return data
 
+
 class Metadata():
     """Provide services for dealing with metadata.
 
@@ -1115,11 +1151,13 @@ class Metadata():
     and returning the first element as key, and a re-stitched list of
     the rest as value.
 
-    The gust of the thing is a metastructure like this:
+    The gist of the thing is a metastructure like this:
 
-        metastructure = {
-            'dc_metadata': dc_metadata,
-            'commands': meta_commands,
+        metadata = {
+            'dc_title': [],
+            ...  
+            'status': [],
+            ...
         }
 
     These two variables are defined as a dictionary of DC elements,
@@ -1146,11 +1184,11 @@ class Metadata():
     }
 
     meta_commands = {
-        'status': '',
-        'sort-reverse': '',
-        'deny': '',
-        'allow': '',
-        'embargo': '',
+        'status': [],
+        'sort-reverse': [],
+        'deny': [],
+        'allow': [],
+        'embargo': [],
     }
 
     warnings = []
@@ -1176,26 +1214,60 @@ class Metadata():
         self.pagefile = pagefile
         self.prefix = prefix
 
+        self.metadata =  self.dc_metadata.copy()
+        self.metadata.update(self.meta_commands)
+
         self.metafilename = self._locate_metafile()
 
         if self.metafilename:
+            self.metadata['filename'] = self.metafilename
             self.metarecord = self._read_metafile()
-
-        self.metadata = None
 
         if self.metarecord:
             (self.metadata, self.commands)  = self.process_metarecord()
 
-            
-    def create_empty_metafile(self):
-        """Return a string containing an empty metadata record.
+    def save(self, data):
+        """Replace the contents of the meta file with items data.
+        """
 
-        This produces a string containing a record suitable for filing
+        if settings.DEBUG:
+            print "--> webnote.Metadata.save"
+
+        self.construct_metafile()
+
+        return True
+
+    def update_metadata(self, data):
+        """Replace values in the metadata structure with supplied dictionary.
+
+        This is often used with POST data.
+        """
+
+        if setting.DEBUG:
+            print "--> webnote.Metadata.update_metadata"
+
+        return True
+
+            
+    def construct_metafile(self):
+        """Return a string containing a metadata record in text format.
+
+        This produces a string containing a record suitable for fileing
         with pages in the document archive. It is intended to be
         written to a text file with a .meta suffix.
 
+        If the metadata structure is empty, as at init, the result
+        will be a file record with a list of keys, but no values.
+
         """
         metarecord = ''
+
+        for item in self.metadata:
+            print item
+
+        
+
+        
         return metarecord
 
     def _locate_metafile(self):
@@ -1206,6 +1278,7 @@ class Metadata():
         -   metafile in the parent directory.
         -   metafile in the meta directory.
         """
+
         if settings.DEBUG:
             print "--> webnote.Metadata._locate_metafile"
 
@@ -1216,20 +1289,19 @@ class Metadata():
         if os.path.isfile(filename):
             return filename
 
-
         steps = basename.split('/')
         last = steps.pop()
         path = '/'.join(steps)
         metaname = last + '.meta'
 
         filename = os.path.join(path, 'meta', last + '.meta')
+
         if os.path.isfile(filename):
             return filename
 
         filename = os.path.join(basename, metaname)
         if os.path.isfile(filename):
             return filename
-
 
         return None
 
@@ -1281,9 +1353,6 @@ class Metadata():
                 commands[line[0]] = line[1]
 
         return (metadata, commands)
-
-
-
     
     def _title(self):
         return '\n'. join(self.metadata['dc.title'])
@@ -1296,8 +1365,11 @@ class Metadata():
     author = property(_author)
 
     def _date(self):
-        return self.metadata['dc.date'][0]
-
+        if len(self.metadata['dc.date']) > 0:
+            return self.metadata['dc.date'][0]
+        else:
+            return ""
+        
     date = property(_date)
 
     def _subject(self):
@@ -1333,8 +1405,5 @@ class Metadata():
         return '; '.join(self.metadata['dc.source'])
 
     source = property(_source)
-
-
-
 
 

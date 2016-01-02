@@ -26,14 +26,14 @@ class PageMetadataForm(forms.Form):
         label='contributors', max_length=255, required=False)
     dc_coverage = forms.CharField(
         label='location', max_length=255, required=False)
-    dc_rights = forms.ChoiceField(
-        label='rights', choices=rights, required=False)
-    dc_source = forms.CharField(
-        label='source', max_length=255, required=False)
-    dc_type = forms.ChoiceField(
-        label='type', choices=settings.DOCTYPE, required=False)
     dc_publisher = forms.CharField(
         label='publisher', max_length=255, required=False)
+    dc_source = forms.CharField(
+        label='source', max_length=255, required=False)
+    dc_rights = forms.ChoiceField(
+        label='rights', choices=rights, required=False)
+    dc_type = forms.ChoiceField(
+        label='type', choices=settings.DOCTYPE, required=False)
     doc_status = forms.ChoiceField(
         label='status', choices=settings.PAGE_STATUS, required=False)
     deny = forms.CharField(
