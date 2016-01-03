@@ -95,7 +95,6 @@ class Webnote():
             links.append(link)
 
             for fig in unref:
-                print fig
                 if fig[1] == link[0]:
                     unref.pop(unref.index(fig))
 
@@ -165,8 +164,6 @@ class Directory(Webnote):
         if settings.DEBUG:
             print "--> webnote.Directory.__init__"
 
-        #print "Directory:", directory
-        
         if not os.path.isdir(directory):
             raise self.ParseDirNotFound(directory)
 
@@ -562,7 +559,8 @@ class Page(Webnote):
     # The name and contents of the target file.
     filename = None
     filecontent = None
-
+    unref_figs = None
+    
     # These are internal (link, text) tuples, and lists of same.
     _store_title = None
     _store_content = None
@@ -769,7 +767,6 @@ class Page(Webnote):
             for item in self.parent_directory.pages:
 
                 (basename, ext) = os.path.splitext(item)
-                print item
                 if (basename == pagename and
                         ext.lower() in settings.SUFFIX['page']):
 
@@ -789,9 +786,10 @@ class Page(Webnote):
 
     def _breadcrumbs(self):
 
+        crumbs = []
         link = self.prefix
         text = self.prefix.replace('/', '')
-        crumbs = [(link, text)]
+        crumbs.append((link, text))
 
         steps = self.address.split('/')
 
@@ -815,17 +813,29 @@ class Page(Webnote):
         returns the filename made nice.
         """
 
+        fname = None
+
         if self._store_title:
             return self._store_title
 
         if settings.DEBUG:
             print "--> webnote.Page._get_title"
 
-        fname = os.path.basename(self.filename)
-        basename, ext = os.path.splitext(fname)
-        self._store_title = basename.replace('_', ' ')
 
-        return self._store_title
+        if self.filename:
+            fname = os.path.basename(self.filename)
+
+        if fname:
+            basename, ext = os.path.splitext(fname)
+
+            self._store_title = basename.replace('_', ' ')
+
+        if self._store_title:
+            return self._store_title
+        else:
+            return "Page title unknown"
+
+        #return self._store_title
 
     title = property(_get_title)
 
@@ -853,16 +863,7 @@ class Page(Webnote):
         (basename, ext) = os.path.splitext(self.filename)
 
         source = content
-        directory = None #self.parent_dirname
-
-        # Prefix needs to be:
-        #     /static/test/good_data/flowers.jpg
-        
-        # And it is. We seem to be producing the correct link, but
-        # it's not working for some reason.
-
-        prefix = ('/static' + self.prefix + self.address)
-
+        prefix = os.path.join('/static', self.address)
         figures = None
 
         if self.paired_directory:
@@ -872,13 +873,14 @@ class Page(Webnote):
         if ext in settings.SUFFIX['text']:
             if figures:
                 content, unref_figs = self.reference_figures(
-                    source, prefix, directory, figures)
+                    source, prefix, figures=figures)
+                self._store_unref_figs = unref_figs
 
             content = markdown.markdown(content)
+            
         else:
             content = self.filecontent
 
-        
         self._store_content = content
 
         return content
@@ -899,20 +901,16 @@ class Page(Webnote):
 
         """
 
-        if self.store_unref_figs:
-            return self.store_unref_figs
-
-        unref_figs = []
         if settings.DEBUG:
             print "--> webnote.Page._get_unref_figs"
 
-        (output, unref_figs) = self.reference_figures(
-            self.filecontent, self.paired_dirname, '/test/',
-            self.paired_directory['figures'])
+        if self._store_unref_figs:
+            return self._store_unref_figs
 
-        self._store_unref_figs = unref_figs
-        self.store_content = output
-        return unref_figs
+        # This just calls the _get_content() method, and does nothing
+        # with the content value.
+        content = self.content
+        return self._store_unref_figs
 
     unref_figs = property(_get_unref_figs)
 
@@ -1024,15 +1022,21 @@ class Page(Webnote):
         if self._store_children:
             return self._store_children
 
-        kids = []
-        
         if self.address == 'index':
             address = ''
         else:
             address = self.address
             
         prefix = os.path.join(self.prefix, address)
-        kids = self.paired_directory.link_pages(prefix)
+        pages = self.paired_directory.link_pages(prefix)
+        kids = []
+        for page in pages:
+            if page[1] == 'index':
+                pass
+            else:
+                kids.append(page)
+        
+        #kids = self.paired_directory.link_pages(prefix)
 
         self._store_children = kids
         return kids
@@ -1261,11 +1265,8 @@ class Metadata():
         """
         metarecord = ''
 
-        for item in self.metadata:
-            print item
-
-        
-
+        #for item in self.metadata:
+        #    print item
         
         return metarecord
 
