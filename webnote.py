@@ -64,9 +64,6 @@ class Webnote():
 
         """
 
-        if settings.DEBUG:
-            print "--> webnote.Webnote.reference_figures"
-
         output = source
         unref = []
         links = []
@@ -109,9 +106,6 @@ class Webnote():
         - Put the remaining string back together.
         - Construct the HTML output string.
         """
-
-        if settings.DEBUG:
-            print "--> webnote.Webnote._figure_html"
 
         content = match.replace('[[', '')
         content = content.replace(']]', '')
@@ -160,9 +154,6 @@ class Directory(Webnote):
     sort = None
 
     def __init__(self, directory, sort=True):
-
-        if settings.DEBUG:
-            print "--> webnote.Directory.__init__"
 
         if not os.path.isdir(directory):
             raise self.ParseDirNotFound(directory)
@@ -331,9 +322,6 @@ class Directory(Webnote):
     def link_all(self, prefix):
         """Return a list of (link, text) tuples identifying all files."""
 
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_all"
-
         targets = []
 
         for item in self.model['all']:
@@ -345,9 +333,6 @@ class Directory(Webnote):
 
     def link_data(self, prefix):
         """Return a list of (link, text) tuples identifying data files."""
-
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_data"
 
         targets = []
 
@@ -361,9 +346,6 @@ class Directory(Webnote):
     def link_docs(self, prefix):
         """Return a list of (link, text) tuples identifying document files."""
 
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_docs"
-
         targets = []
 
         for item in self.model['docs']:
@@ -375,9 +357,6 @@ class Directory(Webnote):
 
     def link_figs(self, prefix):
         """Return a list of (link, text) tuples identifying figure files."""
-
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_figs"
 
         targets = []
 
@@ -391,9 +370,6 @@ class Directory(Webnote):
     def link_hidden(self, prefix):
         """Return a list of (link, text) tuples identifying hidden files."""
 
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_hidden"
-
         targets = []
 
         for item in self.model['hidden']:
@@ -405,9 +381,6 @@ class Directory(Webnote):
 
     def link_html(self, prefix):
         """Return a list of (link, text) tuples identifying all html files."""
-
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_html"
 
         targets = []
 
@@ -421,9 +394,6 @@ class Directory(Webnote):
     def link_image(self, prefix):
         """Return a list of (link, text) tuples identifying image files."""
 
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_image"
-
         images = []
 
         for item in self.model['img_hires']:
@@ -435,9 +405,6 @@ class Directory(Webnote):
 
     def link_meta(self, prefix):
         """Return a list of (link, text) tuples identifying meta files."""
-
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_meta"
 
         targets = []
 
@@ -451,9 +418,6 @@ class Directory(Webnote):
     def link_temp(self, prefix):
         """Return a list of (link, text) tuples identifying temporary files."""
 
-        if settings.DEBUG:
-            print "--> webnote.Directory._link_"
-
         targets = []
 
         for item in self.model['']:
@@ -466,9 +430,6 @@ class Directory(Webnote):
     def link_text(self, prefix):
         """Return a list of (link, text) tuples identifying text files."""
 
-        if settings.DEBUG:
-            print "--> webnote.Directory.link_text"
-
         targets = []
 
         for item in self.model['text']:
@@ -480,9 +441,6 @@ class Directory(Webnote):
 
     def link_pages(self, prefix, suffix=False):
         """Return a list of (link, text) tuples identifying page files."""
-
-        if settings.DEBUG:
-            print "--> webnote.Directory.link_pages"
 
         targets = []
 
@@ -500,9 +458,6 @@ class Directory(Webnote):
 
     def link_unknown(self, prefix):
         """Return a list of (link, text) tuples identifying  files."""
-
-        if settings.DEBUG:
-            print "--> webnote.Directory.link_unknown"
 
         targets = []
 
@@ -596,9 +551,6 @@ class Page(Webnote):
 
         """
 
-        if settings.DEBUG:
-            print "--> webnote.Page.init"
-
         if not os.path.isdir(docroot):
             raise self.DocrootNotFound(docroot)
 
@@ -649,8 +601,6 @@ class Page(Webnote):
         Return True if everything goes according to plan.        
 
         """
-        if settings.DEBUG:
-            print "--> webnote.Page.save"
 
         self.filecontent = data['filecontent']
         
@@ -669,9 +619,6 @@ class Page(Webnote):
         values are the pathnames to those two directories.
 
         """
-
-        if settings.DEBUG:
-            print "--> webnote.Page._find_directories"
 
         paired_dirname = 'paired'
         parent_dirname = 'parent'
@@ -699,8 +646,6 @@ class Page(Webnote):
         directory pathnames having already been set.
 
         """
-        if settings.DEBUG:
-            print "--> webnote.Page._parse_directories"
 
         try:
             self.parent_directory = Directory(self.parent_dirname)
@@ -719,9 +664,6 @@ class Page(Webnote):
                     'Paired directory not found: ' + self.paired_dirname)
 
     def _read_target_file(self):
-
-        if settings.DEBUG:
-            print "--> webnote.Page._read_target_file"
 
         filename = self._find_file()
 
@@ -743,9 +685,6 @@ class Page(Webnote):
         directory for files with basename == address.
 
         """
-
-        if settings.DEBUG:
-            print "--> webnote.Page._find_file"
 
         filename = ''
         address = ''
@@ -818,10 +757,6 @@ class Page(Webnote):
         if self._store_title:
             return self._store_title
 
-        if settings.DEBUG:
-            print "--> webnote.Page._get_title"
-
-
         if self.filename:
             fname = os.path.basename(self.filename)
 
@@ -853,9 +788,6 @@ class Page(Webnote):
         if not self.filename:
             return ''
             
-        if settings.DEBUG:
-            print "--> webnote.Page._get_content"
-
         if self._store_content:
             return self._store_content
 
@@ -901,9 +833,6 @@ class Page(Webnote):
 
         """
 
-        if settings.DEBUG:
-            print "--> webnote.Page._get_unref_figs"
-
         if self._store_unref_figs:
             return self._store_unref_figs
 
@@ -918,9 +847,6 @@ class Page(Webnote):
         if self._store_previous:
             return self._store_previous
 
-        if settings.DEBUG:
-            print "--> webnote.Page._get_previous"
-
         link = ''
         text = ''
 
@@ -934,9 +860,6 @@ class Page(Webnote):
     def _get_nextpage(self):
         if self._store_nextpage:
             return self._store_nextpage
-
-        if settings.DEBUG:
-            print "--> webnote.Page._get_nextpage"
 
         nextpage = []
 
@@ -957,9 +880,6 @@ class Page(Webnote):
 
         if self._store_parent:
             return self._store_parent
-
-        if settings.DEBUG:
-            print "--> webnote.Page._get_parent"
 
         link = ''
         text = ''
@@ -997,9 +917,6 @@ class Page(Webnote):
         if self._store_siblings:
             return self._store_siblings
 
-        if settings.DEBUG:
-            print "--> webnote.Page._get_siblings"
-
         sibs = []
         parent = self._get_parent_address()
         prefix = os.path.join(self.prefix, parent)
@@ -1015,9 +932,6 @@ class Page(Webnote):
 
         if not self.paired_directory:
             return None
-
-        if settings.DEBUG:
-            print "--> webnote.Page._get_children"
 
         if self._store_children:
             return self._store_children
@@ -1066,9 +980,6 @@ class Page(Webnote):
 
     def _get_parent_address(self):
 
-        if settings.DEBUG:
-            print "--> webnote.Page._get_parent_address"
-            
         steps = self.address.split('/')
 
         if len(steps) > 1:
@@ -1211,9 +1122,6 @@ class Metadata():
         Initialise with a file pathname.
         """
 
-        if settings.DEBUG:
-            print "--> webnote.Metadata.__init__"
-
         self.pagefile = pagefile
         self.prefix = prefix
 
@@ -1233,9 +1141,6 @@ class Metadata():
         """Replace the contents of the meta file with items data.
         """
 
-        if settings.DEBUG:
-            print "--> webnote.Metadata.save"
-
         self.construct_metafile()
 
         return True
@@ -1245,9 +1150,6 @@ class Metadata():
 
         This is often used with POST data.
         """
-
-        if setting.DEBUG:
-            print "--> webnote.Metadata.update_metadata"
 
         return True
 
@@ -1279,9 +1181,6 @@ class Metadata():
         -   metafile in the meta directory.
         """
 
-        if settings.DEBUG:
-            print "--> webnote.Metadata._locate_metafile"
-
         (basename, ext) = os.path.splitext(self.pagefile)
         
         filename = basename + '.meta'
@@ -1310,8 +1209,6 @@ class Metadata():
 
         Open and read the file, parse the contents into a metadata structure.
         """
-        if settings.DEBUG:
-            print "--> webnote.Metadata._read_metafile"
 
         record = [('filename', self.metafilename)]
 
