@@ -184,9 +184,6 @@ class Directory(Webnote):
         tilde.
         """
 
-        if settings.DEBUG:
-            print "--> webnote.Directory.parse_directory"
-
         if not os.path.isdir(directory):
             raise self.ParseDirNotFound(directory)
 
@@ -255,9 +252,6 @@ class Directory(Webnote):
     docs = property(_get_docs)
 
     def _get_figs(self):
-
-        if settings.DEBUG:
-            print "--> webnote.Directory._get_figs"
         if self.model['figs']:
             return self.model['figs']
         return []
@@ -1180,6 +1174,7 @@ class Metadata():
         -   metafile in the parent directory.
         -   metafile in the meta directory.
         """
+
 
         (basename, ext) = os.path.splitext(self.pagefile)
         
