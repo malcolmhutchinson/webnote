@@ -1161,9 +1161,6 @@ class Metadata():
         """
         metarecord = ''
 
-        #for item in self.metadata:
-        #    print item
-        
         return metarecord
 
     def _locate_metafile(self):
