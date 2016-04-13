@@ -76,24 +76,26 @@ class Webnote():
 
             if self.figs:
                 figures = self.figs
-            else:
+            elif directory:
                 d = Directory(directory)
                 figures = d.figs
 
-        for figure in figures:
-            link = os.path.join(prefix, figure)
-            caption = figure
-            unref.append((link, caption))
+        if figures:
 
-        for match in result:
-            (link, html) = self._figure_html(match, prefix)
-            output = output.replace(match, html)
+            for figure in figures:
+                link = os.path.join(prefix, figure)
+                caption = figure
+                unref.append((link, caption))
 
-            links.append(link)
+            for match in result:
+                (link, html) = self._figure_html(match, prefix)
+                output = output.replace(match, html)
 
-            for fig in unref:
-                if fig[1] == link[0]:
-                    unref.pop(unref.index(fig))
+                links.append(link)
+
+                for fig in unref:
+                    if fig[1] == link[0]:
+                        unref.pop(unref.index(fig))
 
         return output, unref
 
