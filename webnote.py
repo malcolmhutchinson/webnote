@@ -13,6 +13,10 @@ The Metadata class performs all functions on a page's metadata,
 including locating files, reading them into memory structures, and
 providing standard outputs.
 
+The reference_figures() method in the parent class will return a text
+string with figure references replaces with HTML IMG code linking the
+inline image files in a given directory.
+
 """
 
 import csv
@@ -479,6 +483,15 @@ class Page(Webnote):
     pages, and any images referred to in the text, will be found. . It
     may also have a metadata file associated with it.
 
+
+    ### Usage
+
+        webnote.Page(docroot, address=None, prefix=None)
+
+    Initialise with a docroot string, pointing to the root directory
+    for an archive. If no address is supplied, it will look for a page
+    called 'index'.
+
     Provides the following attributes:
 
         title      A computed title for the page.
@@ -490,7 +503,7 @@ class Page(Webnote):
         children   List of link tuples to pages in the paired directory.
 
     A link tuple has the form (link, text), and is intended to go into
-    a Django template like this:
+    a template like this:
 
         <a href ='{{ link }}'>{{ text }}</a>
 
@@ -526,7 +539,7 @@ class Page(Webnote):
 
     warnings = []
 
-    def __init__(self, docroot, address=None, prefix=None):
+    def __init__(self, docroot, address=None, prefix=None, staticroot=None):
         """Instantiating without an address will return the index file.
 
         Do the minimum necessary computations.
@@ -560,6 +573,8 @@ class Page(Webnote):
         self.address = address
         if address and address[-1] == '/':
             self.address = address[:-1]
+
+        self.staticroot = staticroot
 
         if prefix:
             self.prefix = prefix
@@ -781,6 +796,7 @@ class Page(Webnote):
         empty string.
 
         """
+
         if not self.filename:
             return ''
             
@@ -791,7 +807,9 @@ class Page(Webnote):
         (basename, ext) = os.path.splitext(self.filename)
 
         source = content
-        prefix = os.path.join('/static', self.address)
+        print "HERE", self.staticroot
+        
+        prefix = os.path.join(self.staticroot, self.address)
         figures = None
 
         if self.paired_directory:
@@ -828,6 +846,7 @@ class Page(Webnote):
         attribute, which can set the content global is called first.
 
         """
+
 
         if self._store_unref_figs:
             return self._store_unref_figs
