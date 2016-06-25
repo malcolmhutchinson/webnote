@@ -807,7 +807,6 @@ class Page(Webnote):
         (basename, ext) = os.path.splitext(self.filename)
 
         source = content
-        print "HERE", self.staticroot
         
         prefix = os.path.join(self.staticroot, self.address)
         figures = None

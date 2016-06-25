@@ -59,6 +59,24 @@ DC_ELEMENTS = (
     'DC.Type',
 )
 
+dc_metadata = {
+    "dc.title": [],
+    "dc.creator": [],
+    "dc.subject": [],
+    "dc.description": [],
+    "dc.contributor": [],
+    "dc.coverage": [],
+    "dc.date": [],
+    "dc.type": [],
+    "dc.format": [],
+    "dc.source": [],
+    "dc.language": [],
+    "dc.relation": [],
+    "dc.identifier": [],
+    "dc.rights": [],
+    "dc.publisher": [],
+}
+
 CONTROL_ELEMENTS = (
     'sort-reverse',
     'allow',
@@ -112,8 +130,10 @@ SUFFIX = {
     'text': ('.txt', '.mkd',),
 }
 SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html']
+
 SUFFIX['microsoft_office'] = (
     SUFFIX['ms_access'] + SUFFIX['ms_excel'] + SUFFIX['ms_word'] )
+
 SUFFIX['opendocument'] = (
     SUFFIX['opendoc_base'] +  SUFFIX['opendoc_formulae'] +
     SUFFIX['opendoc_graphics'] +  SUFFIX['opendoc_presentation'] +
@@ -188,20 +208,3 @@ CREATIVE_COMMONS = {
 LICENSES = {'unlicensed': ('', '')}
 LICENSES.update(CREATIVE_COMMONS)
 
-dc_metadata = {
-    "dc.title": [],
-    "dc.creator": [],
-    "dc.subject": [],
-    "dc.description": [],
-    "dc.contributor": [],
-    "dc.coverage": [],
-    "dc.date": [],
-    "dc.type": [],
-    "dc.format": [],
-    "dc.source": [],
-    "dc.language": [],
-    "dc.relation": [],
-    "dc.identifier": [],
-    "dc.rights": [],
-    "dc.publisher": [],
-}
