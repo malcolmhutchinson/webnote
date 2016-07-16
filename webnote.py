@@ -72,7 +72,7 @@ class Webnote():
         unref = []
         links = []
 
-        expression = r'\[\[.*\]\]'
+        expression = r'\[\[.*\]\]' # . = any character except newline.
         p = re.compile(expression)
         result = p.findall(source)
 
@@ -788,7 +788,7 @@ class Page(Webnote):
     def _get_content(self):
         """Compute the content string.
 
-        This will be returned a HTML code, either direct from an HTML
+        This will be returned as HTML code, either direct from an HTML
         page or as the product of parsing the contents of a text
         file.
 
@@ -843,9 +843,7 @@ class Page(Webnote):
         If calling content, the unref figs can be set global, and this
         will return that value. Likewise with the unref_figs
         attribute, which can set the content global is called first.
-
         """
-
 
         if self._store_unref_figs:
             return self._store_unref_figs
@@ -1298,7 +1296,7 @@ class Metadata():
     def _contributor(self):
         return '; '.join(self.metadata['dc.contibutor'])
 
-    contirbutor = property(_contributor)
+    contributor = property(_contributor)
 
     def _location(self):
         return ', '.join(self.metadata['dc.coverage'])
