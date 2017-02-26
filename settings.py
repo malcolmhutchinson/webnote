@@ -129,6 +129,7 @@ SUFFIX = {
 
     'text': ('.txt', '.mkd',),
 }
+
 SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html']
 
 SUFFIX['microsoft_office'] = (
@@ -139,6 +140,9 @@ SUFFIX['opendocument'] = (
     SUFFIX['opendoc_graphics'] +  SUFFIX['opendoc_presentation'] +
     SUFFIX['opendoc_spreadsheet'] +  SUFFIX['opendoc_writer']
     )
+
+SUFFIX['documents'] = (SUFFIX['docs'] + SUFFIX['microsoft_office'] +
+    SUFFIX['opendocument'])
 
 DOCTYPE = (
     ('letter', 'letter'),
