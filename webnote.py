@@ -24,7 +24,7 @@ import os
 import settings
 import re
 import cgi
-#import pypandoc
+
 import markdown2 as markdown
 
 
@@ -50,15 +50,36 @@ class Webnote():
 
         And the name of a directory in which to find the image files,
         return a copy of the text with figure/caption references
-        converted to valid html, and a list of unreferenced figures.
+        converted to a valid html div string, and a list of
+        unreferenced figures. The HTML structure looks like:
 
-        The prefix is appended to the <img src> attribute to complete
-        the link.
+            <div class='figure'>
+                <img src='prefix/image.jpg' alt='image.jpg' />
+                <p class='caption'>Anything following the first space
+                is a caption.</p>
+            </div>
+
+        The prefix is prepended to the <img src> attribute to complete
+        a working link.
 
         Optionally, the figures can be supplied as a list of filenames
         -- as found in the webnote parsed directory
-        structure['figures'] structure. Supplying this list will
-        suppress calling the parse_directory method.
+        structure['figures']. Supplying this list will suppress
+        calling the parse_directory method.
+
+        An alternative syntax is:
+
+            [[L:image.jpg Caption after first space...]]
+            [[R:image.jpg Caption after first space...]]
+
+        Making L/R: the first two characters will cause the output to
+        change to:
+
+            <div class='figure-left'> or
+            <div class='figure-right'>
+
+        ... as appropriate. You can style these to float left or right
+        as necessary.
 
         ### Unimplemented
 
@@ -72,7 +93,7 @@ class Webnote():
         unref = []
         links = []
 
-        expression = r'\[\[.*\]\]' # . = any character except newline.
+        expression = r'\[\[.*\]\]'
         p = re.compile(expression)
         result = p.findall(source)
 
@@ -116,27 +137,32 @@ class Webnote():
         content = match.replace('[[', '')
         content = content.replace(']]', '')
         content = content.strip()
+        divclass = 'figure'
 
         words = content.split(' ')
         filename = words.pop(0)
+
+        if filename[:2] == 'L:':
+            divclass = 'figure-left'
+            filename = filename[2:]
+
+        elif filename[:2] == 'R:':
+            divclass = 'figure-right'
+            filename = filename[2:]
 
         if prefix:
             filepath = os.path.join(prefix, filename)
         else:
             filepath = filename
 
-        caption = ''
-
-        for word in words:
-            caption += word + ' '
-
+        caption = ' '.join(words)
         caption = caption.strip()
         caption = cgi.escape(caption)
 
         link = (filename, caption)
         caption = caption.replace("'", "&#39;")
 
-        html = "<div class='figure'>\n"
+        html = "<div class='" + divclass + "'>\n"
         html += "    <img src='" + filepath + "' "
         html += "alt='" + filename + "' />\n"
         html += "    <p class='caption'>" + caption
@@ -145,7 +171,7 @@ class Webnote():
 
         return (link, html)
 
-            
+
 class Directory(Webnote):
     """Provide directory services.
 
@@ -316,9 +342,9 @@ class Directory(Webnote):
         last = steps.pop()
 
         name = last.replace('_', '')
-        
+
         return name
-    
+
     def link_all(self, prefix):
         """Return a list of (link, text) tuples identifying all files."""
 
@@ -451,7 +477,7 @@ class Directory(Webnote):
                 text = item
             else:
                 text = basename.replace('_', ' ')
-                
+
             targets.append((link, text))
 
         return targets
@@ -524,7 +550,7 @@ class Page(Webnote):
     filename = None
     filecontent = None
     unref_figs = None
-    
+
     # These are internal (link, text) tuples, and lists of same.
     _store_title = None
     _store_content = None
@@ -609,19 +635,18 @@ class Page(Webnote):
         Call the metadata object and update or create a metafile with
         the supplied data.
 
-        Return True if everything goes according to plan.        
+        Return True if everything goes according to plan.
 
         """
 
         self.filecontent = data['filecontent']
-        
+
         f = open(self.filename, 'w')
         f.write(data['filecontent'])
- 
+
         self.warnings.append("Saving file " + self.filename)
         self.metadata.save(data)
         return True
-        
 
     def _find_directories(self):
         """Find the parent and paired directory path names.
@@ -728,7 +753,7 @@ class Page(Webnote):
     def _get_link(self):
         if not self.filename:
             return ('', '')
-        
+
         link = os.path.join(self.prefix, self.address)
         text = os.path.basename(self.filename)
         (basename, ext) = os.path.splitext(text)
@@ -781,8 +806,6 @@ class Page(Webnote):
         else:
             return "Page title unknown"
 
-        #return self._store_title
-
     title = property(_get_title)
 
     def _get_content(self):
@@ -799,7 +822,7 @@ class Page(Webnote):
 
         if not self.filename:
             return ''
-            
+
         if self._store_content:
             return self._store_content
 
@@ -807,14 +830,14 @@ class Page(Webnote):
         (basename, ext) = os.path.splitext(self.filename)
 
         source = content
-        
+
         prefix = os.path.join(self.staticroot, self.address)
         figures = None
 
         if self.paired_directory:
             figures = self.paired_directory.figs
             directory = None
-            
+
         if ext in settings.SUFFIX['text']:
             if figures:
                 content, unref_figs = self.reference_figures(
@@ -822,7 +845,7 @@ class Page(Webnote):
                 self._store_unref_figs = unref_figs
 
             content = markdown.markdown(content)
-            
+
         else:
             content = self.filecontent
 
@@ -900,7 +923,7 @@ class Page(Webnote):
             prefix = self.prefix
 
         if self.address == 'index':
-            self._store_parent = (prefix , 'Index') 
+            self._store_parent = (prefix, 'Index')
             return self._store_parent
 
         steps = self.address.split('/')
@@ -952,7 +975,7 @@ class Page(Webnote):
             address = ''
         else:
             address = self.address
-            
+
         prefix = os.path.join(self.prefix, address)
         pages = self.paired_directory.link_pages(prefix)
         kids = []
@@ -961,8 +984,6 @@ class Page(Webnote):
                 pass
             else:
                 kids.append(page)
-        
-        #kids = self.paired_directory.link_pages(prefix)
 
         self._store_children = kids
         return kids
@@ -971,7 +992,7 @@ class Page(Webnote):
 
     def _get_documents(self):
         """Return a list of the documents in the paired directory. """
- 
+
         if not self.paired_directory:
             return None
 
@@ -983,7 +1004,7 @@ class Page(Webnote):
             address = ''
         else:
             address = self.address
-            
+
         prefix = os.path.join(self.prefix, address)
         documents = self.paired_directory.link_docs(prefix)
         return documents
@@ -999,12 +1020,12 @@ class Page(Webnote):
         else:
             parent = []
 
-        parent = steps[:-1]    
+        parent = steps[:-1]
         parent = '/'.join(parent)
 
         if parent == 'index':
             parent = ''
-            
+
         return parent
 
     def get_form_data(self):
@@ -1017,11 +1038,10 @@ class Page(Webnote):
             'dc_date': self.metadata.date,
             'dc_subject': self.metadata.subject,
             'dc_description': self.metadata.description,
-            #'dc_contributor': self.metadata.contributor,
+            'dc_contributor': self.metadata.contributor,
             'dc_coverage': self.metadata.location,
             'dc_rights': self.metadata.rights,
             'dc_source': self.metadata.source,
-            #'dc_type': self.metadata.type,
         }
 
         return data
@@ -1081,7 +1101,7 @@ class Metadata():
 
         metadata = {
             'dc_title': [],
-            ...  
+            ...
             'status': [],
             ...
         }
@@ -1122,11 +1142,10 @@ class Metadata():
     pagefile = None
     prefix = None
     metafilename = None
-    metarecord = None    # List of (key, value) tuples rep. the file.
-    metastructure = None # Dictionary containing metadata.
+    metarecord = None
+    metastructure = None
     metadata = None
     commands = None
-
 
     def __init__(self, pagefile, prefix=None):
         """Operations on metadata records.
@@ -1137,7 +1156,7 @@ class Metadata():
         self.pagefile = pagefile
         self.prefix = prefix
 
-        self.metadata =  self.dc_metadata.copy()
+        self.metadata = self.dc_metadata.copy()
         self.metadata.update(self.meta_commands)
 
         self.metafilename = self._locate_metafile()
@@ -1147,7 +1166,7 @@ class Metadata():
             self.metarecord = self._read_metafile()
 
         if self.metarecord:
-            (self.metadata, self.commands)  = self.process_metarecord()
+            (self.metadata, self.commands) = self.process_metarecord()
 
     def save(self, data):
         """Replace the contents of the meta file with items data.
@@ -1165,7 +1184,6 @@ class Metadata():
 
         return True
 
-            
     def construct_metafile(self):
         """Return a string containing a metadata record in text format.
 
@@ -1190,9 +1208,8 @@ class Metadata():
         -   metafile in the meta directory.
         """
 
-
         (basename, ext) = os.path.splitext(self.pagefile)
-        
+
         filename = basename + '.meta'
 
         if os.path.isfile(filename):
@@ -1250,9 +1267,9 @@ class Metadata():
 
         for element in settings.DC_ELEMENTS:
             metadata[element.lower()] = []
-        
+
         for line in self.metarecord:
-            
+
             if line[0].lower() in metadata.keys():
                 metadata[line[0].lower()].append(line[1])
 
@@ -1260,7 +1277,7 @@ class Metadata():
                 commands[line[0]] = line[1]
 
         return (metadata, commands)
-    
+
     def _title(self):
         return '\n'. join(self.metadata['dc.title'])
 
@@ -1276,7 +1293,7 @@ class Metadata():
             return self.metadata['dc.date'][0]
         else:
             return ""
-        
+
     date = property(_date)
 
     def _subject(self):
@@ -1312,5 +1329,3 @@ class Metadata():
         return '; '.join(self.metadata['dc.source'])
 
     source = property(_source)
-
-
