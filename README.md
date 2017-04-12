@@ -1,12 +1,6 @@
 The simple syntax
 =================
 
-    Opened  2015-04-03
-    Updated 2015-05-19 
-            2015-07-13
-            2015-10-28
-            2017-04-13
-
 The simple syntax is a way of organising files and folders within a
 directory structure, such that text and html documents can be used to
 index collections of pages and image files. It employs the
@@ -401,7 +395,7 @@ There are four classes:
 
 2.  The 'Directory' class, subclasses `Webnote`. This scans a given
     directory, providing for lists of files by type, and giving access
-    to the `reference_figrues()` method from the parent class.
+    to the `reference_figures()` method from the parent class.
 
 3.  The `Page` class, which provides all the methods associated with
     displaying a page, including computing parent and sibling pages,
