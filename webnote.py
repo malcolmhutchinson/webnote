@@ -14,7 +14,7 @@ including locating files, reading them into memory structures, and
 providing standard outputs.
 
 The reference_figures() method in the parent class will return a text
-string with figure references replaces with HTML IMG code linking the
+string with figure references replaced with HTML IMG code linking the
 inline image files in a given directory.
 
 """
