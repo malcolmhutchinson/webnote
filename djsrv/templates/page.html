@@ -1,0 +1,20 @@
+{% extends 'framework.html' %}{% block main %}{% load staticfiles %} 
+
+<div id='pagecontent'>
+
+{{ page.content|safe }}
+
+</div>
+
+
+
+
+<ol>
+{% for child in page.children %}
+
+    <li><a href='{{ child.0 }}'>{{ child.1 }}</a></li>
+
+
+{% endfor %}
+</ol>
+{% endblock %}

@@ -1,0 +1,22 @@
+{% extends 'framework.html' %}{% block main %}{% load staticfiles %} 
+<h1>{{ h1 }}</h1>
+
+
+
+
+
+<h1>Webnote server at <tt>{{ hostname }}</tt></h1>
+
+
+
+<p><b>username</b>: {{ HOST_DATA.username }}<br />
+  <b>web folder</b>: {{ HOST_DATA.userdir }}</p>
+
+{{ index.clean_name }}
+
+<ol>
+{% for page in index.list_pages %}
+    <li><a href='{{ page.0 }}'>{{ page.1 }}</a></li>
+{% endfor %}
+</ol>
+{% endblock %}
