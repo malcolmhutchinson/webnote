@@ -125,7 +125,7 @@ SUFFIX = {
     'opendoc_writer': ('.odt', '.fodt', ),
 
 
-    'text': ('.txt', '.mkd',),
+    'text': ('.txt', '.mkd', '.md'),
 }
 
 SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html']
