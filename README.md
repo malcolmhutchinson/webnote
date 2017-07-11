@@ -211,7 +211,6 @@ Will be rendered as
 
 ### Relationships
 
-- A page has a parent page.
 - A page exists in a parent directory.
 - A page may have a paired directory.
 - A page may have a metafile.
