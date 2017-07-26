@@ -26,7 +26,7 @@ https://en.wikipedia.org/wiki/List_of_file_formats
 
 """
 
-DEBUG = True
+#DEBUG = True
 
 META = ('meta/', )
 
@@ -34,6 +34,8 @@ THUMBNAILS = (
     'px128/',
     'thb',
 )
+
+STATIC_URL = '/static'
 
 INDEX_depreciated = {
     'filename': 'filename',
@@ -84,6 +86,7 @@ CONTROL_ELEMENTS = (
     'status',
 )
 
+# Just because a suffix is here doesn't mean we do anything with it.
 SUFFIX = {
     'archive': ('.gz', '.tar', '.zip',),
     'audio': ('.flac', '.mp2', '.mp3', '.wav', '.wma',),

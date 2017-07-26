@@ -56,6 +56,8 @@ class Page(Webnote):
     docroot = None
     address = None
     prefix = None
+    figs = None
+    metadata = None
 
     parent_dirname = None
     paired_dirname = None
@@ -83,7 +85,7 @@ class Page(Webnote):
 
     warnings = []
 
-    def __init__(self, docroot, address=None, prefix='/', staticroot=''):
+    def __init__(self, docroot, address=None, prefix=None, staticroot=None):
         """Instantiating without an address will return the index file.
 
         Do the minimum necessary computations.
@@ -92,6 +94,10 @@ class Page(Webnote):
         - Compute the addressed file & read it.
         - Compute the parent and paired directories.
         - Create a Metadata object.
+
+        The staticroot attirbute is used to override
+        settings.STATIC_URL. This string is prepended to urls in the
+        figures code.
 
         Special case: no address = docroot index.
 
@@ -118,13 +124,6 @@ class Page(Webnote):
         if address and address[-1] == '/':
             self.address = address[:-1]
 
-        self.staticroot = staticroot
-
-        if prefix:
-            self.prefix = prefix
-        else:
-            self.prefix = ''
-
         if not address:
             self.address = 'index'
             self.paired_dirname = docroot
@@ -133,6 +132,16 @@ class Page(Webnote):
             (self.paired_dirname,
              self.parent_dirname) = self._find_directories()
 
+        if prefix:
+            self.prefix = prefix
+        else:
+            self.prefix = '/'
+
+        if staticroot:
+            self.staticroot = staticroot
+        else:
+            self.staticroot = settings.STATIC_URL
+            
         self._parse_directories()
         self._read_target_file()
         self.link = self._get_link()
@@ -147,25 +156,19 @@ class Page(Webnote):
         def __str__(self):
             return repr(self.value)
 
-    def save(self, data):
-        """Replace the contents of the file with the supplied data.
+    class DocumentNotFound(Exception):
+        def __init__(self, value):
+            self.value = value
 
-        Call the metadata object and update or create a metafile with
-        the supplied data.
+        def __str__(self):
+            return repr(self.value)
 
-        Return True if everything goes according to plan.
 
-        """
+    def get_absolute_url(self):
+        return os.path.join(self.staticroot, self.docroot, self.address)
 
-        self.filecontent = data['filecontent']
-
-        f = open(self.filename, 'w')
-        f.write(data['filecontent'])
-
-        self.warnings.append("Saving file " + self.filename)
-        self.metadata.save(data)
-        return True
-
+    url = property(get_absolute_url)
+    
     def _find_directories(self):
         """Find the parent and paired directory path names.
 
@@ -326,76 +329,6 @@ class Page(Webnote):
 
     title = property(_get_title)
 
-    def content(self):
-        """Compute the content string.
-
-        This will be returned as HTML code, either direct from an HTML
-        page or as the product of parsing the contents of a text
-        file.
-
-        If no file is found, or it is otherwise unreadable, return an
-        empty string.
-
-        """
-
-        if not self.filename:
-            return ''
-
-        if self._store_content:
-            return self._store_content
-
-        content = self.filecontent
-        (basename, ext) = os.path.splitext(self.filename)
-
-        source = content
-
-        prefix = os.path.join(self.staticroot, self.address)
-        figures = None
-
-        if self.paired_directory:
-            figures = self.paired_directory.get_figs()
-            directory = None
-
-        if ext in settings.SUFFIX['text']:
-            if figures:
-                content, unref_figs = self.reference_figures(
-                    source, prefix, figures=figures)
-                self._store_unref_figs = unref_figs
-
-            content = markdown.markdown(content)
-
-        else:
-            content = self.filecontent
-
-        self._store_content = content
-
-        return content
-
-    #content = property(_get_content)
-
-    def _get_unref_figs(self):
-        """List of (link, text) tuples representing unreferenced figures.
-
-        Unreferenced figures are computed by the
-        Webnote.reference_figures module, which takes a long string, a
-        directory prefix and returns the modified text (which would be
-        part of content) and the list of unreferenced figures.
-
-        If calling content, the unref figs can be set global, and this
-        will return that value. Likewise with the unref_figs
-        attribute, which can set the content global is called first.
-        """
-
-        if self._store_unref_figs:
-            return self._store_unref_figs
-
-        # This just calls the _get_content() method, and does nothing
-        # with the content value.
-        content = self.content
-        return self._store_unref_figs
-
-    unref_figs = property(_get_unref_figs)
-
     def _get_previous(self):
         if self._store_previous:
             return self._store_previous
@@ -460,54 +393,6 @@ class Page(Webnote):
 
     parent = property(_get_parent)
 
-    def _get_siblings(self):
-        """Return a list of (link, text) tuples identifying siblings.
-
-        Siblings are pages in the parent directory -- that is, the
-        direcotry the target page is in.
-        """
-
-        if self._store_siblings:
-            return self._store_siblings
-
-        sibs = []
-        parent = self._get_parent_address()
-        prefix = os.path.join(self.prefix, parent)
-        sibs = self.parent_directory.link_pages(prefix)
-
-        self._store_siblings = sibs
-        return sibs
-
-    siblings = property(_get_siblings)
-
-    def _get_children(self):
-        """Return a list of (link, text) tuples identifying children."""
-
-        if not self.paired_directory:
-            return None
-
-        if self._store_children:
-            return self._store_children
-
-        if self.address == 'index':
-            address = ''
-        else:
-            address = self.address
-
-        prefix = os.path.join(self.prefix, address)
-        pages = self.paired_directory.link_pages(prefix)
-        kids = []
-        for page in pages:
-            if page[1] == 'index':
-                pass
-            else:
-                kids.append(page)
-
-        self._store_children = kids
-        return kids
-
-    children = property(_get_children)
-
     def _get_documents(self):
         """Return a list of the documents in the paired directory. """
 
@@ -546,7 +431,80 @@ class Page(Webnote):
 
         return parent
 
-    def get_form_data(self):
+    def children(self, prefix=None):
+        """Return a list of (link, text) tuples identifying children."""
+
+        if not self.paired_directory:
+            return None
+
+        if self._store_children:
+            return self._store_children
+
+        if self.address == 'index':
+            address = ''
+        else:
+            address = self.address
+
+        if not prefix:
+            prefix = os.path.join(self.prefix, address)
+
+        pages = self.paired_directory.link_pages(prefix)
+        kids = []
+        for page in pages:
+            if page[1] == 'index':
+                pass
+            else:
+                kids.append(page)
+
+        self._store_children = kids
+        return kids
+
+    def content(self):
+        """Compute the content string.
+
+        This will be returned as HTML code, either direct from an HTML
+        page or as the product of parsing the contents of a text
+        file.
+
+        If no file is found, or it is otherwise unreadable, return an
+        empty string.
+
+        """
+
+        if not self.filename:
+            return ''
+
+        if self._store_content:
+            return self._store_content
+
+        content = self.filecontent
+        (basename, ext) = os.path.splitext(self.filename)
+
+        source = content
+
+        prefix = os.path.join(self.staticroot, self.address)
+        figures = None
+
+        if self.paired_directory:
+            figures = self.paired_directory.get_figs()
+            directory = None
+
+        if ext in settings.SUFFIX['text']:
+            if figures:
+                content, unref_figs = self.reference_figures(
+                    source, prefix, figures=figures)
+                self._store_unref_figs = unref_figs
+
+            content = markdown.markdown(content)
+
+        else:
+            content = self.filecontent
+
+        self._store_content = content
+
+        return content
+
+    def form_data(self):
         """Return a dictionary suitable for populating the page forms."""
 
         data = {
@@ -563,3 +521,77 @@ class Page(Webnote):
         }
 
         return data
+
+    def save(self, data):
+        """Replace the contents of the file with the supplied data.
+
+        Call the metadata object and update or create a metafile with
+        the supplied data.
+
+        The attribute data is a dictionary:
+
+        {
+            'filecontent': string,
+            'metadata': metadata object,
+        }
+
+        Return True if everything goes according to plan.
+
+        """
+
+        self.filecontent = data['filecontent']
+        self.metadata = data['metadata']
+
+        f = open(self.filename, 'w')
+        f.write(data['filecontent'])
+
+        self.warnings.append("Saving file " + self.filename)
+        self.metadata.save(data)
+        return True
+
+    def siblings(self, prefix=None):
+        """Return a list of (link, text) tuples identifying siblings.
+
+        Siblings are pages in the parent directory -- that is, the
+        direcotry the target page is in.
+        """
+
+        if self._store_siblings:
+            return self._store_siblings
+
+        sibs = []
+        parent = self._get_parent_address()
+        if not prefix:
+            prefix = os.path.join(self.prefix, parent)
+
+        sibs = self.parent_directory.link_pages(prefix)
+
+        self._store_siblings = sibs
+        return sibs
+
+    def unref_figs(self):
+        """List of (link, text) tuples representing unreferenced figures.
+
+        Unreferenced figures are computed by the
+        Webnote.reference_figures module, which takes a long string, a
+        url prefix and returns the modified text (which would be part
+        of content) and the list of unreferenced figures.
+
+        If calling content, the unref figs can be set global, and this
+        will return that value. Likewise with the unref_figs
+        attribute, which can set the content global is called first.
+
+        """
+
+        if self._store_unref_figs:
+            return self._store_unref_figs
+
+        # This just calls the _get_content() method, and does nothing
+        # with the content value.
+        content = self.content()
+        return self._store_unref_figs
+
+
+
+
+

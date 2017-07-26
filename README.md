@@ -3,7 +3,7 @@ Malcolm's webnote project
 
 This is a collection of Python classes designed to analyse the
 contents of a filesystem for text documents, and return structures
-such that the documenrs can be easily displayed by a web server, and
+such that the documents can be easily displayed by a web server, and
 linked with other documents within the filesystem.
 
 It implements a simple filesystem syntax inspired by Dave Gruber's
@@ -11,7 +11,6 @@ Markdown, a syntax permitting easy writing for the web. The idea was
 to expand markdown to include structuring collections of documents in
 a filesystem of folders and subfolders, and using software in a
 webserver to index them and provide links between them.
-
 
 The simple syntax provides for a set of predictable filenames which
 are human- and machine-readable, and which relate text or html
@@ -39,11 +38,26 @@ A full description of the simple syntax can be found in the
 This repository contains Python classes for analysing directory
 structures for readable files, inline images and metadata. It also
 includes a Django project as a test implementation. The code files for
-these two components are separated within the rot directory into
+these two components are separated within the root directory into
 `webnote/` and `djsrv/` respectively.
 
 
 Further information is available in the [project wiki](https://github.com/malcolmhutchinson/webnote/wiki).
 
 
+Installation
+------------
 
+The webnote software can be used in Python programs without a Django
+installation. If this is your case, reading the
+[Webnote architecture wiki](https://github.com/malcolmhutchinson/webnote/wiki/Webnote-architecture)
+will explain how the various components can be used. The Python source
+files for webnote classes are contained in the `webnote` folder.
+
+Files for the sample Django implementation are held in the `djsrv`
+folder.
+
+If you are unfamiliar with Django, I recommend following the
+[Django tutorial](https://docs.djangoproject.com/en/dev/intro/tutorial01/).
+
+You will have to put the webnote package onto your path.

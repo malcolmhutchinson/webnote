@@ -15,16 +15,22 @@ class Directory(Webnote):
     tuples. Has property attributes to provide lists of figures,
     hi-res images, documents and other files by type.
 
+    The attribute prefix is used to construct urls.
+
     """
 
     directory = None
     model = None
+    prefix = None
     sort = None
 
-    def __init__(self, directory, sort=True):
+    def __init__(self, directory, prefix=None, sort=True):
 
         if not os.path.isdir(directory):
             raise self.ParseDirNotFound(directory)
+
+        if prefix:
+            self.prefix = prefix
 
         self.directory = directory
         self.sort = sort
@@ -94,49 +100,10 @@ class Directory(Webnote):
 
         return output
 
-    def get_link(self):
-        return self.directory
-
-    def get_all_files(self):
-        return self.model['all']
-
-    def get_data(self):
-        return self.model['data']
-
-    def get_dirs(self):
-        return self.model['dirs']
-
-    def get_docs(self):
-        return self.model['docs']
-
     def get_figs(self):
         if self.model['figs']:
             return self.model['figs']
         return []
-
-    def get_hidden(self):
-        return self.model['hidden']
-
-    def get_html(self):
-        return self.model['html']
-
-    def get_image(self):
-        return self.model['image']
-
-    def get_meta(self):
-        return self.model['meta']
-
-    def get_temp(self):
-        return self.model['temp']
-
-    def get_text(self):
-        return self.model['text']
-
-    def get_pages(self):
-        return self.model['page']
-
-    def get_unknown(self):
-        return self.model['unknown']
 
     def link_self(self, prefix):
 
@@ -292,10 +259,16 @@ class Directory(Webnote):
 
         return targets
 
-    def list_pages(self, prefix='', suffix=False):
+    def list_pages(self, prefix=None, suffix=False):
         """Return a list of (link, text) tuples identifying page files."""
 
         targets = []
+
+        if not prefix:
+            if self.prefix:
+                prefix = self.prefix
+            else:
+                prefix = ''
 
         for item in self.model['page']:
             (basename, ext) = os.path.splitext(item)
