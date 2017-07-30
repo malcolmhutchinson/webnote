@@ -1,22 +1,40 @@
 {% extends 'framework.html' %}{% block main %}{% load staticfiles %} 
+<div id='pagecontent'>
 <h1>{{ h1 }}</h1>
 
 
 
 
 
-<h1>Webnote server at <tt>{{ hostname }}</tt></h1>
+<h1>Webnote server at <tt>{{ HOST_DATA.hostname }}</tt></h1>
 
 
 
 <p><b>username</b>: {{ HOST_DATA.username }}<br />
   <b>web folder</b>: {{ HOST_DATA.userdir }}</p>
 
-{{ index.clean_name }}
-
+<h2>Home directory for {{ HOST_DATA.username }}</h2>
 <ol>
-{% for page in index.list_pages %}
+{% for page in index.pages %}
     <li><a href='{{ page.0 }}'>{{ page.1 }}</a></li>
 {% endfor %}
 </ol>
+
+<h2>Archives</h2>
+
+<ol>
+{% for item in archives %}
+    <li><a href='{{ item.0 }}'>{{ item.1 }}</a></li>
+{% endfor %}
+</ol>
+
+<h2>Home directories</h2>
+
+<ol>
+{% for item in userspaces %}
+    <li><a href='{{ item.0 }}'>{{ item.1 }}</a></li>
+{% endfor %}
+</ol>
+
+</div>
 {% endblock %}

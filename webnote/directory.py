@@ -243,10 +243,6 @@ class Directory(Webnote):
 
         return targets
 
-    def link_pages(self, prefix, suffix=False):
-        """DEPRECIATED"""
-        return self.list_pages(prefix, suffix)
-
     def link_unknown(self, prefix):
         """Return a list of (link, text) tuples identifying  files."""
 
@@ -259,7 +255,7 @@ class Directory(Webnote):
 
         return targets
 
-    def list_pages(self, prefix=None, suffix=False):
+    def pages(self, prefix=None, suffix=False):
         """Return a list of (link, text) tuples identifying page files."""
 
         targets = []

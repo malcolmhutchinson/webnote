@@ -75,8 +75,6 @@ class Page(Webnote):
     _store_content = None
     _store_parent = None
     _store_files = None
-    _store_children = None
-    _store_siblings = None
     _store_unref_figs = None
     _store_documents = None
 
@@ -109,6 +107,9 @@ class Page(Webnote):
 
         """
 
+        if not docroot:
+            raise self.DocrootNotFound(docroot)
+
         if not os.path.isdir(docroot):
             raise self.DocrootNotFound(docroot)
 
@@ -119,16 +120,17 @@ class Page(Webnote):
             self.docroot = docroot + '/'
 
         self.address = address
-        if address and address[-1] == '/':
-            self.address = address[:-1]
 
-        if not address:
-            self.address = 'index'
-            self.paired_dirname = docroot
-            self.parent_dirname = docroot
-        else:
+        if address:
             (self.paired_dirname,
              self.parent_dirname) = self._find_directories()
+            if address[-1] == '/':
+                self.address = address[:-1]
+            #if docroot in address:
+            #    self.address = address.replace(docroot, '')
+        else:
+            self.paired_dirname = docroot
+            self.parent_dirname = docroot
 
         if prefix:
             self.prefix = prefix
@@ -227,8 +229,14 @@ class Page(Webnote):
             self.filecontent = f.read()
             self.filename = filename
         except IOError:
-            self.warnings.append('Page not found: ' + self.address)
+            if self.address:
+                self.warnings.append('Page not found: ' + self.address)
+            else:
+                self.warnings.append('Index page not found.')
+            return False
 
+        return True
+            
     def _find_file(self):
         """Find the page file.
 
@@ -258,7 +266,7 @@ class Page(Webnote):
         pagename = address.split('/')[-1]
 
         if self.parent_directory:
-            for item in self.parent_directory.list_pages():
+            for item in self.parent_directory.pages():
 
                 (basename, ext) = os.path.splitext(item[1])
                 if (basename == pagename and
@@ -278,59 +286,66 @@ class Page(Webnote):
         (basename, ext) = os.path.splitext(text)
         return (link, basename)
 
-    def _breadcrumbs(self):
+    def _get_parent_address(self):
 
+        if self.address:
+
+            steps = self.address.split('/')
+  
+            if len(steps) > 1:
+                parent = steps[:-1]
+            else:
+                parent = []
+
+            parent = steps[:-1]
+            parent = '/'.join(parent)
+
+            if parent == 'index':
+                parent = ''
+
+            return parent
+
+        return ''
+
+    def breadcrumbs(self):
+        """A list of (link, text) tuples climbing back up the hierachy."""
+        
         crumbs = []
         link = self.prefix
         text = self.prefix.replace('/', '')
-        crumbs.append((link, text))
+        #crumbs.append((link, text))
 
-        steps = self.address.split('/')
+        if self.address:
+            address = self.address.replace(self.docroot, '')
+            steps = address.split('/')
+            crumbs.append((self.docroot, self.docroot))
+            print "ADDRESS", self.address
 
-        for item in steps:
-            link = os.path.join(link, item)
-            crumbs.append((link, item))
+            for item in steps:
+                link = os.path.join(link, item)
+                crumbs.append((link, item))
+
+        crumbs.append((self.previous()[0], 'prev'))
+        crumbs.append((self.nextpage()[0], 'next'))
 
         return crumbs
-
-    breadcrumbs = property(_breadcrumbs)
-
-    def _get_parent_address(self):
-
-        steps = self.address.split('/')
-
-        if len(steps) > 1:
-            parent = steps[:-1]
-        else:
-            parent = []
-
-        parent = steps[:-1]
-        parent = '/'.join(parent)
-
-        if parent == 'index':
-            parent = ''
-
-        return parent
 
     def children(self, prefix=None):
         """Return a list of (link, text) tuples identifying children."""
 
         if not self.paired_directory:
-            self.warnings.append('No paired directory')
             return None
 
-        if self._store_children:
-            return self._store_children
-
-        if self.address == 'index':
-            address = ''
-        else:
+        if self.address:
             address = self.address
+        else:
+            address = ''
 
         if not prefix:
             prefix = os.path.join(self.prefix, address)
 
-        pages = self.paired_directory.link_pages(prefix)
+        pages = self.paired_directory.pages(prefix)
+
         kids = []
         for page in pages:
             if page[1] == 'index':
@@ -338,7 +353,6 @@ class Page(Webnote):
             else:
                 kids.append(page)
 
-        self._store_children = kids
         return kids
 
     def content(self):
@@ -349,17 +363,22 @@ class Page(Webnote):
         file.
 
         If no file is found, or it is otherwise unreadable, return an
-        empty string.
+        empty string. 
 
         """
 
+        if not self.address:
+            return "<h1>Index</h1>"
+
         if not self.filename:
-            return ''
+            
+            return "<h1>No file found</h1> <p>" + self.address + "</p>"
 
         if self._store_content:
             return self._store_content
 
         content = self.filecontent
+
         (basename, ext) = os.path.splitext(self.filename)
 
         source = content
@@ -396,7 +415,7 @@ class Page(Webnote):
             return self._store_documents
 
         documents = []
-        if self.address == 'index':
+        if not self.address:
             address = ''
         else:
             address = self.address
@@ -425,7 +444,11 @@ class Page(Webnote):
 
     def nextpage(self):
 
-        nextpage = ()
+        link = ''
+        text = "the next pages isn't named yet"
+
+        nextpage = (link, text)
+
 
         return nextpage
 
@@ -448,7 +471,7 @@ class Page(Webnote):
         if self.prefix:
             prefix = self.prefix
 
-        if self.address == 'index':
+        if not self.address:
             self._store_parent = (prefix, 'Index')
             return self._store_parent
 
@@ -469,7 +492,7 @@ class Page(Webnote):
     def previous(self):
 
         link = ''
-        text = ''
+        text = "The previous page has no name"
 
         previous = (link, text)
 
@@ -509,17 +532,13 @@ class Page(Webnote):
         direcotry the target page is in.
         """
 
-        if self._store_siblings:
-            return self._store_siblings
-
         sibs = []
         parent = self._get_parent_address()
         if not prefix:
             prefix = os.path.join(self.prefix, parent)
 
-        sibs = self.parent_directory.link_pages(prefix)
+        sibs = self.parent_directory.pages(prefix)
 
-        self._store_siblings = sibs
         return sibs
 
     def title(self):

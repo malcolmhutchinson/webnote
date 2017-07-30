@@ -1,19 +1,8 @@
 {% extends 'framework.html' %}{% block main %}{% load staticfiles %} 
 
-{% if page.warnings %}
-<div id='warnings'>
-
-
-    <ol>
-{% for warning in page.warnings %}
-        <li>{{ warning }}</li>
-{% endfor %}
-    </ol>
-
-</div>{% endif %}
 <div id='pagecontent'>
 
-{{ page.content|safe }}
+ {{ page.content|safe }}
 
 </div>
 

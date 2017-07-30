@@ -1,6 +1,18 @@
 <!-- nav_page.html -->
+{% if page.warnings %}
+<div id='warnings'>
+    <h3>Warnings</h3>
 
+    <ol>
+{% for warning in page.warnings %}
+        <li>{{ warning }}</li>
+{% endfor %}
+    </ol>
+
+</div>{% endif %}
   
+
+<div id='navcontent'>
 
     <h3>parent</h3>
 
@@ -8,9 +20,6 @@
 
         <li><a href='{{ page.parent.0 }}'>{{ page.parent.1 }}</a></li>
 
-        <li><a href='{{ page.previous.0 }}'>prev</a></li>
-
-        <li><a href='{{ page.nextpage.0 }}'>next</a></li>
 
     </ol>
 
@@ -44,5 +53,6 @@
         </tr>
 
     </table>
+</div>
 <!-- end nav_page.html -->
 
