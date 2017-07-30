@@ -14,10 +14,12 @@ import webnote
 
 ARCHIVES = [
     ('/srv/content/notes', "Collection at /srv/content/notes"),
+    ('/srv/content/intranet', "The old intranet"),
 ]
 
 def index(request):
-    """List the users on the host machine, and archives from a variable.
+    """List the users on the host machine, and archives from the ARCHIVES
+    variable.
 
     """
 
@@ -51,7 +53,7 @@ def index(request):
             'printer': 'css/print.css',
         },
 
-        'navtemplate': 'nav_page.html',
+        'navtemplate': None,
         'HOST_DATA': settings.HOST_DATA,
         'breadcrumbs': breadcrumbs,
 
@@ -65,9 +67,12 @@ def index(request):
 def page(request, url):
     """Display a requested page.."""
 
+    page = None
     template = 'page.html'
+    navtemplate = None
     docroot = None
     prefix = None
+    title = 'A page at some place' 
                            
     breadcrumbs = [
         ('/', 'HOME'),
@@ -99,11 +104,17 @@ def page(request, url):
                 docroot = archive[0]
                 address = '/' + url.replace(docroot, '')
 
-    print "STATS", docroot, address, prefix
-    page = webnote.page.Page(docroot, address=address, prefix=prefix)
+    print "DOCROOT", docroot
+    print "ADDRESS", address
+    print "PREFIX", prefix
 
-    title = 'A page at ' + page.title()
-    breadcrumbs.extend(page.breadcrumbs())
+    try:
+        page = webnote.page.Page(docroot, address=address, prefix=prefix)
+        title = page.title
+        breadcrumbs.extend(page.breadcrumbs())
+        nav_template = 'nav_page.html'
+    except webnote.page.Page.DocrootNotFound:
+        template = 'warning_NotArchive.html'   
     
     context = {
         'docroot': docroot,
@@ -120,7 +131,7 @@ def page(request, url):
         },
 
         'breadcrumbs': breadcrumbs,
-        'navtemplate': 'nav_page.html',
+        'navtemplate': navtemplate,
 
         'HOST_DATA': settings.HOST_DATA,
     }

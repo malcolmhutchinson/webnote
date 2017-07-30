@@ -319,7 +319,6 @@ class Page(Webnote):
             address = self.address.replace(self.docroot, '')
             steps = address.split('/')
             crumbs.append((self.docroot, self.docroot))
-            print "ADDRESS", self.address
 
             for item in steps:
                 link = os.path.join(link, item)

@@ -2,7 +2,7 @@
 """
 
 import os
-
+import settings
 
 class Metadata():
     """Provide services for dealing with metadata.
