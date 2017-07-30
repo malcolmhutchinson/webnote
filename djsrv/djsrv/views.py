@@ -30,7 +30,7 @@ def index(request):
         dirname = os.path.join('/home', user, 'www')
         if os.path.isdir(dirname):
             userspaces.append((user, user))
-            prefix = '/' + user
+            prefix = '/home/' + user
     
     template = 'index.html'
 
@@ -79,21 +79,24 @@ def page(request, url):
     ]
 
 #   Process the URL
-    bits = url.split('/')
     address = None
 
-    dirname = os.path.join('/home', bits[0], 'www')
+#   Process the url: is is a username?
+    bits = url.split('/')
 
-    if os.path.isdir(dirname):
-        docroot = dirname
-        prefix = '/' + bits[0]
-        if len(bits) == 1:
-            address = None
-        elif len(bits) > 1:
+    if bits[0] == 'home':
+        dirname = os.path.join('/home', bits[1], 'www')
+        if os.path.isdir(dirname):
+            docroot = dirname
             bits.pop(0)
-            address = '/'.join(bits)
-        print "BITS", bits
-
+            prefix = '/home/' + bits[0] 
+            if len(bits) == 1:
+                address = None
+            elif len(bits) > 1:
+                bits.pop(0)
+                address = '/'.join(bits)
+        
+#   Or is it in the ARCHIVES list?
     else:
         for archive in ARCHIVES:
             if '/' + url == archive[0]:
@@ -104,10 +107,11 @@ def page(request, url):
                 docroot = archive[0]
                 address = '/' + url.replace(docroot, '')
 
+
     print "DOCROOT", docroot
     print "ADDRESS", address
     print "PREFIX", prefix
-
+    
     try:
         page = webnote.page.Page(docroot, address=address, prefix=prefix)
         title = page.title

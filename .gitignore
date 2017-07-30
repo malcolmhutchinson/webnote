@@ -10,3 +10,5 @@
 *.PDF
 *.tif
 *.data
+djsrv/static/home/
+djsrv/static/srv/

@@ -81,3 +81,7 @@ a:hover {
     max-width: 50em;
     padding: 1em 2em 2em 2em;
 }
+
+.figure img {
+    max-width: 800px;
+}

@@ -126,8 +126,7 @@ class Page(Webnote):
              self.parent_dirname) = self._find_directories()
             if address[-1] == '/':
                 self.address = address[:-1]
-            #if docroot in address:
-            #    self.address = address.replace(docroot, '')
+
         else:
             self.paired_dirname = docroot
             self.parent_dirname = docroot
@@ -165,7 +164,11 @@ class Page(Webnote):
 
 
     def get_absolute_url(self):
-        return os.path.join(self.staticroot, self.docroot, self.address)
+        if self.address:
+            return os.path.join(self.prefix, self.address)
+
+        return self.prefix
+        
 
     url = property(get_absolute_url)
     
@@ -189,56 +192,8 @@ class Page(Webnote):
 
         return paired, parent
 
-    def _parse_directories(self):
-        """Create webnote directory structures for parent and paired dirs.
-
-        Set global variables with Directory objects.
-
-        Sets:
-
-            self.parent_directory as a webnote.Directory object.
-            self.paired_directory as a webnote.Directory object.
-
-        Depends on the self.parent_dirname and self.paired_dirname
-        directory pathnames having already been set.
-
-        """
-
-        try:
-            self.parent_directory = Directory(self.parent_dirname)
-        except Directory.ParseDirNotFound:
-            self.warnings.append(
-                'Parent directory not found: ' + self.parent_dirname)
-
-        if self.paired_dirname == self.parent_dirname:
-            self.paired_directory = self.parent_directory
-
-        else:
-            try:
-                self.paired_directory = Directory(self.paired_dirname)
-            except Directory.ParseDirNotFound:
-                self.warnings.append(
-                    'No paired directory.')
-
-    def _read_target_file(self):
-
-        filename = self._find_file()
-
-        try:
-            f = open(filename, 'r')
-            self.filecontent = f.read()
-            self.filename = filename
-        except IOError:
-            if self.address:
-                self.warnings.append('Page not found: ' + self.address)
-            else:
-                self.warnings.append('Index page not found.')
-            return False
-
-        return True
-            
     def _find_file(self):
-        """Find the page file.
+        """Find the page file, return a filename.
 
         Return a string containing the filename for the page requested
         by the address. This will first try looking for the address
@@ -277,6 +232,54 @@ class Page(Webnote):
 
         return filename
 
+    def _parse_directories(self):
+        """Create webnote directory structures for parent and paired dirs.
+
+        Set global variables with Directory objects.
+
+        Sets:
+
+            self.parent_directory as a webnote.Directory object.
+            self.paired_directory as a webnote.Directory object.
+
+        Depends on the self.parent_dirname and self.paired_dirname
+        directory pathnames having already been set.
+
+        """
+
+        try:
+            self.parent_directory = Directory(self.parent_dirname)
+        except Directory.ParseDirNotFound:
+            self.warnings.append(
+                'Parent directory not found: ' + self.parent_dirname)
+
+        if self.paired_dirname == self.parent_dirname:
+            self.paired_directory = self.parent_directory
+
+        else:
+            try:
+                self.paired_directory = Directory(self.paired_dirname)
+            except Directory.ParseDirNotFound:
+                self.warnings.append(
+                    'No paired directory.')
+            
+    def _read_target_file(self):
+
+        filename = self._find_file()
+
+        try:
+            f = open(filename, 'r')
+            self.filecontent = f.read()
+            self.filename = filename
+        except IOError:
+            if self.address:
+                self.warnings.append('Page not found: ' + self.address)
+            else:
+                self.warnings.append('Index page not found.')
+            return False
+
+        return True
+
     def _get_link(self):
         if not self.filename:
             return ('', '')
@@ -308,18 +311,16 @@ class Page(Webnote):
         return ''
 
     def breadcrumbs(self):
-        """A list of (link, text) tuples climbing back up the hierachy."""
+        """A list of (link, text) tuples climbing back up the hierachy.
+
+        Start with the prefix, then explode the address by slashes."""
         
-        crumbs = []
         link = self.prefix
-        text = self.prefix.replace('/', '')
-        #crumbs.append((link, text))
+        text = self.prefix
+        crumbs = [(link, text)]
 
         if self.address:
-            address = self.address.replace(self.docroot, '')
-            steps = address.split('/')
-            crumbs.append((self.docroot, self.docroot))
-
+            steps = self.address.split('/')
             for item in steps:
                 link = os.path.join(link, item)
                 crumbs.append((link, item))
@@ -382,9 +383,19 @@ class Page(Webnote):
 
         source = content
 
-        prefix = os.path.join(self.staticroot, self.address)
+        # prefix should be "/staic/home/malcolm"
+        prefix = self.prefix
+        if prefix[0] == '/':
+            prefix = self.prefix[1:]
+            
+        prefix = os.path.join(
+            self.staticroot, prefix, self.address)
         figures = None
 
+        #print "PREFIX", prefix
+        #print "self.address", self.address
+
+        
         if self.paired_directory:
             figures = self.paired_directory.get_figs()
             directory = None
