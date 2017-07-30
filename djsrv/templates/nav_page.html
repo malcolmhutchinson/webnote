@@ -1,3 +1,35 @@
+<!-- nav_page.html -->
+
+  
+
+    <h3>parent</h3>
+
+    <ol>
+
+        <li><a href='{{ page.parent.0 }}'>{{ page.parent.1 }}</a></li>
+
+        <li><a href='{{ page.previous.0 }}'>prev</a></li>
+
+        <li><a href='{{ page.nextpage.0 }}'>next</a></li>
+
+    </ol>
+
+    <h3>siblings</h3>
+
+        <ol>
+{% for item in page.siblings %}
+            <li><a href='{{ item.0 }}'>{{ item.1 }}</a></li>
+{% endfor %}
+        </ol>
+
+        <h3>children</h3>
+
+        <ol id='children'>
+{% for child in page.children %}
+            <li><a href='{{ child.0 }}'>{{ child.1 }}</a></li>
+{% endfor %}
+        </ol>
+
     <h3>metadata</h3>
 
     <table>
@@ -12,14 +44,5 @@
         </tr>
 
     </table>
-  
-
-
-    <h3>contents</h3>
-
-        <ol>
-{% for item in page.children %}
-
-{% endfor %}
-        </ol>
+<!-- end nav_page.html -->
 

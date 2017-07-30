@@ -1,20 +1,34 @@
 {% extends 'framework.html' %}{% block main %}{% load staticfiles %} 
 
+{% if page.warnings %}
+<div id='warnings'>
+
+
+    <ol>
+{% for warning in page.warnings %}
+        <li>{{ warning }}</li>
+{% endfor %}
+    </ol>
+
+</div>{% endif %}
 <div id='pagecontent'>
 
 {{ page.content|safe }}
 
 </div>
 
+{% if page.children %}
+<div id='contents'>
 
+    <h2>Contents</h2>
 
-
-<ol>
+    <ol>
 {% for child in page.children %}
-
-    <li><a href='{{ child.0 }}'>{{ child.1 }}</a></li>
-
-
+        <li><a href='{{ child.0 }}'>{{ child.1 }}</a></li>
 {% endfor %}
-</ol>
+    </ol>
+{% endif %}    
+</div>
 {% endblock %}
+
+

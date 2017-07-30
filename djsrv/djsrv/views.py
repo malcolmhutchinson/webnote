@@ -20,6 +20,10 @@ def index(request):
     title = "Webnote server at " + settings.HOST_DATA['hostname']
     index = webnote.directory.Directory(settings.HOST_DATA['userdir'])    
     
+    breadcrumbs = [
+        ('/webnote/', 'HOME'),
+    ]
+
     context = {
 
         'title': title,
@@ -33,6 +37,7 @@ def index(request):
 
         'navtemplate': 'nav_page.html',
         'HOST_DATA': settings.HOST_DATA,
+        'breadcrumbs': breadcrumbs,
     }
     
     return render(request, template, context)
@@ -47,7 +52,7 @@ def page(request, url):
     i = 0
     link = ''
     breadcrumbs = [
-        ('/', 'HOME'),
+        ('/webnote/', 'HOME'),
     ]
 
     for level in levels:
@@ -58,10 +63,12 @@ def page(request, url):
     page = webnote.page.Page(
         settings.HOST_DATA['userdir'],
         address=url,
+        prefix='/webnote'
     )
 
     title = 'A page at ' + page.title
 
+    print "HERE", breadcrumbs
     context = {
 
         'title': title,

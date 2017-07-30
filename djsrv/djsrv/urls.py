@@ -20,7 +20,7 @@ import views
 
 urlpatterns = [
 
-    url(r'^$', views.index, name='index'),
-    url(r"^(['\w/-]+)/$", views.page, name='page'),
+    url(r'^webnote/$', views.index, name='index'),
+    url(r"^webnote/(['\w/-]+)/$", views.page, name='page'),
     url(r'^admin/', admin.site.urls),
 ]
