@@ -98,15 +98,16 @@ def page(request, url):
         
 #   Or is it in the ARCHIVES list?
     else:
+        url = '/' + url
         for archive in ARCHIVES:
-            if '/' + url == archive[0]:
+            if url == archive[0]:
                 docroot = archive[0]
                 address = None
                 prefix = archive[0]
             elif archive[0] in '/' + url:
                 docroot = archive[0]
-                address = '/' + url.replace(docroot, '')
-
+                address = url.replace(docroot + '/', '')
+                prefix = archive[0]
 
     print "DOCROOT", docroot
     print "ADDRESS", address
@@ -116,7 +117,7 @@ def page(request, url):
         page = webnote.page.Page(docroot, address=address, prefix=prefix)
         title = page.title
         breadcrumbs.extend(page.breadcrumbs())
-        nav_template = 'nav_page.html'
+        navtemplate = 'nav_page.html'
     except webnote.page.Page.DocrootNotFound:
         template = 'warning_NotArchive.html'   
     
@@ -137,6 +138,7 @@ def page(request, url):
         'breadcrumbs': breadcrumbs,
         'navtemplate': navtemplate,
 
+        'archives': ARCHIVES,
         'HOST_DATA': settings.HOST_DATA,
     }
     
