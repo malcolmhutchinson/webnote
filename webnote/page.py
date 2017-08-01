@@ -199,7 +199,9 @@ class Page(Webnote):
         by the address. This will first try looking for the address
         with a lowercase extension in the SUFFIX['page'] list.
 
-        If not found there, scan the page files in the parent
+        If no file is found, try "index".[page suffix].
+
+        If not found there, scan all the page files in the parent
         directory for files with basename == address.
 
         """
@@ -209,7 +211,7 @@ class Page(Webnote):
         if self.address:
             address = self.address
 
-        # Check the suffixes
+#       Check the suffixes
         for item in settings.SUFFIX['page']:
             filename = os.path.join(self.docroot, address) + item
 
@@ -217,19 +219,16 @@ class Page(Webnote):
                 self.filename = filename
                 return filename
 
-        # Scan through the page files.
-        pagename = address.split('/')[-1]
-
+#       Scan through the page files.
         if self.parent_directory:
-            for item in self.parent_directory.pages():
+            for item in self.parent_directory.model['page']:
+                (basename, ext) = os.path.splitext(item)
+                if basename =='index':
+                    filename = os.path.join(self.docroot, address) + item
+                    print "FILENAME", filename
 
-                (basename, ext) = os.path.splitext(item[1])
-                if (basename == pagename and
-                        ext.lower() in settings.SUFFIX['page']):
-
-                    filename = os.path.join(self.parent_dirname, item)
                     return filename
-
+        
         return filename
 
     def _parse_directories(self):
@@ -284,7 +283,9 @@ class Page(Webnote):
         if not self.filename:
             return ('', '')
 
-        link = os.path.join(self.prefix, self.address)
+        link = self.prefix
+        if self.address:
+            link = os.path.join(self.prefix, self.address)
         text = os.path.basename(self.filename)
         (basename, ext) = os.path.splitext(text)
         return (link, basename)
@@ -367,8 +368,8 @@ class Page(Webnote):
 
         """
 
-        if not self.address:
-            return "<h1>Index</h1>"
+        #if not self.address:
+        #    return "<h1>Index</h1>"
 
         if not self.filename:
             
@@ -383,17 +384,19 @@ class Page(Webnote):
 
         source = content
 
-        # prefix should be "/staic/home/malcolm"
         prefix = self.prefix
         if prefix[0] == '/':
             prefix = self.prefix[1:]
+
             
-        prefix = os.path.join(
-            self.staticroot, prefix, self.address)
+        prefix = os.path.join(self.staticroot, prefix)
+        if self.address:
+            prefix = os.path.join(self.staticroot, prefix, self.address)
+
         figures = None
 
-        #print "PREFIX", prefix
-        #print "self.address", self.address
+        print "PREFIX", prefix
+        print "self.address", self.address
 
         
         if self.paired_directory:

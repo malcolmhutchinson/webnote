@@ -12,9 +12,18 @@ from django.shortcuts import render
 import settings
 import webnote
 
-ARCHIVES = [
+ARCHIVES2 = [
     ('/srv/content/notes', "Collection at /srv/content/notes"),
     ('/srv/content/intranet', "The old intranet"),
+    ('/srv/content/test', "Test archive"),
+]
+
+# New format (not implemented yet)
+# (url prefix, docroot, link text.
+ARCHIVES = [
+    ('/notes', '/srv/content/notes', "Collection at /srv/content/notes"),
+    ('/intranet', '/srv/content/intranet', "The old intranet"),
+    ('/test', '/srv/content/test', "Test archive"),
 ]
 
 def index(request):
@@ -101,12 +110,12 @@ def page(request, url):
         url = '/' + url
         for archive in ARCHIVES:
             if url == archive[0]:
-                docroot = archive[0]
+                docroot = archive[1]
                 address = None
                 prefix = archive[0]
-            elif archive[0] in '/' + url:
-                docroot = archive[0]
-                address = url.replace(docroot + '/', '')
+            elif archive[0] in url:
+                docroot = archive[1]
+                address = url.replace(archive[0] + '/', '')
                 prefix = archive[0]
 
     print "DOCROOT", docroot
