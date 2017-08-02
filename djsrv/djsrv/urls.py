@@ -21,6 +21,6 @@ import views
 urlpatterns = [
 
     url(r'^$', views.index, name='index'),
-    url(r"^(['\w/-]+)/$", views.page, name='page'),
+    url(r"^(['\.\w/-]+)/$", views.page, name='page'),
     url(r'^admin/', admin.site.urls),
 ]

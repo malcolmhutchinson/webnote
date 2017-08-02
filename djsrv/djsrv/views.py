@@ -38,7 +38,8 @@ def index(request):
     for user in os.listdir('/home'):
         dirname = os.path.join('/home', user, 'www')
         if os.path.isdir(dirname):
-            userspaces.append((user, user))
+            
+            userspaces.append(('/home/' + user, user))
             prefix = '/home/' + user
     
     template = 'index.html'
@@ -151,7 +152,7 @@ def page(request, url):
         'HOST_DATA': settings.HOST_DATA,
         
     }
-    
+
     return render(request, template, context)
 
 

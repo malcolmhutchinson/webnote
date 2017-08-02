@@ -9,15 +9,14 @@ class Metadata():
 
     This class knows all about the metadata files. Give it the
     pathname to a file and it will determine where the metafile is,
-    read it and return a dictionary of key/value pairs.
+    read it and return a list of key/value pairs.
 
-    It can also write a metadata file, given a list containing lines
-    to be written into the file. Each item in the list is a (key,
-    value) tuple.
+    It can also create a metafile for a new page, and guess the
+    contents of certain fields, like title, author, etc.
 
     A metadata record looks like this:
 
-        # Dublin Core metadata
+        # Dublin Core metadata record
         DC.Title:       Webnote
         DC.Creator:     Malcolm Hutchinson
         DC.Subject:     Filesystem syntax, information systems, Django, Python
@@ -30,7 +29,6 @@ class Metadata():
         DC.Source:
         DC.Language:    en
         DC.Identifier:
-        DC.Publisher:   archaeography.co.nz
         DC.Publisher:   Malcolm Hutchinson
         DC.Relation:
         DC.Rights:      cc-by
@@ -49,26 +47,39 @@ class Metadata():
     This class can read a file containing a record like this, and
     parse it into a metadata structure.
 
-    This file is represented by a list containing (key, value)
-    tuples. These are obtained by splitting each line at the colon,
-    and returning the first element as key, and a re-stitched list of
-    the rest as value.
+    The metadata file is represented by a list stored at
+    self.metarecord, containing (key, value) tuples. These are
+    obtained by splitting each line at the colon, and returning the
+    first element as key, and a re-stitched list of the rest as value.
 
-    The gist of the thing is a metastructure like this:
+    A metarecord structure looks like this:
 
-        metadata = {
-            'dc_title': [],
-            ...
-            'status': [],
-            ...
-        }
+    [
+        ('comment', ' Dublin Core metadata record\n')
+        ('DC.title', 'Webnote test data collection')
+        ('DC.creator', 'Hutchinson, M. G.')
+        ('DC.creator', 'Whyte, S. K.')
+        ('DC.subject', 'Simple syntax, test data')
+        ('DC.description', 'Index page to the test data set')
+        ('DC.contributor', '')
+        ('DC.coverage', 'Hamilton, New Zealand')
+        ('DC.date', '2015-11-29')
+        ('DC.type', 'Test data')
+        ('DC.format', 'text/html')
+        ('DC.source', '')
+        ('DC.language', 'en')
+        ('DC.identifier', '')
+        ('DC.publisher', 'archaeography.co.nz')
+        ('DC.publisher', 'Malcolm Hutchinson')
+        ('DC.relation', '')
+        ('DC.rights', 'cc-by')
+        ('comment', ' END DC metadata\n')
+    ]
 
-    These two variables are defined as a dictionary of DC elements,
-    and a list of commands.
 
     """
 
-    dc_metadata = {
+    DC_METADATA = {
         "dc.title": [],
         "dc.creator": [],
         "dc.subject": [],
@@ -79,14 +90,14 @@ class Metadata():
         "dc.type": [],
         "dc.format": [],
         "dc.source": [],
-        "dc.language": [],
+        "dc.language": ['en',],
         "dc.relation": [],
         "dc.identifier": [],
         "dc.rights": [],
         "dc.publisher": [],
     }
 
-    meta_commands = {
+    META_COMMANDS = {
         'status': [],
         'sort-reverse': [],
         'deny': [],
@@ -109,20 +120,61 @@ class Metadata():
         Initialise with a file pathname.
         """
 
+        self.metarecord = None
         self.pagefile = pagefile
-
-        self.metadata = self.dc_metadata.copy()
-        self.metadata.update(self.meta_commands)
-
-        self.metafilename = self._locate_metafile()
+        self.metafilename = self.locate_metafile()
 
         if self.metafilename:
-            self.metadata['filename'] = self.metafilename
-            self.metarecord = self._read_metafile()
+            self.metarecord = self.read_metafile()
 
-        if self.metarecord:
-            (self.metadata, self.commands) = self.process_metarecord()  
+        if not self.metarecord:
+            self.metarecord = self.construct_metarecord()
+    
+        (self.metadata, self.commands) = self.process_metarecord()  
 
+        
+    def construct_metafile(self, metarecord=None):
+        """Return a string containing a metadata record in text format.
+
+        A metafile is a string representation of a metarecord.
+
+        This produces a string containing a record suitable for fileing
+        with pages in the document archive. It is intended to be
+        written to a text file with a .meta suffix.
+
+        If the metadata structure is empty, as at init, the result
+        will be a file record with a list of keys, but no values.
+
+        """
+
+        if not metarecord:
+            metarecord = self.metarecord
+        
+        for line in metarecord:
+            print line
+
+        metafile = ''
+        return metafile
+        
+    def construct_metarecord(self):
+        """Return a metarecord object from filespace data.
+
+        A metarecord is a list of (key, value) tuples.
+        """
+        
+        metarecord = [
+            ('comment', 'Dublin core metadata record'),
+        ]
+
+        for line in self.DC_METADATA.keys():
+            metarecord.append((line, ''))
+
+        metarecord.append(
+            (('comment', 'Dublin core metadata record')),
+        )
+
+        return metarecord
+        
     def dublincore(self):
         """Return a list of DC metadata attribute names and values.
 
@@ -156,28 +208,16 @@ class Metadata():
 
         return True
 
-    def construct_metafile(self):
-        """Return a string containing a metadata record in text format.
-
-        This produces a string containing a record suitable for fileing
-        with pages in the document archive. It is intended to be
-        written to a text file with a .meta suffix.
-
-        If the metadata structure is empty, as at init, the result
-        will be a file record with a list of keys, but no values.
-
-        """
-        metarecord = ''
-
-        return metarecord
-
-    def _locate_metafile(self):
+    def locate_metafile(self):
         """Locate the metafile for the given address.
 
         This follows this process:
 
         -   metafile in the parent directory.
         -   metafile in the meta directory.
+        -   metafile in the paired directory.
+
+        Return None if no file found.
         """
 
         (basename, ext) = os.path.splitext(self.pagefile)
@@ -203,7 +243,7 @@ class Metadata():
 
         return None
 
-    def _read_metafile(self):
+    def read_metafile(self):
         """Return a metadata structure from the metafile filename.
 
         Open and read the file, parse the contents into a metadata structure.
@@ -235,7 +275,7 @@ class Metadata():
         """
 
         metadata = {}
-        commands = self.meta_commands
+        commands = self.META_COMMANDS
 
         for element in settings.DC_ELEMENTS:
             metadata[element.lower()] = []

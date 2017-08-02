@@ -373,8 +373,10 @@ class Page(Webnote):
         """
 
         if not self.filename:
-            return "<h1>No file found</h1> <p>" + self.address + "</p>"
-
+            if not self.address:
+                return "<h1>Index " + self.prefix + "</h1>"
+            return "<h1>No file found " + self.address + "</h1>"
+        
         if self._store_content:
             return self._store_content
 
@@ -564,7 +566,7 @@ class Page(Webnote):
         title = None
 
 #       Search the metarecord first.
-        if self.metadata.title():
+        if self.metadata:
             return self.metadata.title()
 
 #       Find the H1 line in the content string        

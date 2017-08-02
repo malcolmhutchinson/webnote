@@ -1,17 +1,4 @@
 <!-- nav_page.html -->
-{% if page.warnings %}
-<div id='warnings'>
-    <h3>Warnings</h3>
-
-    <ol>
-{% for warning in page.warnings %}
-        <li>{{ warning }}</li>
-{% endfor %}
-    </ol>
-
-</div>{% endif %}
-  
-
 <div id='navcontent'>
 
     <h3>parent</h3>
@@ -42,6 +29,10 @@
     <h3>DC metadata</h3>
 
     <table class='keypair'>
+        <tr>
+            <th>metafile</th>
+            <td>{{ page.metadata.metafilename }}</td>
+        </tr>
 {% for element in page.metadata.dublincore %}
         <tr>
             <th>{{ element.0 }}</th>
