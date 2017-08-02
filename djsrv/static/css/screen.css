@@ -22,6 +22,10 @@ a:hover {
     background: black;
 }
 
+th, td {
+    vertical-align: top;
+}
+
 #header {
     background: white;
     font-family: sans-serif;
@@ -80,9 +84,24 @@ a:hover {
     margin-right: auto;
     max-width: 50em;
     padding: 1em 2em 2em 2em;
+    border-top: 1px black solid;
 }
 
-.figure img {
+img {
     width: 100%;
     max-width: 800px;
+}
+.figure-right {
+    width: 40%;
+    float: right;
+    margin-left: 2em;
+}
+.figure-left {
+    width: 40%;
+    float: left;
+    margin-right: 2em;
+}
+
+.keypair th {
+    text-align: right;
 }

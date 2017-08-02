@@ -2,11 +2,13 @@
 """
 
 import os
+
+from bs4 import BeautifulSoup
 import markdown2 as markdown
 
 from directory import Directory
-import settings
 from metadata import Metadata
+import settings
 from webnote import Webnote
 
 
@@ -71,7 +73,6 @@ class Page(Webnote):
     unref_figs = None
 
     # These are internal (link, text) tuples, and lists of same.
-    _store_title = None
     _store_content = None
     _store_parent = None
     _store_files = None
@@ -225,8 +226,6 @@ class Page(Webnote):
                 (basename, ext) = os.path.splitext(item)
                 if basename =='index':
                     filename = os.path.join(self.docroot, address) + item
-                    print "FILENAME", filename
-
                     return filename
         
         return filename
@@ -366,13 +365,14 @@ class Page(Webnote):
         If no file is found, or it is otherwise unreadable, return an
         empty string. 
 
+        Computing the content necessarily computes unreferenced
+        figures, and vice-versa. To prevent duplication, the results
+        of the computation are stored, in store_content, and
+        store_unref_figs, respectively. 
+
         """
 
-        #if not self.address:
-        #    return "<h1>Index</h1>"
-
         if not self.filename:
-            
             return "<h1>No file found</h1> <p>" + self.address + "</p>"
 
         if self._store_content:
@@ -395,14 +395,9 @@ class Page(Webnote):
 
         figures = None
 
-        print "PREFIX", prefix
-        print "self.address", self.address
-
-        
         if self.paired_directory:
             figures = self.paired_directory.get_figs()
             directory = None
-
         if ext in settings.SUFFIX['text']:
             if figures:
                 content, unref_figs = self.reference_figures(
@@ -410,7 +405,6 @@ class Page(Webnote):
                 self._store_unref_figs = unref_figs
 
             content = markdown.markdown(content)
-
         else:
             content = self.filecontent
 
@@ -562,27 +556,31 @@ class Page(Webnote):
         -   The H1 line in the content string,
         -   The filename made nice.
 
-        At the moment, it's in "only just going" mode, and only
-        returns the filename made nice.
+        If there is more than one h1 line in the file, it will take
+        the first one it finds.
+
         """
 
-        fname = None
+        title = None
 
-        if self._store_title:
-            return self._store_title
+#       Search the metarecord first.
+        if self.metadata.title():
+            return self.metadata.title()
 
+#       Find the H1 line in the content string        
+        soup = BeautifulSoup(self.content(), "html.parser")
+        h1 = soup.find_all('h1')
+        for element in h1:
+            return element.string
+
+#       No h1 tag? Prettify the filename.
         if self.filename:
             fname = os.path.basename(self.filename)
-
-        if fname:
             basename, ext = os.path.splitext(fname)
+            return basename.replace('_', ' ')
 
-            self._store_title = basename.replace('_', ' ')
+        return "Title unknown"
 
-        if self._store_title:
-            return self._store_title
-        else:
-            return "Page title unknown"
 
     def unref_figs(self):
         """List of (link, text) tuples representing unreferenced figures.

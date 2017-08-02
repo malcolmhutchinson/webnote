@@ -121,7 +121,7 @@ def page(request, url):
     print "DOCROOT", docroot
     print "ADDRESS", address
     print "PREFIX", prefix
-    
+
     try:
         page = webnote.page.Page(docroot, address=address, prefix=prefix)
         title = page.title
@@ -149,6 +149,7 @@ def page(request, url):
 
         'archives': ARCHIVES,
         'HOST_DATA': settings.HOST_DATA,
+        
     }
     
     return render(request, template, context)

@@ -97,21 +97,19 @@ class Metadata():
     warnings = []
 
     pagefile = None
-    prefix = None
     metafilename = None
     metarecord = None
     metastructure = None
     metadata = None
     commands = None
 
-    def __init__(self, pagefile, prefix=None):
+    def __init__(self, pagefile):
         """Operations on metadata records.
 
         Initialise with a file pathname.
         """
 
         self.pagefile = pagefile
-        self.prefix = prefix
 
         self.metadata = self.dc_metadata.copy()
         self.metadata.update(self.meta_commands)
@@ -123,9 +121,26 @@ class Metadata():
             self.metarecord = self._read_metafile()
 
         if self.metarecord:
-            (self.metadata, self.commands) = self.process_metarecord()
+            (self.metadata, self.commands) = self.process_metarecord()  
 
+    def dublincore(self):
+        """Return a list of DC metadata attribute names and values.
+
+        List of (key, value) tuples taken from the metafile, with
+        order and duplicated elements preserved.
+
+        """
+
+        dc = []
+
+        for item in self.metarecord:
+            if item[0][:3].upper() == 'DC.':
+                dc.append(item)
+                
+        return dc
+                          
     def save(self, data):
+
         """Replace the contents of the meta file with items data.
         """
 
@@ -235,54 +250,46 @@ class Metadata():
 
         return (metadata, commands)
 
-    def _title(self):
+    def title(self):
         return '\n'. join(self.metadata['dc.title'])
 
-    title = property(_title)
-
-    def _author(self):
+    def author(self):
         return '; '.join(self.metadata['dc.creator'])
 
-    author = property(_author)
-
-    def _date(self):
+    def pubdate(self):
         if len(self.metadata['dc.date']) > 0:
             return self.metadata['dc.date'][0]
         else:
             return ""
 
-    date = property(_date)
-
-    def _subject(self):
+    def subject(self):
         return ', '.join(self.metadata['dc.subject'])
 
-    subject = property(_subject)
-
-    def _description(self):
+    def description(self):
 
         desc = """This fake description is declared in the
         webnote. Metadata._description() method."""
 
         return '\n'.join(self.metadata['dc.description'])
 
-    description = property(_description)
-
-    def _contributor(self):
+    def contributors(self):
         return '; '.join(self.metadata['dc.contibutor'])
 
-    contributor = property(_contributor)
-
-    def _location(self):
+    def location(self):
         return ', '.join(self.metadata['dc.coverage'])
 
-    location = property(_location)
+    def rights(self):
+        rights = None
+        right = '; '.join(self.metadata['dc.rights'])
+        if right in settings.LICENSES.keys():
+            rights = "<a href='" + settings.LICENSES[right][0] + "'>"
+            rights += settings.LICENSES[right][1] + "</a>"
 
-    def _rights(self):
-        return '; '.join(self.metadata['dc.rights'])
-
-    rights = property(_rights)
-
-    def _source(self):
+        return rights
+        
+    def source(self):
         return '; '.join(self.metadata['dc.source'])
 
-    source = property(_source)
+    def publisher(self):
+        return '; '.join(self.metadata['dc.publisher'])
+

@@ -5,7 +5,7 @@
 <head>
 <title>{{ title }}</title>
 
-{% if metadata %}{% include metadata.html %}{% endif %}
+{% if page.metadata %}{% include 'metadata.html' %}{% endif %}
 {% load static %}
 
 <link rel='stylesheet'
