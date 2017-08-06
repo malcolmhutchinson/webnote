@@ -2,9 +2,16 @@
 
 <div id='pagecontent'>
 
- {{ page.content|safe }}
+  {{ page.content|safe }}
+
+
+<pre>{{ page.metadata.create_metafile.1 }}</pre>
+
 
 </div>
+
+
+
 
 {% if page.children %}
 <div id='contents'>

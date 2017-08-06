@@ -26,6 +26,12 @@ ARCHIVES = [
     ('/test', '/srv/content/test', "Test archive"),
 ]
 
+def edit(request):
+    template = 'editpage.html'
+    
+    return render(request, template, context)
+
+
 def index(request):
     """List the users on the host machine, and archives from the ARCHIVES
     variable.
@@ -119,9 +125,9 @@ def page(request, url):
                 address = url.replace(archive[0] + '/', '')
                 prefix = archive[0]
 
-    print "DOCROOT", docroot
-    print "ADDRESS", address
-    print "PREFIX", prefix
+    #print "DOCROOT", docroot
+    #print "ADDRESS", address
+    #print "PREFIX", prefix
 
     try:
         page = webnote.page.Page(docroot, address=address, prefix=prefix)

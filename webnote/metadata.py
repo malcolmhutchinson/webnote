@@ -133,12 +133,15 @@ class Metadata():
         (self.metadata, self.commands) = self.process_metarecord()  
 
         
-    def construct_metafile(self, metarecord=None):
+    def construct_metafile_record(self, metarecord=None):
         """Return a string containing a metadata record in text format.
+
+        This is normally used to create a metafile record for a new
+        page, or one which doesn't have a metafile associated with it.
 
         A metafile is a string representation of a metarecord.
 
-        This produces a string containing a record suitable for fileing
+        This produces a string containing a record suitable for filing
         with pages in the document archive. It is intended to be
         written to a text file with a .meta suffix.
 
@@ -147,13 +150,29 @@ class Metadata():
 
         """
 
+
         if not metarecord:
             metarecord = self.metarecord
-        
-        for line in metarecord:
-            print line
-
+ 
         metafile = ''
+
+        for line in metarecord:
+
+            (key, value) = line
+            if key.lower() == 'comment':
+                key = '#'
+            else:
+                key = key + ":"
+                
+            if key.lower() == 'dc.title:':
+                if not value:
+                    value = self.find_title()
+
+            
+            metafile += key
+            metafile += '   '
+            metafile += value + '\n'
+
         return metafile
         
     def construct_metarecord(self):
@@ -166,16 +185,46 @@ class Metadata():
             ('comment', 'Dublin core metadata record'),
         ]
 
-        for line in self.DC_METADATA.keys():
+        for line in sorted(self.DC_METADATA.keys()):
             metarecord.append((line, ''))
 
         metarecord.append(
-            (('comment', 'Dublin core metadata record')),
+            (('comment', 'End Dublin core metadata record')),
         )
-
+        
         return metarecord
+
+    def create_metafile(self, metarecord=None):
+        """Create a file in the preferred metafile location.
+
+        This method has SIDE EFFECTS!
+
+        Write a metafile record into that file. 
+        """
+
+        (dirpath, filename) = os.path.split(self.preferred_filename())
+        
+        #dirpath = os.path.join(dirpath, 'meta')
+        metafile = self.construct_metafile_record(metarecord=metarecord)
+
+        filename = self.preferred_filename()
+        if not os.path.isdir(dirpath):
+            print "MAKING DIRECTORY AT ", dirpath
+            os.mkdir(dirpath)
+
+        if os.path.isfile(filename):
+            print "METAFILE EXISTS AT ", filename
+        else:
+            print "WRITING METAFILE RECORD TO", filename
+            f = open(filename, 'w')
+            f.write(metafile)
+            f.close()
+            
+        return (filename, metafile)
+        
         
     def dublincore(self):
+
         """Return a list of DC metadata attribute names and values.
 
         List of (key, value) tuples taken from the metafile, with
@@ -188,9 +237,17 @@ class Metadata():
         for item in self.metarecord:
             if item[0][:3].upper() == 'DC.':
                 dc.append(item)
-                
         return dc
-                          
+
+    def find_title(self):
+        """Find the title from page content etc."""
+
+        (path, fname) = os.path.split(self.pagefile)
+        (basename, ext) = os.path.splitext(fname)
+        title = basename.replace('_', ' ')
+
+        return title
+    
     def save(self, data):
 
         """Replace the contents of the meta file with items data.
@@ -242,6 +299,20 @@ class Metadata():
             return filename
 
         return None
+
+    def preferred_filename(self):
+        """Return the preferred filename for a new metadata file.
+
+        """
+
+        filename = ''
+
+        (path, pagefile) = os.path.split(self.pagefile)
+        (basename, ext) = os.path.splitext(pagefile)
+
+        filename = os.path.join(path, settings.META[0], basename + '.meta')
+
+        return filename
 
     def read_metafile(self):
         """Return a metadata structure from the metafile filename.

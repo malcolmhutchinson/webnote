@@ -567,7 +567,8 @@ class Page(Webnote):
 
 #       Search the metarecord first.
         if self.metadata:
-            return self.metadata.title()
+            if self.metadata.title():
+                return self.metadata.title()
 
 #       Find the H1 line in the content string        
         soup = BeautifulSoup(self.content(), "html.parser")
