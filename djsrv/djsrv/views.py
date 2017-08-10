@@ -9,6 +9,7 @@ import socket
 
 from django.shortcuts import render
 
+import forms
 import settings
 import webnote
 
@@ -26,9 +27,99 @@ ARCHIVES = [
     ('/test', '/srv/content/test', "Test archive"),
 ]
 
-def edit(request):
-    template = 'editpage.html'
+def edit(request, url):
     
+    page = None
+    template = 'editpage.html'
+    navtemplate = None
+    docroot = None
+    prefix = None
+    title = 'A page at some place' 
+                           
+    breadcrumbs = [
+        ('/', 'HOME'),
+    ]
+
+#   Process the URL
+    address = None
+
+#   Process the url: is is a username?
+    bits = url.split('/')
+
+    if bits[0] == 'home':
+        dirname = os.path.join('/home', bits[1], 'www')
+        if os.path.isdir(dirname):
+            docroot = dirname
+            bits.pop(0)
+            prefix = '/home/' + bits[0] 
+            if len(bits) == 1:
+                address = None
+            elif len(bits) > 1:
+                bits.pop(0)
+                address = '/'.join(bits)
+        
+#   Or is it in the ARCHIVES list?
+    else:
+        url = '/' + url
+        for archive in ARCHIVES:
+            if url == archive[0]:
+                docroot = archive[1]
+                address = None
+                prefix = archive[0]
+            elif archive[0] in url:
+                docroot = archive[1]
+                address = url.replace(archive[0] + '/', '')
+                prefix = archive[0]
+
+    try:
+        page = webnote.page.Page(docroot, address=address, prefix=prefix)
+        title = page.title
+        breadcrumbs.extend(page.breadcrumbs())
+        navtemplate = 'nav_editpage.html'
+    except webnote.page.Page.DocrootNotFound:
+        template = 'warning_NotArchive.html'   
+    
+    dc_form = forms.DublinCoreForm()
+    dc_form.fields['dc_creator'].initial = page.metadata.author
+    dc_form.fields['dc_contributor'].initial = page.metadata.contributors
+    dc_form.fields['dc_coverage'].initial = page.metadata.location
+    dc_form.fields['dc_date'].initial = page.metadata.pubdate
+    dc_form.fields['dc_description'].initial = page.metadata.description
+    dc_form.fields['dc_format'].initial = page.metadata.fileformat
+    dc_form.fields['dc_language'].initial = page.metadata.language
+    dc_form.fields['dc_publisher'].initial = page.metadata.publisher
+    dc_form.fields['dc_rights'].initial = page.metadata.rights
+    dc_form.fields['dc_subject'].initial = page.metadata.subject
+    dc_form.fields['dc_title'].initial = page.metadata.title
+    dc_form.fields['dc_type'].initial = page.metadata.doctype
+    dc_form.fields['dc_source'].initial = page.metadata.source
+
+    content_form = forms.ContentForm()
+    content_form.fields['content'].initial = page.filecontent
+
+    context = {
+        'docroot': docroot,
+        'address': address,
+        'prefix': prefix,
+        'title': title,
+        'page': page,
+        'url': url,
+
+        'stylesheets': {
+            'app': None,
+            'screen': 'css/screen.css',
+            'printer': 'css/print.css',
+        },
+
+        'breadcrumbs': breadcrumbs,
+        'navtemplate': navtemplate,
+
+        'archives': ARCHIVES,
+        'HOST_DATA': settings.HOST_DATA,
+        'dc_form': dc_form,
+        'content_form': content_form,        
+    }
+
     return render(request, template, context)
 
 

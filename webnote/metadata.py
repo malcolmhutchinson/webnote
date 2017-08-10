@@ -136,9 +136,6 @@ class Metadata():
     def construct_metafile_record(self, metarecord=None):
         """Return a string containing a metadata record in text format.
 
-        This is normally used to create a metafile record for a new
-        page, or one which doesn't have a metafile associated with it.
-
         A metafile is a string representation of a metarecord.
 
         This produces a string containing a record suitable for filing
@@ -148,8 +145,10 @@ class Metadata():
         If the metadata structure is empty, as at init, the result
         will be a file record with a list of keys, but no values.
 
-        """
+        Normally used to create a metafile record for a new page, or
+        one which doesn't have a metafile associated with it.
 
+        """
 
         if not metarecord:
             metarecord = self.metarecord
@@ -361,11 +360,30 @@ class Metadata():
 
         return (metadata, commands)
 
+#   Methods to return individual field values.    
     def title(self):
         return '\n'. join(self.metadata['dc.title'])
 
     def author(self):
         return '; '.join(self.metadata['dc.creator'])
+
+    def contributors(self):
+        return '; '.join(self.metadata['dc.contributor'])
+
+    def description(self):
+        return '\n'.join(self.metadata['dc.description'])
+
+    def doctype(self):
+        return '; '.join(self.metadata['dc.type'])
+
+    def fileformat(self):
+        return '; '.join(self.metadata['dc.format'])
+
+    def language(self):
+        return ', '.join(self.metadata['dc.language'])
+
+    def location(self):
+        return ', '.join(self.metadata['dc.coverage'])
 
     def pubdate(self):
         if len(self.metadata['dc.date']) > 0:
@@ -373,23 +391,14 @@ class Metadata():
         else:
             return ""
 
-    def subject(self):
-        return ', '.join(self.metadata['dc.subject'])
-
-    def description(self):
-
-        desc = """This fake description is declared in the
-        webnote. Metadata._description() method."""
-
-        return '\n'.join(self.metadata['dc.description'])
-
-    def contributors(self):
-        return '; '.join(self.metadata['dc.contibutor'])
-
-    def location(self):
-        return ', '.join(self.metadata['dc.coverage'])
+    def publisher(self):
+        return '; '.join(self.metadata['dc.publisher'])
 
     def rights(self):
+        return '; '.join(self.metadata['dc.rights'])
+    
+    def rights_markup(self):
+        """Return marked-up code for rights. """
         rights = None
         right = '; '.join(self.metadata['dc.rights'])
         if right in settings.LICENSES.keys():
@@ -401,6 +410,6 @@ class Metadata():
     def source(self):
         return '; '.join(self.metadata['dc.source'])
 
-    def publisher(self):
-        return '; '.join(self.metadata['dc.publisher'])
+    def subject(self):
+        return ', '.join(self.metadata['dc.subject'])
 

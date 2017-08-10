@@ -1,0 +1,122 @@
+<!-- nav_editpage.html -->
+<div id='navcontent'>
+
+    <h3>edit metadata</h3>
+
+    <table class='form'>
+        {{ dc_form }}
+    </table>
+
+
+    <h3>parent</h3>
+
+    <ol>
+
+        <li><a href='{{ page.parent.0 }}'>{{ page.parent.1 }}</a></li>
+
+
+    </ol>
+
+    <h3>siblings</h3>
+
+        <ol>
+{% for item in page.siblings %}
+            <li><a href='{{ item.0 }}'>{{ item.1 }}</a></li>
+{% endfor %}
+        </ol>
+
+        <h3>children</h3>
+
+        <ol id='children'>
+{% for child in page.children %}
+            <li><a href='{{ child.0 }}'>{{ child.1 }}</a></li>
+{% endfor %}
+        </ol>
+
+
+
+
+    <h3>Selected metadata fields</h3>
+    
+    <table class='keypair'>
+
+        <tr>
+            <th>url</th>
+            <td>{{ page.url }}</td>
+        </tr>
+
+        <tr>
+            <th>metafile</th>
+            <td>{{ page.metadata.metafilename }}</td>
+        </tr>
+
+        <tr>
+            <th>meta prefix</th>
+            <td>{{ page.metadata.prefix }}</td>
+        </tr>
+
+        <tr>
+            <th>title</th>
+            <td>{{ page.metadata.title }}</td>
+        </tr>
+
+        <tr>
+            <th>author</th>
+            <td>{{ page.metadata.author }}</td>
+        </tr>
+
+        <tr>
+            <th>subject</th>
+            <td>{{ page.metadata.subject }}</td>
+        </tr>
+
+        <tr>
+            <th>publisher</th>
+            <td>{{ page.metadata.publisher }}</td>
+        </tr>
+
+        <tr>
+            <th>date</th>
+            <td>{{ page.metadata.pubdate }}</td>
+        </tr>
+
+        <tr>
+            <th>description</th>
+            <td>{{ page.metadata.description }}</td>
+        </tr>
+
+        <tr>
+            <th>contrbutors</th>
+            <td>{{ page.metadata. }}</td>
+        </tr>
+
+        <tr>
+            <th>location</th>
+            <td>{{ page.metadata.location }}</td>
+        </tr>
+
+        <tr>
+            <th>rights</th>
+            <td>{{ page.metadata.rights|safe }}</td>
+        </tr>
+
+        <tr>
+            <th></th>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th></th>
+            <td></td>
+        </tr>
+
+        <tr>
+            <th></th>
+            <td></td>
+        </tr>
+
+    </table>
+
+</div>
+<!-- end nav_page.html -->
+
