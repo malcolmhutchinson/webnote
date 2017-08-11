@@ -1,0 +1,4 @@
+The depth test
+==============
+
+This filespace tests the computation of breadcrumbs, and of the arbitrary bepth of a document archive.

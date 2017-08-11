@@ -1,0 +1,14 @@
+Bad references
+==============
+
+This page has a link to an image which doesn't exit.
+
+[[missing.jpg This points to a non-existent file called "missing.jpg" ]]
+
+### Bad link
+
+This link goes to [a page which dosn't exist](/test/band_data/nowhere).
+
+You are supposed to see a polite notice saying a file couldn't be
+found at the requested address.
+

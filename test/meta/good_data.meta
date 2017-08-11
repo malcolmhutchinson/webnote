@@ -1,0 +1,25 @@
+# Dublin Core metadata record
+DC.Title:       Webnote test data: known Good data set
+DC.Creator:     Malcolm Hutchinson
+DC.Subject:     Simple syntax, test data
+DC.Description: Test data, proven good. All documents within comply with the simple syntax.
+DC.Contributor:
+DC.Coverage:    Hamilton, New Zealand
+DC.Date:        2015-11-29
+DC.Type:        Test data
+DC.Format:      text/html
+DC.Source:
+DC.Language:    en
+DC.Identifier:
+DC.Publisher:   archaeography.co.nz
+DC.Publisher:   Malcolm Hutchinson
+DC.Relation:
+DC.Rights:      cc-by
+# END DC metadata
+
+# Page command options
+sort-reverse:   false # true
+deny:           all
+allow:          staff
+status:         draft
+# END page command

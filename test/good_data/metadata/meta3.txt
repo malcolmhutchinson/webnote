@@ -1,0 +1,12 @@
+Metadata file 3
+===============
+
+    2015-11-27
+
+This file is a movable feast. It has three metafiles, one each in the
+parent, meta and paired directories. The filenames for these can be
+changed slightly to turn them on and off.
+
+There are no other files in the paired directory, so no contents
+listed below.
+

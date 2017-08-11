@@ -1,0 +1,7 @@
+Metadata file 2
+===============
+
+    2015-11-27
+
+This file has a metafile at `meta/meta2.meta`.
+

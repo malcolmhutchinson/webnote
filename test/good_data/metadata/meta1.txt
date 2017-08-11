@@ -1,0 +1,6 @@
+Metadata file 1
+===============
+
+    2015-11-27
+
+This page has a metafile called `meta1.meta` in it's parent directory.

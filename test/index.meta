@@ -1,0 +1,26 @@
+# Dublin Core metadata record
+DC.title:       Webnote test data collection
+DC.creator:     Hutchinson, M. G.
+DC.creator:     Whyte, S. K.
+DC.subject:     Simple syntax, test data
+DC.description: Index page to the test data set
+DC.contributor:
+DC.coverage:    Hamilton, New Zealand
+DC.date:        2015-11-29
+DC.type:        Test data
+DC.format:      text/html
+DC.source:
+DC.language:    en
+DC.identifier:
+DC.publisher:   archaeography.co.nz
+DC.publisher:   Malcolm Hutchinson
+DC.relation:
+DC.rights:      cc-by
+# END DC metadata
+
+# Page command options
+sort-reverse:   false # true
+deny:           all
+allow:          staff
+status:         draft
+# END page command
