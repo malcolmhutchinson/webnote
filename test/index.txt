@@ -1,4 +1,4 @@
-The test index
+The test index 2
 ==============
 
 These files have been constructed to test the webnote simple syntax

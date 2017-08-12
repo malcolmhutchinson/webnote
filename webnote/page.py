@@ -29,13 +29,13 @@ class Page(Webnote):
 
     ### Usage
 
-        webnote.Page(docroot, address=None, prefix=None)
+        webnote.Page(docroot, address=None, baseurl=None)
 
     Initialise with a docroot string, pointing to the root directory
     for an archive. If no address is supplied, it will look for a page
     called 'index'.
 
-    The prefix its prepended to the link src value, providing a way of
+    The baseurl its prepended to the link src value, providing a way of
     referencing local files with a URL.
 
     Provides the following methods:
@@ -57,7 +57,7 @@ class Page(Webnote):
 
     docroot = None
     address = None
-    prefix = None
+    baseurl = None
     metadata = None
 
     parent_dirname = None
@@ -81,7 +81,7 @@ class Page(Webnote):
 
     warnings = []
 
-    def __init__(self, docroot, address=None, prefix=None, staticroot=None):
+    def __init__(self, docroot, address=None, baseurl=None, staticroot=None):
         """Instantiating without an address will return the index file.
 
         Do the minimum necessary computations.
@@ -132,10 +132,10 @@ class Page(Webnote):
             self.paired_dirname = docroot
             self.parent_dirname = docroot
 
-        if prefix:
-            self.prefix = prefix
+        if baseurl:
+            self.baseurl = baseurl
         else:
-            self.prefix = '/'
+            self.baseurl = '/'
 
         if staticroot:
             self.staticroot = staticroot
@@ -166,9 +166,9 @@ class Page(Webnote):
 
     def get_absolute_url(self):
         if self.address:
-            return os.path.join(self.prefix, self.address)
+            return os.path.join(self.baseurl, self.address)
 
-        return self.prefix
+        return self.baseurl
         
 
     url = property(get_absolute_url)
@@ -282,9 +282,9 @@ class Page(Webnote):
         if not self.filename:
             return ('', '')
 
-        link = self.prefix
+        link = self.baseurl
         if self.address:
-            link = os.path.join(self.prefix, self.address)
+            link = os.path.join(self.baseurl, self.address)
         text = os.path.basename(self.filename)
         (basename, ext) = os.path.splitext(text)
         return (link, basename)
@@ -313,10 +313,10 @@ class Page(Webnote):
     def breadcrumbs(self):
         """A list of (link, text) tuples climbing back up the hierachy.
 
-        Start with the prefix, then explode the address by slashes."""
+        Start with the baseurl, then explode the address by slashes."""
         
-        link = self.prefix
-        text = self.prefix
+        link = self.baseurl
+        text = self.baseurl
         crumbs = [(link, text)]
 
         if self.address:
@@ -330,7 +330,7 @@ class Page(Webnote):
 
         return crumbs
 
-    def children(self, prefix=None):
+    def children(self, baseurl=None):
         """Return a list of (link, text) tuples identifying children."""
 
         if not self.paired_directory:
@@ -341,10 +341,10 @@ class Page(Webnote):
         else:
             address = ''
 
-        if not prefix:
-            prefix = os.path.join(self.prefix, address)
+        if not baseurl:
+            baseurl = os.path.join(self.baseurl, address)
 
-        pages = self.paired_directory.pages(prefix)
+        pages = self.paired_directory.pages(baseurl)
 
         kids = []
         for page in pages:
@@ -374,7 +374,7 @@ class Page(Webnote):
 
         if not self.filename:
             if not self.address:
-                return "<h1>Index " + self.prefix + "</h1>"
+                return "<h1>Index " + self.baseurl + "</h1>"
             return "<h1>No file found " + self.address + "</h1>"
         
         if self._store_content:
@@ -386,14 +386,14 @@ class Page(Webnote):
 
         source = content
 
-        prefix = self.prefix
-        if prefix[0] == '/':
-            prefix = self.prefix[1:]
+        baseurl = self.baseurl
+        if baseurl[0] == '/':
+            baseurl = self.baseurl[1:]
 
             
-        prefix = os.path.join(self.staticroot, prefix)
+        baseurl = os.path.join(self.staticroot, baseurl)
         if self.address:
-            prefix = os.path.join(self.staticroot, prefix, self.address)
+            baseurl = os.path.join(self.staticroot, baseurl, self.address)
 
         figures = None
 
@@ -403,7 +403,7 @@ class Page(Webnote):
         if ext in settings.SUFFIX['text']:
             if figures:
                 content, unref_figs = self.reference_figures(
-                    source, prefix, figures=figures)
+                    source, baseurl, figures=figures)
                 self._store_unref_figs = unref_figs
 
             content = markdown.markdown(content)
@@ -429,8 +429,8 @@ class Page(Webnote):
         else:
             address = self.address
 
-        prefix = os.path.join(self.prefix, address)
-        documents = self.paired_directory.link_docs(prefix)
+        baseurl = os.path.join(self.baseurl, address)
+        documents = self.paired_directory.link_docs(baseurl)
         return documents
 
     def form_data(self):
@@ -476,21 +476,21 @@ class Page(Webnote):
 
         link = ''
         text = ''
-        prefix = ''
-        if self.prefix:
-            prefix = self.prefix
+        baseurl = ''
+        if self.baseurl:
+            baseurl = self.baseurl
 
         if not self.address:
-            self._store_parent = (prefix, 'Index')
+            self._store_parent = (baseurl, 'Index')
             return self._store_parent
 
         steps = self.address.split('/')
         if len(steps) == 1:
-            self._store_parent = (self.prefix, 'Index')
+            self._store_parent = (self.baseurl, 'Index')
             return self._store_parent
 
         junk = steps.pop()
-        link = os.path.join(prefix, '/'.join(steps))
+        link = os.path.join(baseurl, '/'.join(steps))
         text = steps[-1]
 
         par = (link, text)
@@ -534,7 +534,7 @@ class Page(Webnote):
         self.metadata.save(data)
         return True
 
-    def siblings(self, prefix=None):
+    def siblings(self, baseurl=None):
         """Return a list of (link, text) tuples identifying siblings.
 
         Siblings are pages in the parent directory -- that is, the
@@ -543,10 +543,10 @@ class Page(Webnote):
 
         sibs = []
         parent = self._get_parent_address()
-        if not prefix:
-            prefix = os.path.join(self.prefix, parent)
+        if not baseurl:
+            baseurl = os.path.join(self.baseurl, parent)
 
-        sibs = self.parent_directory.pages(prefix)
+        sibs = self.parent_directory.pages(baseurl)
 
         return sibs
 
@@ -590,7 +590,7 @@ class Page(Webnote):
 
         Unreferenced figures are computed by the
         Webnote.reference_figures module, which takes a long string, a
-        url prefix and returns the modified text (which would be part
+        url baseurl and returns the modified text (which would be part
         of content) and the list of unreferenced figures.
 
         If calling content, the unref figs can be set global, and this

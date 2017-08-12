@@ -25,7 +25,7 @@ class Webnote():
 
     warnings = []
 
-    def reference_figures(self, source, prefix, directory=None, figures=None):
+    def reference_figures(self, source, baseurl, directory=None, figures=None):
         """Convert coded references to figures in a text into HTML.
 
         Given a source text containing references to image files in
@@ -39,12 +39,12 @@ class Webnote():
         unreferenced figures. The HTML structure looks like:
 
             <div class='figure'>
-                <img src='prefix/image.jpg' alt='image.jpg' />
+                <img src='baseurl/image.jpg' alt='image.jpg' />
                 <p class='caption'>Anything following the first space
                 is a caption.</p>
             </div>
 
-        The prefix is prepended to the <img src> attribute to complete
+        The baseurl is prepended to the <img src> attribute to complete
         a working link.
 
         Optionally, the figures can be supplied as a list of filenames
@@ -93,12 +93,12 @@ class Webnote():
         if figures:
 
             for figure in figures:
-                link = os.path.join(prefix, figure)
+                link = os.path.join(baseurl, figure)
                 caption = figure
                 unref.append((link, caption))
 
             for match in result:
-                (link, html) = self._figure_html(match, prefix)
+                (link, html) = self._figure_html(match, baseurl)
                 output = output.replace(match, html)
 
                 links.append(link)
@@ -109,7 +109,7 @@ class Webnote():
 
         return output, unref
 
-    def _figure_html(self, match, prefix):
+    def _figure_html(self, match, baseurl):
         """Replace a match code with the HTML DIV for displaying an image.
 
         - Strip off the square brackets at each end.
@@ -135,8 +135,8 @@ class Webnote():
             divclass = 'figure-right'
             filename = filename[2:]
 
-        if prefix:
-            filepath = os.path.join(prefix, filename)
+        if baseurl:
+            filepath = os.path.join(baseurl, filename)
         else:
             filepath = filename
 

@@ -16,7 +16,7 @@ import webnote
 ARCHIVES2 = [
     ('/srv/content/notes', "Collection at /srv/content/notes"),
     ('/srv/content/intranet', "The old intranet"),
-    ('/srv/content/test', "Test archive"),
+    ('/test', "Test archive"),
 ]
 
 # New format (not implemented yet)
@@ -24,7 +24,9 @@ ARCHIVES2 = [
 ARCHIVES = [
     ('/notes', '/srv/content/notes', "Collection at /srv/content/notes"),
     ('/intranet', '/srv/content/intranet', "The old intranet"),
-    ('/test', '/srv/content/test', "Test archive"),
+    ('/test', os.path.join(settings.STATICFILES_DIRS[0], 'test'),
+     "Test archive"
+    ),
 ]
 
 def edit(request, url):
@@ -33,7 +35,7 @@ def edit(request, url):
     template = 'editpage.html'
     navtemplate = None
     docroot = None
-    prefix = None
+    baseurl = None
     title = 'A page at some place' 
                            
     breadcrumbs = [
@@ -51,7 +53,7 @@ def edit(request, url):
         if os.path.isdir(dirname):
             docroot = dirname
             bits.pop(0)
-            prefix = '/home/' + bits[0] 
+            baseurl = '/home/' + bits[0] 
             if len(bits) == 1:
                 address = None
             elif len(bits) > 1:
@@ -65,14 +67,14 @@ def edit(request, url):
             if url == archive[0]:
                 docroot = archive[1]
                 address = None
-                prefix = archive[0]
+                baseurl = archive[0]
             elif archive[0] in url:
                 docroot = archive[1]
                 address = url.replace(archive[0] + '/', '')
-                prefix = archive[0]
+                baseurl = archive[0]
 
     try:
-        page = webnote.page.Page(docroot, address=address, prefix=prefix)
+        page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
         title = page.title
         breadcrumbs.extend(page.breadcrumbs())
         navtemplate = 'nav_editpage.html'
@@ -100,7 +102,7 @@ def edit(request, url):
     context = {
         'docroot': docroot,
         'address': address,
-        'prefix': prefix,
+        'baseurl': baseurl,
         'title': title,
         'page': page,
         'url': url,
@@ -130,20 +132,20 @@ def index(request):
     """
 
     userspaces = []
-    prefix = None
+    baseurl = None
 
     for user in os.listdir('/home'):
         dirname = os.path.join('/home', user, 'www')
         if os.path.isdir(dirname):
             
             userspaces.append(('/home/' + user, user))
-            prefix = '/home/' + user
+            baseurl = '/home/' + user
     
     template = 'index.html'
 
     title = "Webnote server at " + settings.HOST_DATA['hostname']
     index = webnote.directory.Directory(settings.HOST_DATA['userdir'],
-                                        prefix=prefix)    
+                                        baseurl=baseurl)    
     
     breadcrumbs = [
         ('/webnote/', 'HOME'),
@@ -178,7 +180,7 @@ def page(request, url):
     template = 'page.html'
     navtemplate = None
     docroot = None
-    prefix = None
+    baseurl = None
     title = 'A page at some place' 
                            
     breadcrumbs = [
@@ -196,7 +198,7 @@ def page(request, url):
         if os.path.isdir(dirname):
             docroot = dirname
             bits.pop(0)
-            prefix = '/home/' + bits[0] 
+            baseurl = '/home/' + bits[0] 
             if len(bits) == 1:
                 address = None
             elif len(bits) > 1:
@@ -210,28 +212,29 @@ def page(request, url):
             if url == archive[0]:
                 docroot = archive[1]
                 address = None
-                prefix = archive[0]
+                baseurl = archive[0]
             elif archive[0] in url:
                 docroot = archive[1]
                 address = url.replace(archive[0] + '/', '')
-                prefix = archive[0]
+                baseurl = archive[0]
 
-    #print "DOCROOT", docroot
-    #print "ADDRESS", address
-    #print "PREFIX", prefix
+    print "DOCROOT", docroot
+    print "ADDRESS", address
+    print "BASEURL", baseurl
 
     try:
-        page = webnote.page.Page(docroot, address=address, prefix=prefix)
+        page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
         title = page.title
         breadcrumbs.extend(page.breadcrumbs())
         navtemplate = 'nav_page.html'
     except webnote.page.Page.DocrootNotFound:
+        print "HERE"
         template = 'warning_NotArchive.html'   
     
     context = {
         'docroot': docroot,
         'address': address,
-        'prefix': prefix,
+        'baseurl': baseurl,
         'title': title,
         'page': page,
         'url': url,
