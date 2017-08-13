@@ -1,6 +1,7 @@
 """Classes implimenting the simple filesystem syntax.
 """
 
+import copy
 import os
 import settings
 
@@ -56,23 +57,23 @@ class Metadata():
 
     [
         ('comment', ' Dublin Core metadata record\n')
-        ('DC.title', 'Webnote test data collection')
-        ('DC.creator', 'Hutchinson, M. G.')
-        ('DC.creator', 'Whyte, S. K.')
-        ('DC.subject', 'Simple syntax, test data')
-        ('DC.description', 'Index page to the test data set')
-        ('DC.contributor', '')
-        ('DC.coverage', 'Hamilton, New Zealand')
-        ('DC.date', '2015-11-29')
-        ('DC.type', 'Test data')
-        ('DC.format', 'text/html')
-        ('DC.source', '')
-        ('DC.language', 'en')
-        ('DC.identifier', '')
-        ('DC.publisher', 'archaeography.co.nz')
-        ('DC.publisher', 'Malcolm Hutchinson')
-        ('DC.relation', '')
-        ('DC.rights', 'cc-by')
+        ('dc.title', 'Webnote test data collection')
+        ('dc.creator', 'Hutchinson, M. G.')
+        ('dc.creator', 'Whyte, S. K.')
+        ('dc.subject', 'Simple syntax, test data')
+        ('dc.description', 'Index page to the test data set')
+        ('dc.contributor', '')
+        ('dc.coverage', 'Hamilton, New Zealand')
+        ('dc.date', '2015-11-29')
+        ('dc.type', 'Test data')
+        ('dc.format', 'text/html')
+        ('dc.source', '')
+        ('dc.language', 'en')
+        ('dc.identifier', '')
+        ('dc.publisher', 'archaeography.co.nz')
+        ('dc.publisher', 'Malcolm Hutchinson')
+        ('dc.relation', '')
+        ('dc.rights', 'cc-by')
         ('comment', ' END DC metadata\n')
     ]
 
@@ -120,7 +121,6 @@ class Metadata():
         Initialise with a file pathname.
         """
 
-        self.metarecord = None
         self.pagefile = pagefile
         self.metafilename = self.locate_metafile()
 
@@ -256,14 +256,6 @@ class Metadata():
 
         return True
 
-    def update_metadata(self, data):
-        """Replace values in the metadata structure with supplied dictionary.
-
-        This is often used with POST data.
-        """
-
-        return True
-
     def locate_metafile(self):
         """Locate the metafile for the given address.
 
@@ -313,6 +305,28 @@ class Metadata():
 
         return filename
 
+    def process_metarecord(self, metarecord=None):
+        """Convert self.metarecord into metadata and command structures.
+
+        """
+
+        metadata = {}
+        commands = copy.deepcopy(self.META_COMMANDS)
+
+        # Ensures we can always reach for a dc. element.
+        for element in settings.DC_ELEMENTS:
+            metadata[element.lower()] = []
+
+        for line in self.metarecord:
+
+            if line[0].lower() in metadata.keys():
+                metadata[line[0].lower()].append(line[1])
+
+            elif line[0] in commands:
+                commands[line[0]] = line[1]
+
+        return (metadata, commands)
+
     def read_metafile(self):
         """Return a metadata structure from the metafile filename.
 
@@ -338,27 +352,6 @@ class Metadata():
                 record.append((key, value))
 
         return record
-
-    def process_metarecord(self):
-        """Turn a file record thing into a memory structure we can work with.
-
-        """
-
-        metadata = {}
-        commands = self.META_COMMANDS
-
-        for element in settings.DC_ELEMENTS:
-            metadata[element.lower()] = []
-
-        for line in self.metarecord:
-
-            if line[0].lower() in metadata.keys():
-                metadata[line[0].lower()].append(line[1])
-
-            elif line[0] in commands:
-                commands[line[0]] = line[1]
-
-        return (metadata, commands)
 
 #   Methods to return individual field values.    
     def title(self):
@@ -412,4 +405,12 @@ class Metadata():
 
     def subject(self):
         return ', '.join(self.metadata['dc.subject'])
+
+    def update_metadata(self, data):
+        """Replace values in the metadata structure with supplied dictionary.
+
+        This is often used with POST data.
+        """
+
+        return True
 

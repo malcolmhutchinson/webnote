@@ -81,7 +81,7 @@ class Page(Webnote):
 
     warnings = []
 
-    def __init__(self, docroot, address=None, baseurl=None, staticroot=None):
+    def __init__(self, docroot, baseurl=None, address=None, staticroot=None):
         """Instantiating without an address will return the index file.
 
         Do the minimum necessary computations.

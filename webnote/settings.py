@@ -170,6 +170,12 @@ TRUE = (
     'y', 'ya', 'yah', 'yeah', 'yes', 'yip', 'yep',
 )
 
+# Licenses
+
+# These provide for the use of codes, like "cc-by" in the dc.rights
+# field. This is a dictionary, keyed by the code strings, each with a
+# (link, text) tuple.
+
 CREATIVE_COMMONS = {
     'cc-by': (
         'http://creativecommons.org/licenses/by/4.0/',

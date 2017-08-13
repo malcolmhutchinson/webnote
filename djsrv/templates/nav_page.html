@@ -26,7 +26,8 @@
 {% endfor %}
         </ol>
 
-    <h3>DC metadata</h3>
+{% if page.metadata.metafile %}
+    <h3>Dublin core metadata</h3>
 
     <table class='keypair'>
         <tr>
@@ -40,7 +41,7 @@
         </tr>
 {% endfor %}
     </table>
-
+{% endif %}
 
 
 
