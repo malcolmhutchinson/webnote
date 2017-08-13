@@ -47,10 +47,13 @@ class Webnote():
         The baseurl is prepended to the <img src> attribute to complete
         a working link.
 
-        Optionally, the figures can be supplied as a list of filenames
-        -- as found in the webnote parsed directory
-        structure['figures']. Supplying this list will suppress
-        calling the parse_directory method.
+        Optionally, the figures can be supplied as a list of
+        filenames. 
+
+            ['file1.jpg', 'file2.png', ...]
+
+        Supplying this list will suppress calling the parse_directory
+        method.
 
         An alternative syntax is:
 

@@ -86,7 +86,12 @@ CONTROL_ELEMENTS = (
     'status',
 )
 
+# The SUFFIX dictionary identifies file type from the filename
+# suffix. Each key points to a list of string values, including the
+# dot prefix.
+
 # Just because a suffix is here doesn't mean we do anything with it.
+
 SUFFIX = {
     'archive': ('.gz', '.tar', '.zip',),
     'audio': ('.flac', '.mp2', '.mp3', '.wav', '.wma',),
@@ -97,7 +102,7 @@ SUFFIX = {
     'geovector': (
         '.gml', '.gpx', '.kml', '.shp', '.tab',
     ),
-    'html': ('.html', '.htm', '.xhtml',),
+    'html': ('.html', '.htm', '.xhtml', '.xhtm'),
     'image': (
         '.3fr', '.ari', '.arw', '.bay', '.cap', '.cr2', '.crw', '.dcr',
         '.dcs', '.dng', '.drf', '.eip', '.erf', '.fff', '.iiq', '.k25',
@@ -127,11 +132,13 @@ SUFFIX = {
     'opendoc_spreadsheet': ('.ods', '.fods', ),
     'opendoc_writer': ('.odt', '.fodt', ),
 
-
-    'text': ('.txt', '.mkd', '.md'),
+    'markdown': ('.mkd', '.md',),
+    'text': ('.txt', '.md',),
 }
 
-SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html']
+# The SUFFIX structure also holds composite lists.
+# A page file is identified as any member of html, text, markdown. 
+SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html'] + SUFFIX['markdown']
 
 SUFFIX['microsoft_office'] = (
     SUFFIX['ms_access'] + SUFFIX['ms_excel'] + SUFFIX['ms_word'])
@@ -145,6 +152,7 @@ SUFFIX['opendocument'] = (
 SUFFIX['documents'] = (SUFFIX['docs'] + SUFFIX['microsoft_office'] +
                        SUFFIX['opendocument'])
 
+# DOCTYPE describes the category of document a given page is.
 DOCTYPE = (
     ('letter', 'letter'),
     ('manual', 'manual'),
