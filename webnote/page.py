@@ -29,14 +29,14 @@ class Page(Webnote):
 
     ### Usage
 
-        webnote.Page(docroot, address=None, baseurl=None)
+        webnote.page.Page(docroot, baseurl, address)
 
     Initialise with a docroot string, pointing to the root directory
     for an archive. If no address is supplied, it will look for a page
     called 'index'.
 
-    The baseurl its prepended to the link src value, providing a way of
-    referencing local files with a URL.
+    Docroot and baseurl map file path to url. The address is appended
+    to each to provide a full path or url.
 
     Provides the following methods:
 
@@ -52,6 +52,14 @@ class Page(Webnote):
     a template like this:
 
         <a href ='{{ link }}'>{{ text }}</a>
+
+
+    Optional arguments
+
+    To save a Page object, include a dictionary containing string
+    values for fields in settings.DC_METADATA.
+
+        webnote.page.Page(docroot, baseurl, address, data=data)
 
     """
 
@@ -81,7 +89,9 @@ class Page(Webnote):
 
     warnings = []
 
-    def __init__(self, docroot, baseurl=None, address=None, staticroot=None):
+    def __init__(self, docroot, baseurl, address=None,
+                 data=None, staticroot=None
+    ):
         """Instantiating without an address will return the index file.
 
         Do the minimum necessary computations.
@@ -170,7 +180,6 @@ class Page(Webnote):
 
         return self.baseurl
         
-
     url = property(get_absolute_url)
     
     def _find_directories(self):
@@ -524,14 +533,15 @@ class Page(Webnote):
 
         """
 
-        self.filecontent = data['filecontent']
-        self.metadata = data['metadata']
+        #self.filecontent = data['content']
+        #self.metadata = data['metadata']
 
-        f = open(self.filename, 'w')
-        f.write(data['filecontent'])
+        #f = open(self.filename, 'w')
+        #f.write(data['filecontent'])
 
-        self.warnings.append("Saving file " + self.filename)
+        #self.warnings.append("Saving file " + self.filename)
         self.metadata.save(data)
+
         return True
 
     def siblings(self, baseurl=None):

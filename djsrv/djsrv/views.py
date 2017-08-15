@@ -80,9 +80,6 @@ def index(request):
 def page(request, url, command=None):
     """Display a requested page.."""
 
-    if command:
-        print command
-    
     address = None
     baseurl = None
     content_form = None
@@ -125,9 +122,10 @@ def page(request, url, command=None):
                 address = url.replace(archive[0] + '/', '')
                 baseurl = archive[0]
 
-    print "DOCROOT", docroot
-    print "ADDRESS", address
-    print "BASEURL", baseurl
+    #print "DOCROOT", docroot
+    #print "ADDRESS", address
+    #print "BASEURL", baseurl
+
 
     try:
         page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
@@ -161,7 +159,8 @@ def page(request, url, command=None):
         content_form.fields['content'].initial = page.filecontent
 
 
-
+    if request.POST:
+        page.save(request.POST.dict())
 
     context = {
         'docroot': docroot,

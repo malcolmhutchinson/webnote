@@ -81,21 +81,21 @@ class Metadata():
     """
 
     DC_METADATA = {
-        "dc.title": [],
-        "dc.creator": [],
-        "dc.subject": [],
-        "dc.description": [],
-        "dc.contributor": [],
-        "dc.coverage": [],
-        "dc.date": [],
-        "dc.type": [],
-        "dc.format": [],
-        "dc.source": [],
-        "dc.language": ['en',],
-        "dc.relation": [],
-        "dc.identifier": [],
-        "dc.rights": [],
-        "dc.publisher": [],
+        "dc_title": [],
+        "dc_creator": [],
+        "dc_subject": [],
+        "dc_description": [],
+        "dc_contributor": [],
+        "dc_coverage": [],
+        "dc_date": [],
+        "dc_type": [],
+        "dc_format": [],
+        "dc_source": [],
+        "dc_language": ['en',],
+        "dc_relation": [],
+        "dc_identifier": [],
+        "dc_rights": [],
+        "dc_publisher": [],
     }
 
     META_COMMANDS = {
@@ -126,6 +126,7 @@ class Metadata():
 
         if self.metafilename:
             self.metarecord = self.read_metafile()
+            #self.filemodel = self.read_metafile()
 
         if not self.metarecord:
             self.metarecord = self.construct_metarecord()
@@ -173,6 +174,15 @@ class Metadata():
             metafile += value + '\n'
 
         return metafile
+
+    def save(self, data):
+        """Save a metarecord to file."""
+
+        print "SAVING metarecord"
+        for item in self.metarecord:
+            print item
+
+#       Process the input dictionary into a metarecord
         
     def construct_metarecord(self):
         """Return a metarecord object from filespace data.
@@ -247,14 +257,6 @@ class Metadata():
 
         return title
     
-    def save(self, data):
-
-        """Replace the contents of the meta file with items data.
-        """
-
-        self.construct_metafile()
-
-        return True
 
     def locate_metafile(self):
         """Locate the metafile for the given address.
@@ -328,7 +330,7 @@ class Metadata():
         return (metadata, commands)
 
     def read_metafile(self):
-        """Return a metadata structure from the metafile filename.
+        """Return a metafile model structure from the metafile filename.
 
         Open and read the file, parse the contents into a metadata structure.
         """

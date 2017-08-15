@@ -61,26 +61,8 @@ DC_ELEMENTS = (
     'DC.Type',
 )
 
-dc_metadata = {
-    "dc.title": [],
-    "dc.creator": [],
-    "dc.subject": [],
-    "dc.description": [],
-    "dc.contributor": [],
-    "dc.coverage": [],
-    "dc.date": [],
-    "dc.type": [],
-    "dc.format": [],
-    "dc.source": [],
-    "dc.language": [],
-    "dc.relation": [],
-    "dc.identifier": [],
-    "dc.rights": [],
-    "dc.publisher": [],
-}
-
 CONTROL_ELEMENTS = (
-    'sort-reverse',
+    'sort',
     'allow',
     'deny',
     'status',

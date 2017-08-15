@@ -21,6 +21,11 @@
 </head>
 <body>
 
+{% if dc_form or content_form %}
+<form action = '' method='post'>
+{% csrf_token %}
+{% endif %}
+  
     <div id='header'>
 
         <ul>
@@ -50,6 +55,10 @@
 
         
     </div>
+
+{% if dc_form or content_form %}
+</form>
+{% endif %}
 
 </body>
 </html>
