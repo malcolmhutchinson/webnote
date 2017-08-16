@@ -58,6 +58,42 @@ Files for the sample Django implementation are held in the `djsrv`
 folder.
 
 If you are unfamiliar with Django, I recommend following the
-[Django tutorial](https://docs.djangoproject.com/en/dev/intro/tutorial01/).
+[Django
+tutorial](https://docs.djangoproject.com/en/dev/intro/tutorial01/).
 
-You will have to put the webnote package onto your path.
+Create a development directory:
+
+    $ mkdir ~/dev/webnote
+    $ cd ~/dev/webnote
+
+Make a directory to hold the code under version control:
+
+    $ mkdir code
+
+Clone the code from github:
+
+    $ git clone https://github.com/malcolmhutchinson/webnote.git code/
+
+Install a virtual environment. 
+
+    $ virtualenv env
+
+You will have to install Django, and a number of other dependencies,
+into the environment:
+
+    $ source env/bin/activate
+    (env) $ pip install django, markdown2, bs4
+
+You will have to put the webnote package onto your path. I've done
+this by placing a simlink in my virtual environment at
+
+    $ ln -s ~/dev/webnote/code/webnote ~/dev/webnote/env/lib/python2.7/site-packages/webnote
+
+Now, run the Django development server:
+
+    (env) $ python code/djsrv/manage.py runserver
+
+And point your webserver at localhost, port 8000:
+
+    http://localhost:8000/
+

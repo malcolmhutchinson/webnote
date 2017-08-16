@@ -252,7 +252,7 @@ class Metadata():
 
         dc = []
 
-        for item in self.filemodel:
+        for item in self.metadata.keys():
             if item[0][:3].upper() == 'DC.':
                 dc.append(item)
         return dc
