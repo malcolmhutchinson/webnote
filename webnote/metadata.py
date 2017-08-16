@@ -15,7 +15,7 @@ class Metadata():
     It can also create a metafile for a new page, and guess the
     contents of certain fields, like title, author, etc.
 
-    A metadata record looks like this:
+    A metafile record looks like this:
 
         # Dublin Core metadata record
         DC.Title:       Webnote
@@ -48,93 +48,87 @@ class Metadata():
     This class can read a file containing a record like this, and
     parse it into a metadata structure.
 
-    The metadata file is represented by a list stored at
-    self.metarecord, containing (key, value) tuples. These are
+    The metafile is represented by a list stored at
+    self.filemodel, containing (key, value) tuples. These are
     obtained by splitting each line at the colon, and returning the
     first element as key, and a re-stitched list of the rest as value.
 
-    A metarecord structure looks like this:
-
-    [
-        ('comment', ' Dublin Core metadata record\n')
-        ('dc.title', 'Webnote test data collection')
-        ('dc.creator', 'Hutchinson, M. G.')
-        ('dc.creator', 'Whyte, S. K.')
-        ('dc.subject', 'Simple syntax, test data')
-        ('dc.description', 'Index page to the test data set')
-        ('dc.contributor', '')
-        ('dc.coverage', 'Hamilton, New Zealand')
-        ('dc.date', '2015-11-29')
-        ('dc.type', 'Test data')
-        ('dc.format', 'text/html')
-        ('dc.source', '')
-        ('dc.language', 'en')
-        ('dc.identifier', '')
-        ('dc.publisher', 'archaeography.co.nz')
-        ('dc.publisher', 'Malcolm Hutchinson')
-        ('dc.relation', '')
-        ('dc.rights', 'cc-by')
-        ('comment', ' END DC metadata\n')
-    ]
-
-
     """
 
-    DC_METADATA = {
-        "dc_title": [],
-        "dc_creator": [],
-        "dc_subject": [],
-        "dc_description": [],
-        "dc_contributor": [],
-        "dc_coverage": [],
-        "dc_date": [],
-        "dc_type": [],
-        "dc_format": [],
-        "dc_source": [],
-        "dc_language": ['en',],
-        "dc_relation": [],
-        "dc_identifier": [],
-        "dc_rights": [],
-        "dc_publisher": [],
-    }
+    DC_METADATA = (
+        "dc_title",
+        "dc_creator",
+        "dc_subject",
+        "dc_description",
+        "dc_contributor",
+        "dc_coverage",
+        "dc_date",
+        "dc_type",
+        "dc_format",
+        "dc_source",
+        "dc_language",
+        "dc_relation",
+        "dc_identifier",
+        "dc_rights",
+        "dc_publisher",
+    )
 
-    META_COMMANDS = {
-        'status': [],
-        'sort-reverse': [],
-        'deny': [],
-        'allow': [],
-        'embargo': [],
-    }
+    COMMANDS = (
+        'status',
+        'sort',
+        'deny',
+        'allow',
+        'embargo',
+    )
 
     warnings = []
 
-    pagefile = None
-    metafilename = None
-    metarecord = None
-    metastructure = None
+    data = None
+    filemodel = None
     metadata = None
-    commands = None
+    metafilename = None
+    pagefile = None
 
-    def __init__(self, pagefile):
+    def __init__(self, pagefile=None, data=None):
         """Operations on metadata records.
 
-        Initialise with a file pathname.
+        Instantiation creates a dictionary structure called
+        `metadata`, holding lists of Dublin core elements, and
+        commands.
+
+        Initialise with an optional pathname to a page (without
+        extension). Will search for a metafile under simple syntax
+        rules, and read this file into the metadata structure.
+
+        Initialise with data = a dictionary with those Dublin core and
+        command keys, and it will load those values into the metadata
+        structure.
+
         """
 
-        self.pagefile = pagefile
-        self.metafilename = self.locate_metafile()
+        metadata = {}
+        for key in self.DC_METADATA:
+            metadata[key] = [] 
+        for key in self.COMMANDS:
+            metadata[key] = []
+
+        if pagefile:
+            self.pagefile = pagefile
+            self.metafilename = self.locate_metafile()
 
         if self.metafilename:
-            self.metarecord = self.read_metafile()
-            #self.filemodel = self.read_metafile()
+            self.filemodel = self.read_metafile()
+        else:
+            self.metadata = metadata
 
-        if not self.metarecord:
-            self.metarecord = self.construct_metarecord()
-    
-        (self.metadata, self.commands) = self.process_metarecord()  
+        if self.filemodel:
+            self.metadata = self.process_filemodel(self.filemodel)
 
+        if data:
+            self.data = data
+            self.metadata = self.process_data(data)
         
-    def construct_metafile_record(self, metarecord=None):
+    def construct_metafile_record(self, data=None):
         """Return a string containing a metadata record in text format.
 
         A metafile is a string representation of a metarecord.
@@ -151,36 +145,51 @@ class Metadata():
 
         """
 
-        if not metarecord:
-            metarecord = self.metarecord
- 
         metafile = ''
+        record = '# Dublin core metadata.\n'
 
-        for line in metarecord:
+        metadata = self.metadata
 
-            (key, value) = line
-            if key.lower() == 'comment':
-                key = '#'
-            else:
-                key = key + ":"
+        
+        for element in self.DC_METADATA:
+            if element in metadata.keys():
+                key = element.replace('dc_', 'DC.')
+                record +=  key + ": "
+                record += '; '.join(metadata[element]) + '\n'
+
+        record += "# end Dublin core elements.\n\n"
+
+        for element in self.COMMANDS:
+            if element in metadata.keys():
+                record += element + ": "
+                #print metadata[element]
+                record += '; '.join(metadata[element]) + '\n'
+            
+        
+        #for line in metarecord:
+
+        #    (key, value) = line
+        #    if key.lower() == 'comment':
+        #        key = '#'
+        #    else:
+        #        key = key + ":"
                 
-            if key.lower() == 'dc.title:':
-                if not value:
-                    value = self.find_title()
+        #    if key.lower() == 'dc.title:':
+        #        if not value:
+        #            value = self.find_title()
 
             
-            metafile += key
-            metafile += '   '
-            metafile += value + '\n'
+        #    metafile += key
+        #    metafile += '   '
+        #    metafile += value + '\n'
 
-        return metafile
+        return record
 
     def save(self, data):
         """Save a metarecord to file."""
 
         print "SAVING metarecord"
-        for item in self.metarecord:
-            print item
+        print self.construct_metafile_record()
 
 #       Process the input dictionary into a metarecord
         
@@ -243,7 +252,7 @@ class Metadata():
 
         dc = []
 
-        for item in self.metarecord:
+        for item in self.filemodel:
             if item[0][:3].upper() == 'DC.':
                 dc.append(item)
         return dc
@@ -307,32 +316,34 @@ class Metadata():
 
         return filename
 
-    def process_metarecord(self, metarecord=None):
+    def process_filemodel(self, filemodel):
         """Convert self.metarecord into metadata and command structures.
 
         """
 
         metadata = {}
-        commands = copy.deepcopy(self.META_COMMANDS)
 
-        # Ensures we can always reach for a dc. element.
-        for element in settings.DC_ELEMENTS:
+        # Ensures we can always reach for a dc_ element, and a command.
+        for element in self.DC_METADATA:
+            metadata[element.lower()] = []
+        for element in self.COMMANDS:
             metadata[element.lower()] = []
 
-        for line in self.metarecord:
+        # Build the commands in as keys also
+        for line in self.filemodel:
+            
+            if line[0].lower().replace('.', '_') in metadata.keys():
+                metadata[line[0].lower().replace('.', '_')].append(line[1])
 
-            if line[0].lower() in metadata.keys():
-                metadata[line[0].lower()].append(line[1])
+            elif line[0].lower() in self.COMMANDS:
+                metadata[line[0]] = line[1]
 
-            elif line[0] in commands:
-                commands[line[0]] = line[1]
-
-        return (metadata, commands)
+        return metadata
 
     def read_metafile(self):
         """Return a metafile model structure from the metafile filename.
 
-        Open and read the file, parse the contents into a metadata structure.
+        Open and read the file, parse the contents into a filemodel structure.
         """
 
         record = [('filename', self.metafilename)]
@@ -357,45 +368,45 @@ class Metadata():
 
 #   Methods to return individual field values.    
     def title(self):
-        return '\n'. join(self.metadata['dc.title'])
+        return '\n'. join(self.metadata['dc_title'])
 
     def author(self):
-        return '; '.join(self.metadata['dc.creator'])
+        return '; '.join(self.metadata['dc_creator'])
 
     def contributors(self):
-        return '; '.join(self.metadata['dc.contributor'])
+        return '; '.join(self.metadata['dc_contributor'])
 
     def description(self):
-        return '\n'.join(self.metadata['dc.description'])
+        return '\n'.join(self.metadata['dc_description'])
 
     def doctype(self):
-        return '; '.join(self.metadata['dc.type'])
+        return '; '.join(self.metadata['dc_type'])
 
     def fileformat(self):
-        return '; '.join(self.metadata['dc.format'])
+        return '; '.join(self.metadata['dc_format'])
 
     def language(self):
-        return ', '.join(self.metadata['dc.language'])
+        return ', '.join(self.metadata['dc_language'])
 
     def location(self):
-        return ', '.join(self.metadata['dc.coverage'])
+        return ', '.join(self.metadata['dc_coverage'])
 
     def pubdate(self):
-        if len(self.metadata['dc.date']) > 0:
-            return self.metadata['dc.date'][0]
+        if len(self.metadata['dc_date']) > 0:
+            return self.metadata['dc_date'][0]
         else:
             return ""
 
     def publisher(self):
-        return '; '.join(self.metadata['dc.publisher'])
+        return '; '.join(self.metadata['dc_publisher'])
 
     def rights(self):
-        return '; '.join(self.metadata['dc.rights'])
+        return '; '.join(self.metadata['dc_rights'])
     
     def rights_markup(self):
         """Return marked-up code for rights. """
         rights = None
-        right = '; '.join(self.metadata['dc.rights'])
+        right = '; '.join(self.metadata['dc_rights'])
         if right in settings.LICENSES.keys():
             rights = "<a href='" + settings.LICENSES[right][0] + "'>"
             rights += settings.LICENSES[right][1] + "</a>"
@@ -403,10 +414,10 @@ class Metadata():
         return rights
         
     def source(self):
-        return '; '.join(self.metadata['dc.source'])
+        return '; '.join(self.metadata['dc_source'])
 
     def subject(self):
-        return ', '.join(self.metadata['dc.subject'])
+        return ', '.join(self.metadata['dc_subject'])
 
     def update_metadata(self, data):
         """Replace values in the metadata structure with supplied dictionary.
