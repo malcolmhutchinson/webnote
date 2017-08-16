@@ -13,14 +13,7 @@ import forms
 import settings
 import webnote
 
-ARCHIVES2 = [
-    ('/srv/content/notes', "Collection at /srv/content/notes"),
-    ('/srv/content/intranet', "The old intranet"),
-    ('/test', "Test archive"),
-]
-
-# New format (not implemented yet)
-# (url prefix, docroot, link text.
+# (url prefix, docroot, link text).
 ARCHIVES = [
     ('/notes', '/srv/content/notes', "Collection at /srv/content/notes"),
     ('/intranet', '/srv/content/intranet', "The old intranet"),
@@ -139,29 +132,18 @@ def page(request, url, command=None):
 
         template = 'editpage.html'
         navtemplate = 'nav_editpage.html'
-        
-        dc_form = forms.DublinCoreForm()
-        dc_form.fields['dc_creator'].initial = page.metadata.author
-        dc_form.fields['dc_contributor'].initial = page.metadata.contributors
-        dc_form.fields['dc_coverage'].initial = page.metadata.location
-        dc_form.fields['dc_date'].initial = page.metadata.pubdate
-        dc_form.fields['dc_description'].initial = page.metadata.description
-        dc_form.fields['dc_format'].initial = page.metadata.fileformat
-        dc_form.fields['dc_language'].initial = page.metadata.language
-        dc_form.fields['dc_publisher'].initial = page.metadata.publisher
-        dc_form.fields['dc_rights'].initial = page.metadata.rights
-        dc_form.fields['dc_subject'].initial = page.metadata.subject
-        dc_form.fields['dc_title'].initial = page.metadata.title
-        dc_form.fields['dc_type'].initial = page.metadata.doctype
-        dc_form.fields['dc_source'].initial = page.metadata.source
+
+        dc_form = forms.DublinCoreForm(initial=page.metadata.formdata_dc())
 
         content_form = forms.ContentForm()
         content_form.fields['content'].initial = page.filecontent
 
-
     if request.POST:
-        page.save(request.POST.dict())
-
+        page.save(request.POST)
+        page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
+        dc_form = forms.DublinCoreForm(initial=page.metadata.formdata_dc())
+        content_form.fields['content'].initial = page.filecontent
+        
     context = {
         'docroot': docroot,
         'address': address,

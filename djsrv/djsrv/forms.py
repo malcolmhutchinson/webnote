@@ -11,15 +11,19 @@ class ContentForm(forms.Form):
 
     
 class DublinCoreForm(forms.Form):
-    dc_contributor = forms.CharField(
-        max_length=255, required=False, label='contributer')
-    dc_coverage = forms.CharField(
-        max_length=255, required=False, label='location')
+    dc_title = forms.CharField(
+        max_length=255, required=False, label='title')
     dc_creator = forms.CharField(
         max_length=255, required=False, label='author')
+    dc_subject = forms.CharField(
+        max_length=255, required=False, label='keywords')
+    dc_coverage = forms.CharField(
+        max_length=255, required=False, label='location')
     dc_date = forms.DateField(label='date', required=False)
     dc_description = forms.CharField(
         max_length=255, required=False, label='description')
+    dc_contributor = forms.CharField(
+        max_length=255, required=False, label='contributer')
     dc_format = forms.CharField(
         max_length=255, required=False, label='format')
     dc_language = forms.CharField(
@@ -32,10 +36,6 @@ class DublinCoreForm(forms.Form):
         max_length=255, required=False, label='rights')
     dc_source = forms.CharField(
         max_length=255, required=False, label='source')
-    dc_subject = forms.CharField(
-        max_length=255, required=False, label='keywords')
-    dc_title = forms.CharField(
-        max_length=255, required=False, label='title')
     dc_type = forms.CharField(
         max_length=255, required=False, label='type')
 

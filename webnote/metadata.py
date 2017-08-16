@@ -2,6 +2,7 @@
 """
 
 import copy
+import datetime
 import os
 import settings
 
@@ -55,7 +56,7 @@ class Metadata():
 
     """
 
-    DC_METADATA = (
+    ELEMENTS = (
         "dc_title",
         "dc_creator",
         "dc_subject",
@@ -69,8 +70,8 @@ class Metadata():
         "dc_language",
         "dc_relation",
         "dc_identifier",
-        "dc_rights",
         "dc_publisher",
+        "dc_rights",
     )
 
     COMMANDS = (
@@ -106,11 +107,7 @@ class Metadata():
 
         """
 
-        metadata = {}
-        for key in self.DC_METADATA:
-            metadata[key] = [] 
-        for key in self.COMMANDS:
-            metadata[key] = []
+        metadata = self.build_empty_metadata()
 
         if pagefile:
             self.pagefile = pagefile
@@ -128,119 +125,19 @@ class Metadata():
             self.data = data
             self.metadata = self.process_data(data)
         
-    def construct_metafile_record(self, data=None):
-        """Return a string containing a metadata record in text format.
+    def build_empty_metadata(self):
+        """Return an empty metadata structure dictionary. 
 
-        A metafile is a string representation of a metarecord.
-
-        This produces a string containing a record suitable for filing
-        with pages in the document archive. It is intended to be
-        written to a text file with a .meta suffix.
-
-        If the metadata structure is empty, as at init, the result
-        will be a file record with a list of keys, but no values.
-
-        Normally used to create a metafile record for a new page, or
-        one which doesn't have a metafile associated with it.
-
-        """
-
-        metafile = ''
-        record = '# Dublin core metadata.\n'
-
-        metadata = self.metadata
-
+        This is a dictionary of lists, keyed by ELEMENTS and COMMANDS."""
         
-        for element in self.DC_METADATA:
-            if element in metadata.keys():
-                key = element.replace('dc_', 'DC.')
-                record +=  key + ": "
-                record += '; '.join(metadata[element]) + '\n'
-
-        record += "# end Dublin core elements.\n\n"
-
+        metadata = {}
+        for element in self.ELEMENTS:
+            metadata[element] = []
         for element in self.COMMANDS:
-            if element in metadata.keys():
-                record += element + ": "
-                #print metadata[element]
-                record += '; '.join(metadata[element]) + '\n'
-            
-        
-        #for line in metarecord:
+            metadata[element] = []
 
-        #    (key, value) = line
-        #    if key.lower() == 'comment':
-        #        key = '#'
-        #    else:
-        #        key = key + ":"
-                
-        #    if key.lower() == 'dc.title:':
-        #        if not value:
-        #            value = self.find_title()
+        return metadata
 
-            
-        #    metafile += key
-        #    metafile += '   '
-        #    metafile += value + '\n'
-
-        return record
-
-    def save(self, data):
-        """Save a metarecord to file."""
-
-        print "SAVING metarecord"
-        print self.construct_metafile_record()
-
-#       Process the input dictionary into a metarecord
-        
-    def construct_metarecord(self):
-        """Return a metarecord object from filespace data.
-
-        A metarecord is a list of (key, value) tuples.
-        """
-        
-        metarecord = [
-            ('comment', 'Dublin core metadata record'),
-        ]
-
-        for line in sorted(self.DC_METADATA.keys()):
-            metarecord.append((line, ''))
-
-        metarecord.append(
-            (('comment', 'End Dublin core metadata record')),
-        )
-        
-        return metarecord
-
-    def create_metafile(self, metarecord=None):
-        """Create a file in the preferred metafile location.
-
-        This method has SIDE EFFECTS!
-
-        Write a metafile record into that file. 
-        """
-
-        (dirpath, filename) = os.path.split(self.preferred_filename())
-        
-        #dirpath = os.path.join(dirpath, 'meta')
-        metafile = self.construct_metafile_record(metarecord=metarecord)
-
-        filename = self.preferred_filename()
-        if not os.path.isdir(dirpath):
-            print "MAKING DIRECTORY AT ", dirpath
-            os.mkdir(dirpath)
-
-        if os.path.isfile(filename):
-            print "METAFILE EXISTS AT ", filename
-        else:
-            print "WRITING METAFILE RECORD TO", filename
-            f = open(filename, 'w')
-            f.write(metafile)
-            f.close()
-            
-        return (filename, metafile)
-        
-        
     def dublincore(self):
 
         """Return a list of DC metadata attribute names and values.
@@ -253,8 +150,11 @@ class Metadata():
         dc = []
 
         for item in self.metadata.keys():
-            if item[0][:3].upper() == 'DC.':
-                dc.append(item)
+            if item[:3].lower() == 'dc_':
+                dc.append(
+                    (item.replace('dc_', 'DC.'),
+                     '; '.join(self.metadata[item])))
+
         return dc
 
     def find_title(self):
@@ -302,6 +202,50 @@ class Metadata():
 
         return None
 
+    def formdata_dc(self):
+        """Return a dictionary suitable for populating forms."""
+
+        formdata = {}
+        for element in self.ELEMENTS:
+            formdata[element] = '; '.join(self.metadata[element])
+        
+        return formdata
+        
+    def metafile_record(self, data=None):
+        """Return a string containing a metadata record in text format.
+
+        This produces a string containing a record suitable for filing
+        with pages in the document archive. It is intended to be
+        written to a text file with a .meta suffix.
+
+        If the metadata structure is empty, as at init, the result
+        will be a file record with a list of keys, but no values.
+
+        """
+
+        record = '# Dublin core metadata.\n'
+
+        metadata = self.metadata
+        
+        for element in self.ELEMENTS:
+            if element in metadata.keys():
+                key = element.replace('dc_', 'DC.')
+                record +=  key + ": "
+                record += '; '.join(metadata[element]) + '\n'
+
+        record += "# end Dublin core elements.\n\n"
+
+        record += "# Page commands.\n"
+        for element in self.COMMANDS:
+            if element in metadata.keys():
+                record += element + ": "
+                record += '; '.join(metadata[element]) + '\n'
+        record += "# End page commands.\n"
+        record += "# Record written by webnote.metadata at "
+        record += str(datetime.datetime.now()) + '\n'
+
+        return record
+
     def preferred_filename(self):
         """Return the preferred filename for a new metadata file.
 
@@ -316,20 +260,23 @@ class Metadata():
 
         return filename
 
+    def process_data(self, data):
+
+        metadata = self.build_empty_metadata()
+
+        for element in metadata.keys():
+            if element in data.keys():
+                metadata[element].append(data[element])
+                    
+        return metadata
+        
     def process_filemodel(self, filemodel):
-        """Convert self.metarecord into metadata and command structures.
+        """Convert a filemodel into metadata structure.
 
         """
 
-        metadata = {}
-
-        # Ensures we can always reach for a dc_ element, and a command.
-        for element in self.DC_METADATA:
-            metadata[element.lower()] = []
-        for element in self.COMMANDS:
-            metadata[element.lower()] = []
-
-        # Build the commands in as keys also
+        metadata = self.build_empty_metadata()
+        
         for line in self.filemodel:
             
             if line[0].lower().replace('.', '_') in metadata.keys():
@@ -343,7 +290,11 @@ class Metadata():
     def read_metafile(self):
         """Return a metafile model structure from the metafile filename.
 
-        Open and read the file, parse the contents into a filemodel structure.
+        Open and read the file, parse the contents into a filemodel
+        structure.
+
+        Key and value are separated by colon ':'.
+
         """
 
         record = [('filename', self.metafilename)]
@@ -366,6 +317,28 @@ class Metadata():
 
         return record
 
+    def save(self, data=None):
+        """Save a metarecord to file."""
+
+        if data:
+            self.metadata = self.process_data(data)    
+
+        record = self.metafile_record()
+
+        metafilename = self.metafilename
+        if not self.metafilename:
+            metafilename = self.preferred_filename()
+            
+        (path, fname) = os.path.split(metafilename)
+
+        if not os.path.isdir(path):
+            print "MAKING META DIRECTORY"
+            os.mkdir(path)
+
+        f = open(metafilename,'w')
+        f.write(record)
+        f.close()
+        
 #   Methods to return individual field values.    
     def title(self):
         return '\n'. join(self.metadata['dc_title'])
@@ -418,12 +391,4 @@ class Metadata():
 
     def subject(self):
         return ', '.join(self.metadata['dc_subject'])
-
-    def update_metadata(self, data):
-        """Replace values in the metadata structure with supplied dictionary.
-
-        This is often used with POST data.
-        """
-
-        return True
 

@@ -533,13 +533,12 @@ class Page(Webnote):
 
         """
 
-        #self.filecontent = data['content']
-        #self.metadata = data['metadata']
+        if 'content' in data.keys():
+        
+            filecontent = data['content']
+            f = open(self.filename, 'w')
+            f.write(filecontent)
 
-        #f = open(self.filename, 'w')
-        #f.write(data['filecontent'])
-
-        #self.warnings.append("Saving file " + self.filename)
         self.metadata.save(data)
 
         return True
