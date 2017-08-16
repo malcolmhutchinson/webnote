@@ -15,10 +15,10 @@ import webnote
 
 # (url prefix, docroot, link text).
 ARCHIVES = [
-    ('/notes', '/srv/content/notes', "Collection at /srv/content/notes"),
-    ('/intranet', '/srv/content/intranet', "The old intranet"),
-    ('/test', os.path.join(settings.STATICFILES_DIRS[0], 'test'),
-     "Test archive"
+    #('/notes', '/srv/content/notes', "Collection at /srv/content/notes"),
+    #('/intranet', '/srv/content/intranet', "The old intranet"),
+    ('/manual', os.path.join(settings.STATICFILES_DIRS[0], 'manual'),
+     "Webnote manual and test pages"
     ),
 ]
 

@@ -1,25 +1,26 @@
-# Dublin Core metadata record
-DC.Title:       Webnote test ddata collection: with a colon in the title
-DC.Creator:     Malcolm Hutchinson
-DC.Subject:     Simple syntax, test data
-DC.Description: Index page to the test data set
-DC.Contributor:
-DC.Coverage:    Hamilton, New Zealand
-DC.Date:        2015-11-29
-DC.Type:        Test data
-DC.Format:      text/html
-DC.Source:
-DC.Language:    en
-DC.Identifier:
-DC.Publisher:   archaeography.co.nz
-DC.Publisher:   Malcolm Hutchinson
-DC.Relation:
-DC.Rights:      cc-by
-# END DC metadata
+# Dublin core metadata.
+DC.title: Webnote manual
+DC.creator: Malcolm Hutchinson
+DC.subject: Simple syntax, web delivery
+DC.description: Index page to the test data set
+DC.contributor: 
+DC.coverage: Hamilton, New Zealand
+DC.date: 2015-11-29
+DC.type: index page
+DC.format: text/markdown
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: cc-by
+# end Dublin core elements.
 
-# Page command options
-sort-reverse:   false # true
-deny:           all
-allow:          staff
-status:         draft
-# END page command
+# Page commands.
+status: 
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-16 23:31:43.078090
