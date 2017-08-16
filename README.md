@@ -93,7 +93,7 @@ Now, run the Django development server:
 
     (env) $ python code/djsrv/manage.py runserver
 
-And point your webserver at localhost, port 8000:
+And point your browser at localhost, port 8000:
 
     http://localhost:8000/
 
