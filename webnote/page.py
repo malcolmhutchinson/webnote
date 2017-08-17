@@ -516,7 +516,7 @@ class Page(Webnote):
 
         return previous
 
-    def save(self, data):
+    def save(self, data, files=None):
         """Replace the contents of the file with the supplied data.
 
         Call the metadata object and update or create a metafile with
@@ -524,10 +524,9 @@ class Page(Webnote):
 
         The attribute data is a dictionary:
 
-        {
-            'filecontent': string,
-            'metadata': metadata object,
-        }
+            'content': 'string containing contents to be written to file',
+            'dc_title': dc_title,
+            ...
 
         Return True if everything goes according to plan.
 
@@ -538,6 +537,19 @@ class Page(Webnote):
             filecontent = data['content']
             f = open(self.filename, 'w')
             f.write(filecontent)
+
+        if not self.paired_directory:
+            path = os.path.join(self.docroot, self.address)
+            os.mkdir(path)
+
+        if files:
+            f = files['filename']
+            filepath = os.path.join(
+                self.docroot, self.address, str(files['filename']))
+
+            with open(filepath, 'wb+') as destination:
+                for chunk in f.chunks():
+                    destination.write(chunk)
 
         self.metadata.save(data)
 

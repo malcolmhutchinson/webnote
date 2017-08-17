@@ -102,6 +102,11 @@ img {
     margin-right: 2em;
 }
 
+.fig-100px {
+    width: 100px;
+    margin: 2px;
+    float: left;
+
 .keypair th {
     text-align: right;
 }

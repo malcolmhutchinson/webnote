@@ -25,6 +25,8 @@ class Webnote():
 
     warnings = []
 
+    # Need to get rid of the directory argument. This would be called
+    # from a Directory object, if one were known.
     def reference_figures(self, source, baseurl, directory=None, figures=None):
         """Convert coded references to figures in a text into HTML.
 

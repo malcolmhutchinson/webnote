@@ -139,10 +139,12 @@ def page(request, url, command=None):
         content_form.fields['content'].initial = page.filecontent
 
     if request.POST:
-        page.save(request.POST)
+        page.save(request.POST, files=request.FILES)
         page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
         dc_form = forms.DublinCoreForm(initial=page.metadata.formdata_dc())
         content_form.fields['content'].initial = page.filecontent
+
+    #print "HERE", page.paired_directory.directory
         
     context = {
         'docroot': docroot,

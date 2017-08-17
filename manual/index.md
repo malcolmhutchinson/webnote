@@ -1,6 +1,9 @@
 The webnote manual
 ==================
 
+[[R:sydneyOperahHouse.jpg Just to show figures are working.]]
+
+
 This is all about how to use webnote.
 
 We start with instructions on how to download the code from GitHub
@@ -15,38 +18,46 @@ These pages also contain examples of how to structure a collection of
 text files and images to form a simple syntax archive, so you can see
 exactly how it works.
 
-
-[[L:sydneyOperahHouse.jpg Figure to the left (this is the caption).]]
-
-
 This is a document archive which should conform to simple syntax
 rules. That is, the "good data" will conform, whereas the "bad data"
 directory contains files designed to trip the machine up.
 
-This file has several test features embedded in it too. At the moment,
-this consists of a lot of exessive verbiage, the purpose of which is
-merely to provide a page that is long enough such that the user will
-have to scroll down to see all of it.
+
+### Index (or outline)
+
+In a particular order.
+
+    download and install
+
+    configuration
+
+        configuring the archives
+
+        adding new archives to the server
+
+    deployment
+
+    using the Django app on a deployed server
+
+        creating new pages
+
+        editing page content and metadata
+
+        editing files directly
+
+    The simple syntax
+
+        Overview
+
+        Page relationships
+        
+        Pages in markdown
+
+        Including figures with captions
+
+That's more like an outline really. It will soon be converted into a
+webnote archive of text files and illustrations in image files.
 
 
-Level two heading
------------------
 
-This is the start of a main section within the page. There might be
-some words along here, or maybe a figure and caption. 
 
-### Level three heading
-
-[[R:flowers.jpg Figure to the right.]]
-
-This is a minor break within a section. There may well be some more
-words here. Maybe even a paragraph or two.
-
-One day soon, there will be a list of unreferenced figures, below the
-contents section there. 
-
-One day, these test files will be combined with a bunch of manual
-files, and I'll ship this thing, first to my adventurer website, and
-then to github or something.
-
-It will require building a deployment script. 

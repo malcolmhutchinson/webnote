@@ -9,8 +9,8 @@ class ContentForm(forms.Form):
     )
 
 
-    
 class DublinCoreForm(forms.Form):
+    filename = forms.FileField(required=False, label='Upload file')
     dc_title = forms.CharField(
         max_length=255, required=False, label='title')
     dc_creator = forms.CharField(
@@ -38,7 +38,6 @@ class DublinCoreForm(forms.Form):
         max_length=255, required=False, label='source')
     dc_type = forms.CharField(
         max_length=255, required=False, label='type')
-
 
 
 

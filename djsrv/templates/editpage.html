@@ -1,11 +1,24 @@
 {% extends 'framework.html' %}{% block main %}{% load staticfiles %} 
 
-<div id='pagecontent'>
+ <div id='pagecontent'>
 
   <h3>Edit this page</h3>
 
    {{ content_form.as_p }}
 
+  {% if page.unref_figs %}
+  <h3>Unreferenced figures</h3>
+
+  {% for fig in page.unref_figs %}
+
+  <div class='fig-100px' style="width: 150px; display: inline; float: left;">
+    
+    <img src='{{ fig.0 }}' alt='{{ fig.1 }}'  />
+    <p class='caption'>{{ fig.1 }}</p>
+  </div>{% endfor %}
+
+  <div style='clear: both;'></div>{% endif %}
+  
   <hr />
 
 
