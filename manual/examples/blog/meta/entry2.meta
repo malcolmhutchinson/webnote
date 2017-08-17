@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Blog entry 2
+DC.creator: 
+DC.subject: 
+DC.description: 
+DC.contributor: 
+DC.coverage: 
+DC.date: 
+DC.type: 
+DC.format: 
+DC.source: 
+DC.language: 
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: 
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-16 23:42:34.793311
