@@ -90,20 +90,20 @@ class Page(Webnote):
     warnings = []
 
     def __init__(self, docroot, baseurl, address=None,
-                 data=None, staticroot=None
-    ):
-        """Instantiating without an address will return the index file.
+                 data=None, staticroot=None):
+        """Create a Page object, compute parent & paired directories.
 
         Do the minimum necessary computations.
 
         - Set globals for input variables.
-        - Determine the docroot exists. Exit with exception if not.
-        - Compute the addressed file & read it. Exit with exception
-          if this file is not found.
+        - Determine if the docroot exists. Exit with exception if not.
+        - Compute the addressed file & read it. 
         - Compute the parent and paired directories.
         - Create a Metadata object.
 
-        The staticroot attirbute is used to override
+        Instantiating without an address will return the index file.
+
+        The staticroot attribute is used to override
         settings.STATIC_URL. This string is prepended to urls in the
         figures code.
 
@@ -113,13 +113,15 @@ class Page(Webnote):
             docroot index.
 
             This looks for a file called 'index' with one of the
-            values in settings.SUFFIX['page']. If it doesn't find one,
-            it addeds a line to the warnings list.
+            values in settings.SUFFIX['page']. 
+
+        The data attribute is used to override content and metadata
+        values, and can be supplied when saving an object.
 
         """
 
         if not docroot:
-            raise self.DocrootNotFound(docroot)
+            raise self.DocrootNotSupplied()
 
         if not os.path.isdir(docroot):
             raise self.DocrootNotFound(docroot)
@@ -160,6 +162,13 @@ class Page(Webnote):
             self.metadata = Metadata(self.filename)
 
     class DocrootNotFound(Exception):
+        def __init__(self, value):
+            self.value = value
+
+        def __str__(self):
+            return repr(self.value)
+
+    class DocrootNotSupplied(Exception):
         def __init__(self, value):
             self.value = value
 
@@ -399,7 +408,6 @@ class Page(Webnote):
         if baseurl[0] == '/':
             baseurl = self.baseurl[1:]
 
-            
         baseurl = os.path.join(self.staticroot, baseurl)
         if self.address:
             baseurl = os.path.join(self.staticroot, baseurl, self.address)
@@ -407,17 +415,18 @@ class Page(Webnote):
         figures = None
 
         if self.paired_directory:
-            figures = self.paired_directory.get_figs()
+            figures = self.paired_directory.figures()
             directory = None
-        if ext in settings.SUFFIX['text']:
+
+        if ext in settings.SUFFIX['html']:
+            content = self.filecontent
+        else:
             if figures:
                 content, unref_figs = self.reference_figures(
                     source, baseurl, figures=figures)
                 self._store_unref_figs = unref_figs
 
             content = markdown.markdown(content)
-        else:
-            content = self.filecontent
 
         self._store_content = content
 

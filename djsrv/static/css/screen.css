@@ -26,6 +26,13 @@ th, td {
     vertical-align: top;
 }
 
+pre, code {
+    background: #eee;
+}
+pre {
+    padding: 1em;
+}
+
 #header {
     background: white;
     font-family: sans-serif;
@@ -72,24 +79,20 @@ th, td {
 #pagecontent {
     margin-left: auto;
     margin-right: auto;
-    max-width: 50em;
+    max-width: 40em;
     padding: 1em 2em 2em 2em;
 }
-#pagecontent p {
-    max-width: 40em;
 
-}
 #contents {
     margin-left: auto;
     margin-right: auto;
-    max-width: 50em;
+    max-width: 40em;
     padding: 1em 2em 2em 2em;
     border-top: 1px black solid;
 }
 
 img {
     width: 100%;
-    max-width: 800px;
 }
 .figure-right {
     width: 40%;

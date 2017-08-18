@@ -46,71 +46,6 @@ class Directory(Webnote):
     def __unicode__(self):
         return self.directory
 
-    def parse_directory(self, directory):
-        """Return a dictionary containing lists of files by type.
-
-        It looks for keys in the settings.SUFFIX variable. The output
-        dictionary will have elemements corresponding to the keys of
-        this dictionary. It will also contain elements "dirs",
-        "hidden" and "all".
-
-        Hidden files start with a period. Temporary files end with a
-        tilde.
-        """
-
-        if not os.path.isdir(directory):
-            raise self.ParseDirNotFound(directory)
-
-        output = {
-            'dirs': [],
-            'hidden': [],
-            'temp': [],
-            'unknown': [],
-        }
-
-        for key in settings.SUFFIX:
-            output[key] = []
-
-        if self.sort:
-            listing = sorted(os.listdir(directory))
-        else:
-            listing = os.listdir(directory)
-
-        for item in listing:
-            if item[0] == '.':
-                output['hidden'].append(item)
-
-            elif item[-1] == '~':
-                output['temp'].append(item)
-
-            elif os.path.isdir(os.path.join(directory, item)):
-                output['dirs'].append(item)
-
-            else:
-                basename, ext = os.path.splitext(item)
-                found = False
-                for key in settings.SUFFIX:
-                    if ext.lower() in settings.SUFFIX[key]:
-                        output[key].append(item)
-                        found = True
-                if not found:
-                    output['unknown'].append(item)
-
-        output['all'] = listing
-
-        return output
-
-    def get_figs(self):
-        if self.model['figs']:
-            return self.model['figs']
-        return []
-
-    def link_self(self, baseurl):
-
-        link = os.path.join(baseurl, self.directory)
-        text = self.clean_name()
-        return (link, text)
-
     def clean_name(self):
 
         steps = self.directory.split('/')
@@ -122,6 +57,17 @@ class Directory(Webnote):
             name = '/home/' + getpass.getuser() + '/www/'
             
         return name
+
+    def figures(self):
+        if self.model['figs']:
+            return self.model['figs']
+        return []
+
+    def link_self(self, baseurl):
+
+        link = os.path.join(baseurl, self.directory)
+        text = self.clean_name()
+        return (link, text)
 
     def link_all(self, baseurl):
         """Return a list of (link, text) tuples identifying all files."""
@@ -277,4 +223,58 @@ class Directory(Webnote):
             targets.append((link, text))
 
         return targets
+
+    def parse_directory(self, directory):
+        """Return a dictionary containing lists of files by type.
+
+        It looks for keys in the settings.SUFFIX variable. The output
+        dictionary will have elemements corresponding to the keys of
+        this dictionary. It will also contain elements "dirs",
+        "hidden" and "all".
+
+        Hidden files start with a period. Temporary files end with a
+        tilde.
+        """
+
+        if not os.path.isdir(directory):
+            raise self.ParseDirNotFound(directory)
+
+        output = {
+            'dirs': [],
+            'hidden': [],
+            'temp': [],
+            'unknown': [],
+        }
+
+        for key in settings.SUFFIX:
+            output[key] = []
+
+        if self.sort:
+            listing = sorted(os.listdir(directory))
+        else:
+            listing = os.listdir(directory)
+
+        for item in listing:
+            if item[0] == '.':
+                output['hidden'].append(item)
+
+            elif item[-1] == '~':
+                output['temp'].append(item)
+
+            elif os.path.isdir(os.path.join(directory, item)):
+                output['dirs'].append(item)
+
+            else:
+                basename, ext = os.path.splitext(item)
+                found = False
+                for key in settings.SUFFIX:
+                    if ext.lower() in settings.SUFFIX[key]:
+                        output[key].append(item)
+                        found = True
+                if not found:
+                    output['unknown'].append(item)
+
+        output['all'] = listing
+
+        return output
 
