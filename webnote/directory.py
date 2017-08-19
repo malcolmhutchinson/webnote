@@ -44,7 +44,6 @@ class Directory(Webnote):
                 self.docroot = docroot
 
                 self.address = dirpath.replace(docroot, '')
-                print "ADDRESS", self.address
         
         if baseurl:
             self.baseurl = baseurl
@@ -52,10 +51,6 @@ class Directory(Webnote):
         self.dirpath = dirpath
         self.sort = sort
         self.model = self._parse_directory(dirpath)
-
-        print "DIRPATH", dirpath
-        print "DOCROOT", docroot
-        print "BASEURL", baseurl
 
     class ParseDirNotFound(Exception):
         def __init__(self, value):
