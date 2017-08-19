@@ -115,7 +115,7 @@ SUFFIX = {
     'opendoc_writer': ('.odt', '.fodt', ),
 
     'markdown': ('.mkd', '.md',),
-    'text': ('.txt', '.md',),
+    'text': ('.txt', ),
 }
 
 # The SUFFIX structure also holds composite lists.

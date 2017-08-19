@@ -26,6 +26,10 @@ th, td {
     vertical-align: top;
 }
 
+code {
+    font-size: 120%;
+}
+
 pre, code {
     background: #eee;
 }

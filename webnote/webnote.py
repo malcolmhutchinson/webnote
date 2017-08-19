@@ -27,7 +27,7 @@ class Webnote():
 
     # Need to get rid of the directory argument. This would be called
     # from a Directory object, if a directory is known.
-    def reference_figures(self, source, baseurl, directory=None, figures=None):
+    def reference_figures(self, source, baseurl, figures=None):
         """Convert coded references to figures in a text into HTML.
 
         Given a source text containing references to image files in
@@ -86,14 +86,6 @@ class Webnote():
         expression = r'\[\[.*\]\]'
         p = re.compile(expression)
         result = p.findall(source)
-
-        if not figures:
-
-            if self.figs:
-                figures = self.figs
-            elif directory:
-                d = Directory(directory)
-                figures = d.figs
 
         if figures:
 

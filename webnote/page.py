@@ -120,15 +120,14 @@ class Page(Webnote):
 
         """
 
-        if not docroot:
-            raise self.DocrootNotSupplied()
-
         if not os.path.isdir(docroot):
             raise self.DocrootNotFound(docroot)
 
         self.warnings = []
 
         self.docroot = docroot
+        self.baseurl = baseurl
+        
         if docroot[-1] != '/':
             self.docroot = docroot + '/'
 
@@ -153,8 +152,10 @@ class Page(Webnote):
             self.staticroot = staticroot
         else:
             self.staticroot = settings.STATIC_URL
-            
-        self._parse_directories()
+
+        (self.parent_directory,
+         self.paired_directory) = self._parse_directories()
+        
         self._read_target_file()
         self.link = self._get_link()
 
@@ -168,20 +169,12 @@ class Page(Webnote):
         def __str__(self):
             return repr(self.value)
 
-    class DocrootNotSupplied(Exception):
-        def __init__(self, value):
-            self.value = value
-
-        def __str__(self):
-            return repr(self.value)
-
     class DocumentNotFound(Exception):
         def __init__(self, value):
             self.value = value
 
         def __str__(self):
             return repr(self.value)
-
 
     def get_absolute_url(self):
         if self.address:
@@ -251,7 +244,7 @@ class Page(Webnote):
     def _parse_directories(self):
         """Create webnote directory structures for parent and paired dirs.
 
-        Set global variables with Directory objects.
+        Return parent and paired directory objects.
 
         Sets:
 
@@ -263,21 +256,26 @@ class Page(Webnote):
 
         """
 
+        parent = None
+        paired = None
+
         try:
-            self.parent_directory = Directory(self.parent_dirname)
+            parent = Directory(self.parent_dirname)
         except Directory.ParseDirNotFound:
             self.warnings.append(
                 'Parent directory not found: ' + self.parent_dirname)
 
         if self.paired_dirname == self.parent_dirname:
-            self.paired_directory = self.parent_directory
+            paired = parent
 
         else:
             try:
-                self.paired_directory = Directory(self.paired_dirname)
+                paired = Directory(self.paired_dirname)
             except Directory.ParseDirNotFound:
                 self.warnings.append(
                     'No paired directory.')
+
+        return(parent, paired)
             
     def _read_target_file(self):
 
@@ -415,15 +413,16 @@ class Page(Webnote):
         figures = None
 
         if self.paired_directory:
-            figures = self.paired_directory.figures()
+            figures = self.paired_directory.model['figs']
             directory = None
 
         if ext in settings.SUFFIX['html']:
             content = self.filecontent
         else:
             if figures:
-                content, unref_figs = self.reference_figures(
-                    source, baseurl, figures=figures)
+                (content, unref_figs) = self.reference_figures(
+                    source, baseurl, figures=figures
+                )                
                 self._store_unref_figs = unref_figs
 
             content = markdown.markdown(content)

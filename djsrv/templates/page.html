@@ -2,6 +2,13 @@
 
 <div id='pagecontent'>
 
+  <ol>
+  {% for page in page.paired_directory.pages %}
+  <li>{{page.1 }}</li>
+  {% endfor %}
+  </ol>
+
+  
   {{ page.content|safe }}
 
 </div><!-- Close pagecontent -->

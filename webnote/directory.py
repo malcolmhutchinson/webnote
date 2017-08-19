@@ -1,12 +1,12 @@
 """Classes implimenting the simple filesystem syntax.
 """
 
-
 import getpass
 import os
 import settings
 
 from webnote import Webnote
+
 
 class Directory(Webnote):
     """Provide directory services.
@@ -19,22 +19,24 @@ class Directory(Webnote):
 
     """
 
-    directory = None
+    dirpath = None
     model = None
     baseurl = None
     sort = None
 
-    def __init__(self, directory, baseurl=None, sort=True):
+    def __init__(self, dirpath, baseurl=None, sort=True):
+        """Create a Directory object from a string path to directory.
+        """
 
-        if not os.path.isdir(directory):
-            raise self.ParseDirNotFound(directory)
+        if not os.path.isdir(dirpath):
+            raise self.ParseDirNotFound(dirpath)
 
         if baseurl:
             self.baseurl = baseurl
 
-        self.directory = directory
+        self.dirpath = dirpath
         self.sort = sort
-        self.model = self.parse_directory(directory)
+        self.model = self._parse_directory(dirpath)
 
     class ParseDirNotFound(Exception):
         def __init__(self, value):
@@ -44,32 +46,63 @@ class Directory(Webnote):
             return repr(self.value)
 
     def __unicode__(self):
-        return self.directory
+        return self.dirpath
 
-    def clean_name(self):
+    def _parse_directory(self, dirpath):
+        """Return a dictionary containing lists of files by type.
 
-        steps = self.directory.split('/')
-        last = steps.pop()
+        It looks for keys in the settings.SUFFIX variable. The output
+        dictionary will have elemements corresponding to the keys of
+        this dictionary. It will also contain elements "dirs",
+        "hidden" and "all".
 
-        name = last.replace('_', '')
+        Hidden files start with a period. Temporary files end with a
+        tilde.
+        """
 
-        if last == 'www':
-            name = '/home/' + getpass.getuser() + '/www/'
-            
-        return name
+        if not os.path.isdir(dirpath):
+            raise self.ParseDirNotFound(dirpath)
 
-    def figures(self):
-        if self.model['figs']:
-            return self.model['figs']
-        return []
+        output = {
+            'dirs': [],
+            'hidden': [],
+            'temp': [],
+            'unknown': [],
+        }
 
-    def link_self(self, baseurl):
+        for key in settings.SUFFIX:
+            output[key] = []
 
-        link = os.path.join(baseurl, self.directory)
-        text = self.clean_name()
-        return (link, text)
+        if self.sort:
+            listing = sorted(os.listdir(dirpath))
+        else:
+            listing = os.listdir(dirpath)
 
-    def link_all(self, baseurl):
+        for item in listing:
+            if item[0] == '.':
+                output['hidden'].append(item)
+
+            elif item[-1] == '~':
+                output['temp'].append(item)
+
+            elif os.path.isdir(os.path.join(dirpath, item)):
+                output['dirs'].append(item)
+
+            else:
+                basename, ext = os.path.splitext(item)
+                found = False
+                for key in settings.SUFFIX:
+                    if ext.lower() in settings.SUFFIX[key]:
+                        output[key].append(item)
+                        found = True
+                if not found:
+                    output['unknown'].append(item)
+
+        output['all'] = listing
+
+        return output
+
+    def all_files(self, baseurl=None):
         """Return a list of (link, text) tuples identifying all files."""
 
         targets = []
@@ -81,7 +114,19 @@ class Directory(Webnote):
 
         return targets
 
-    def link_data(self, baseurl):
+    def clean_name(self):
+
+        steps = self.dirpath.split('/')
+        last = steps.pop()
+
+        name = last.replace('_', '')
+
+        if last == 'www':
+            name = '/home/' + getpass.getuser() + '/www/'
+            
+        return name
+
+    def datafiles(self, baseurl=None):
         """Return a list of (link, text) tuples identifying data files."""
 
         targets = []
@@ -93,7 +138,7 @@ class Directory(Webnote):
 
         return targets
 
-    def link_docs(self, baseurl):
+    def documents(self, baseurl=None):
         """Return a list of (link, text) tuples identifying document files."""
 
         targets = []
@@ -105,10 +150,16 @@ class Directory(Webnote):
 
         return targets
 
-    def link_figs(self, baseurl):
+    def figures(self, baseurl=None):
         """Return a list of (link, text) tuples identifying figure files."""
 
         targets = []
+
+        if not baseurl:
+            if self.baseurl:
+                baseurl = self.baseurl
+            else:
+                baseurl = ''
 
         for item in self.model['figs']:
             link = os.path.join(baseurl, item)
@@ -117,7 +168,7 @@ class Directory(Webnote):
 
         return targets
 
-    def link_hidden(self, baseurl):
+    def hiddenfiles(self, baseurl=None):
         """Return a list of (link, text) tuples identifying hidden files."""
 
         targets = []
@@ -129,19 +180,7 @@ class Directory(Webnote):
 
         return targets
 
-    def link_html(self, baseurl):
-        """Return a list of (link, text) tuples identifying all html files."""
-
-        targets = []
-
-        for item in self.model['html']:
-            link = os.path.join(baseurl, item)
-            text = item
-            targets.append((link, text))
-
-        return targets
-
-    def link_image(self, baseurl):
+    def hiresimages(self, baseurl=None):
         """Return a list of (link, text) tuples identifying image files."""
 
         images = []
@@ -153,7 +192,19 @@ class Directory(Webnote):
 
         return images
 
-    def link_meta(self, baseurl):
+    def htmlfiles(self, baseurl=None):
+        """Return a list of (link, text) tuples identifying all html files."""
+
+        targets = []
+
+        for item in self.model['html']:
+            link = os.path.join(baseurl, item)
+            text = item
+            targets.append((link, text))
+
+        return targets
+
+    def metafiles(self, baseurl=None):
         """Return a list of (link, text) tuples identifying meta files."""
 
         targets = []
@@ -165,45 +216,10 @@ class Directory(Webnote):
 
         return targets
 
-    def link_temp(self, baseurl):
-        """Return a list of (link, text) tuples identifying temporary files."""
-
-        targets = []
-
-        for item in self.model['']:
-            link = os.path.join(baseurl, item)
-            text = item
-            targets.append((link, text))
-
-        return targets
-
-    def link_text(self, baseurl):
-        """Return a list of (link, text) tuples identifying text files."""
-
-        targets = []
-
-        for item in self.model['text']:
-            link = os.path.join(baseurl, item)
-            text = item
-            targets.append((link, text))
-
-        return targets
-
-    def link_unknown(self, baseurl):
-        """Return a list of (link, text) tuples identifying  files."""
-
-        targets = []
-
-        for item in self.model['unknown']:
-            link = os.path.join(baseurl, item)
-            text = item
-            targets.append((link, text))
-
-        return targets
-
-    def pages(self, baseurl=None, suffix=False):
+    def pages(self, baseurl=None, suffix=None):
         """Return a list of (link, text) tuples identifying page files."""
 
+        print "HERE ----------------------------------------"
         targets = []
 
         if not baseurl:
@@ -224,57 +240,47 @@ class Directory(Webnote):
 
         return targets
 
-    def parse_directory(self, directory):
-        """Return a dictionary containing lists of files by type.
+    def tempfiles(self, baseurl=None):
+        """Return a list of (link, text) tuples identifying temporary files."""
 
-        It looks for keys in the settings.SUFFIX variable. The output
-        dictionary will have elemements corresponding to the keys of
-        this dictionary. It will also contain elements "dirs",
-        "hidden" and "all".
+        targets = []
 
-        Hidden files start with a period. Temporary files end with a
-        tilde.
-        """
+        for item in self.model['']:
+            link = os.path.join(baseurl, item)
+            text = item
+            targets.append((link, text))
 
-        if not os.path.isdir(directory):
-            raise self.ParseDirNotFound(directory)
+        return targets
 
-        output = {
-            'dirs': [],
-            'hidden': [],
-            'temp': [],
-            'unknown': [],
-        }
+    def textfiles(self, baseurl=None):
+        """Return a list of (link, text) tuples identifying text files."""
 
-        for key in settings.SUFFIX:
-            output[key] = []
+        targets = []
 
-        if self.sort:
-            listing = sorted(os.listdir(directory))
-        else:
-            listing = os.listdir(directory)
+        for item in self.model['text']:
+            link = os.path.join(baseurl, item)
+            text = item
+            targets.append((link, text))
 
-        for item in listing:
-            if item[0] == '.':
-                output['hidden'].append(item)
+        return targets
 
-            elif item[-1] == '~':
-                output['temp'].append(item)
+    def unknownfiles(self, baseurl=None):
+        """Return a list of (link, text) tuples identifying  files."""
 
-            elif os.path.isdir(os.path.join(directory, item)):
-                output['dirs'].append(item)
+        targets = []
 
-            else:
-                basename, ext = os.path.splitext(item)
-                found = False
-                for key in settings.SUFFIX:
-                    if ext.lower() in settings.SUFFIX[key]:
-                        output[key].append(item)
-                        found = True
-                if not found:
-                    output['unknown'].append(item)
+        for item in self.model['unknown']:
+            link = os.path.join(baseurl, item)
+            text = item
+            targets.append((link, text))
 
-        output['all'] = listing
+        return targets
 
-        return output
+
+
+    def link_self(self, baseurl):
+
+        link = os.path.join(baseurl, self.dirpath)
+        text = self.clean_name()
+        return (link, text)
 
