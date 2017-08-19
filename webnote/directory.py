@@ -19,24 +19,40 @@ class Directory(Webnote):
 
     """
 
+    address = None
     dirpath = None
     model = None
     baseurl = None
     sort = None
 
-    def __init__(self, dirpath, baseurl=None, sort=True):
+    def __init__(self, dirpath, docroot=None, baseurl=None, sort=True):
         """Create a Directory object from a string path to directory.
+
+        The address is computed by cutting the docroot from the dirpath.
         """
 
         if not os.path.isdir(dirpath):
             raise self.ParseDirNotFound(dirpath)
 
+        if docroot:
+            if dirpath == docroot:
+                self.docroot = ''
+                self.address = ''
+            else:
+                self.docroot = docroot
+
+                self.address = dirpath.replace(docroot, '')
+        
         if baseurl:
             self.baseurl = baseurl
 
         self.dirpath = dirpath
         self.sort = sort
         self.model = self._parse_directory(dirpath)
+
+        print "DIRPATH", dirpath
+        print "DOCROOT", docroot
+        print "BASEURL", baseurl
 
     class ParseDirNotFound(Exception):
         def __init__(self, value):
@@ -108,7 +124,7 @@ class Directory(Webnote):
         targets = []
 
         for item in self.model['all']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
@@ -132,7 +148,7 @@ class Directory(Webnote):
         targets = []
 
         for item in self.model['data']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
@@ -144,7 +160,7 @@ class Directory(Webnote):
         targets = []
 
         for item in self.model['docs']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
@@ -162,7 +178,7 @@ class Directory(Webnote):
                 baseurl = ''
 
         for item in self.model['figs']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
@@ -174,7 +190,7 @@ class Directory(Webnote):
         targets = []
 
         for item in self.model['hidden']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
@@ -186,7 +202,7 @@ class Directory(Webnote):
         images = []
 
         for item in self.model['img_hires']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             images.append((link, text))
 
@@ -198,7 +214,7 @@ class Directory(Webnote):
         targets = []
 
         for item in self.model['html']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
@@ -219,12 +235,21 @@ class Directory(Webnote):
     def pages(self, baseurl=None, suffix=None):
         """Return a list of (link, text) tuples identifying page files."""
 
-        print "HERE ----------------------------------------"
         targets = []
-
+        address = ''
+        if self.address:
+            address = self.address
+            
         if not baseurl:
             if self.baseurl:
-                baseurl = self.baseurl
+                baseurl = os.path.join(self.baseurl, address)
+
+
+
+
+                print "HERE", baseurl
+
+
             else:
                 baseurl = ''
 
@@ -246,7 +271,7 @@ class Directory(Webnote):
         targets = []
 
         for item in self.model['']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
@@ -258,7 +283,7 @@ class Directory(Webnote):
         targets = []
 
         for item in self.model['text']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
@@ -270,17 +295,10 @@ class Directory(Webnote):
         targets = []
 
         for item in self.model['unknown']:
-            link = os.path.join(baseurl, item)
+            link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
 
         return targets
 
-
-
-    def link_self(self, baseurl):
-
-        link = os.path.join(baseurl, self.dirpath)
-        text = self.clean_name()
-        return (link, text)
 

@@ -25,9 +25,7 @@ class Webnote():
 
     warnings = []
 
-    # Need to get rid of the directory argument. This would be called
-    # from a Directory object, if a directory is known.
-    def reference_figures(self, source, baseurl, figures=None):
+    def reference_figures(self, source, baseurl, figures):
         """Convert coded references to figures in a text into HTML.
 
         Given a source text containing references to image files in
@@ -35,7 +33,7 @@ class Webnote():
 
             [[image.jpg Anything following the first space is a caption.]]
 
-        And the name of a directory in which to find the image files,
+        A string to prepend to urls, and a list of image filenames,
         return a copy of the text with figure/caption references
         converted to a valid html div string, and a list of
         unreferenced figures. The HTML structure looks like:
@@ -49,13 +47,9 @@ class Webnote():
         The baseurl is prepended to the <img src> attribute to complete
         a working link.
 
-        Optionally, the figures can be supplied as a list of
-        filenames. 
+        The figures must be supplied as a list of filenames.
 
             ['file1.jpg', 'file2.png', ...]
-
-        Supplying this list will suppress calling the parse_directory
-        method.
 
         An alternative syntax is:
 
@@ -87,24 +81,25 @@ class Webnote():
         p = re.compile(expression)
         result = p.findall(source)
 
-        if figures:
+#       To begin with, all figures are unreferenced.
+#       Build the (link, text) tuples for the images list.
+        for figure in figures:
+            link = os.path.join(baseurl, figure)
+            caption = figure
+            unref.append((link, caption))
 
-            for figure in figures:
-                link = os.path.join(baseurl, figure)
-                caption = figure
-                unref.append((link, caption))
+        for match in result:
+            (link, html) = self._figure_html(match, baseurl)
+            output = output.replace(match, html)
 
-            for match in result:
-                (link, html) = self._figure_html(match, baseurl)
-                output = output.replace(match, html)
+            links.append(link)
 
-                links.append(link)
+#           Pop the figure off the unreferenced list.
+            for fig in unref:
+                if fig[1] == link[0]:
+                    unref.pop(unref.index(fig))
 
-                for fig in unref:
-                    if fig[1] == link[0]:
-                        unref.pop(unref.index(fig))
-
-        return output, unref
+        return (output, unref)
 
     def _figure_html(self, match, baseurl):
         """Replace a match code with the HTML DIV for displaying an image.

@@ -73,7 +73,7 @@ class Page(Webnote):
 
     # These are stored webnote directory structures.
     parent_directory = None
-    paired_directory = None
+    paired = None
 
     # The name and contents of the target file.
     filename = None
@@ -154,7 +154,7 @@ class Page(Webnote):
             self.staticroot = settings.STATIC_URL
 
         (self.parent_directory,
-         self.paired_directory) = self._parse_directories()
+         self.paired) = self._parse_directories()
         
         self._read_target_file()
         self.link = self._get_link()
@@ -249,7 +249,7 @@ class Page(Webnote):
         Sets:
 
             self.parent_directory as a webnote.Directory object.
-            self.paired_directory as a webnote.Directory object.
+            self.paired as a webnote.Directory object.
 
         Depends on the self.parent_dirname and self.paired_dirname
         directory pathnames having already been set.
@@ -260,7 +260,11 @@ class Page(Webnote):
         paired = None
 
         try:
-            parent = Directory(self.parent_dirname)
+            parent = Directory(
+                dirpath=self.parent_dirname,
+                docroot=self.docroot,
+                baseurl=self.baseurl,
+            )
         except Directory.ParseDirNotFound:
             self.warnings.append(
                 'Parent directory not found: ' + self.parent_dirname)
@@ -270,7 +274,11 @@ class Page(Webnote):
 
         else:
             try:
-                paired = Directory(self.paired_dirname)
+                paired = Directory(
+                    dirpath=self.paired_dirname,
+                    docroot=self.docroot,
+                    baseurl=self.baseurl,
+                )
             except Directory.ParseDirNotFound:
                 self.warnings.append(
                     'No paired directory.')
@@ -349,7 +357,7 @@ class Page(Webnote):
     def children(self, baseurl=None):
         """Return a list of (link, text) tuples identifying children."""
 
-        if not self.paired_directory:
+        if not self.paired:
             return None
 
         if self.address:
@@ -360,7 +368,7 @@ class Page(Webnote):
         if not baseurl:
             baseurl = os.path.join(self.baseurl, address)
 
-        pages = self.paired_directory.pages(baseurl)
+        pages = self.paired.pages(baseurl)
 
         kids = []
         for page in pages:
@@ -412,8 +420,8 @@ class Page(Webnote):
 
         figures = None
 
-        if self.paired_directory:
-            figures = self.paired_directory.model['figs']
+        if self.paired:
+            figures = self.paired.model['figs']
             directory = None
 
         if ext in settings.SUFFIX['html']:
@@ -434,7 +442,7 @@ class Page(Webnote):
     def documents(self):
         """Return a list of the documents in the paired directory. """
 
-        if not self.paired_directory:
+        if not self.paired:
             return None
 
         if self._store_documents:
@@ -447,7 +455,7 @@ class Page(Webnote):
             address = self.address
 
         baseurl = os.path.join(self.baseurl, address)
-        documents = self.paired_directory.link_docs(baseurl)
+        documents = self.paired.link_docs(baseurl)
         return documents
 
     def form_data(self):
@@ -546,7 +554,7 @@ class Page(Webnote):
             f = open(self.filename, 'w')
             f.write(filecontent)
 
-        if not self.paired_directory:
+        if not self.paired:
             path = os.path.join(self.docroot, self.address)
             os.mkdir(path)
 
@@ -567,13 +575,20 @@ class Page(Webnote):
         """Return a list of (link, text) tuples identifying siblings.
 
         Siblings are pages in the parent directory -- that is, the
-        direcotry the target page is in.
+        directory the target page is in.
         """
 
+#       To impliment: build this from parent_dir.model['pages'].
+#       Count through the page filenames, and make the url None if the
+#       file basename is the same as this one.
+        
         sibs = []
         parent = self._get_parent_address()
         if not baseurl:
-            baseurl = os.path.join(self.baseurl, parent)
+            if self.baseurl:
+                baseurl = self.baseurl
+            else:
+                baseurl = os.path.join(self.baseurl, parent)
 
         sibs = self.parent_directory.pages(baseurl)
 

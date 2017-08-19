@@ -3,8 +3,8 @@
 <div id='pagecontent'>
 
   <ol>
-  {% for page in page.paired_directory.pages %}
-  <li>{{page.1 }}</li>
+  {% for page in page.paired.pages %}
+  <li><a href='{{ page.0 }}'>{{page.0 }}</a></li>
   {% endfor %}
   </ol>
 
