@@ -35,6 +35,8 @@ class Directory(Webnote):
             raise self.ParseDirNotFound(dirpath)
 
         if docroot:
+            if docroot[-1] == '/':
+                docroot = docroot[:-1]
             if dirpath == docroot:
                 self.docroot = ''
                 self.address = ''
@@ -42,6 +44,7 @@ class Directory(Webnote):
                 self.docroot = docroot
 
                 self.address = dirpath.replace(docroot, '')
+                print "ADDRESS", self.address
         
         if baseurl:
             self.baseurl = baseurl
