@@ -2,9 +2,17 @@
 
  <div id='pagecontent'>
 
-  <h3>Edit this page</h3>
+{% if newfile_form %}
+<h1>Create a new file here</h1>
 
-   {{ content_form.as_p }}
+{{ newfile_form.as_p }}
+
+{% else %}
+  <h3>Edit this page</h3>
+{% endif %}
+
+
+{{ content_form.as_p }}
 
   {% if page.unref_figs %}
   <h3>Unreferenced figures</h3>

@@ -2,13 +2,6 @@
 
 <div id='pagecontent'>
 
-  <ol>
-  {% for page in page.paired.pages %}
-  <li><a href='{{ page.0 }}'>{{page.0 }}</a></li>
-  {% endfor %}
-  </ol>
-
-  
   {{ page.content|safe }}
 
 </div><!-- Close pagecontent -->

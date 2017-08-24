@@ -127,6 +127,7 @@ class Page(Webnote):
 
         self.docroot = docroot
         self.baseurl = baseurl
+        self.data = data
         
         if docroot[-1] != '/':
             self.docroot = docroot + '/'
@@ -155,12 +156,13 @@ class Page(Webnote):
 
         (self.parent_directory,
          self.paired) = self._parse_directories()
-        
-        self._read_target_file()
+
+        self.filename = self._find_filename(docroot, address)
+        self.filecontent = self._read_target_file(self.filename)
+
         self.link = self._get_link()
 
-        if self.filename:
-            self.metadata = Metadata(self.filename)
+        self.metadata = Metadata(self.filename, data)
 
     class DocrootNotFound(Exception):
         def __init__(self, value):
@@ -204,7 +206,7 @@ class Page(Webnote):
 
         return paired, parent
 
-    def _find_file(self):
+    def _find_filename(self, docroot, address):
         """Find the page file, return a filename.
 
         Return a string containing the filename for the page requested
@@ -219,13 +221,12 @@ class Page(Webnote):
         """
 
         filename = ''
-        address = ''
-        if self.address:
-            address = self.address
 
+        if not address:
+            address = ''
 #       Check the suffixes
         for item in settings.SUFFIX['page']:
-            filename = os.path.join(self.docroot, address) + item
+            filename = os.path.join(docroot, address) + item
 
             if os.path.isfile(filename):
                 self.filename = filename
@@ -236,9 +237,14 @@ class Page(Webnote):
             for item in self.parent_directory.model['page']:
                 (basename, ext) = os.path.splitext(item)
                 if basename =='index':
-                    filename = os.path.join(self.docroot, address) + item
+                    filename = os.path.join(docroot, address) + item
                     return filename
-        
+
+#       It's not a file. Return a standard filename.
+        if address:
+            filename = os.path.join(docroot, address + '.md')
+        else:
+            filename = None
         return filename
 
     def _parse_directories(self):
@@ -285,22 +291,24 @@ class Page(Webnote):
 
         return(parent, paired)
             
-    def _read_target_file(self):
+    def _read_target_file(self, filename):
 
-        filename = self._find_file()
+        filecontent = ''
+
+        if not filename:
+            return None
 
         try:
             f = open(filename, 'r')
-            self.filecontent = f.read()
-            self.filename = filename
+            filecontent = f.read()
         except IOError:
             if self.address:
                 self.warnings.append('Page not found: ' + self.address)
             else:
                 self.warnings.append('Index page not found.')
-            return False
+            return None
 
-        return True
+        return filecontent
 
     def _get_link(self):
         if not self.filename:
@@ -405,7 +413,9 @@ class Page(Webnote):
             return self._store_content
 
         content = self.filecontent
-
+        if not content:
+            content = ''
+            
         (basename, ext) = os.path.splitext(self.filename)
 
         source = content
@@ -432,9 +442,18 @@ class Page(Webnote):
                     source, baseurl, figures=figures
                 )                
                 self._store_unref_figs = unref_figs
-
+            else:
+                content = self.filecontent
+            
             content = markdown.markdown(content)
 
+#       Find the H1 line in the content string        
+        soup = BeautifulSoup(content, "html.parser")
+        h1 = soup.find_all('h1')
+        if not len(h1):
+            content = ("<h1>" + self.title_from_fname().replace('_', ' ') +
+                       "</h1>\n\n" + content)
+        
         self._store_content = content
 
         return content
@@ -547,11 +566,14 @@ class Page(Webnote):
         Return True if everything goes according to plan.
 
         """
-
+        filename = self.filename
+        if not self.filename:
+            filename = os.path.join(self.docroot, self.address + '.md')
+        
         if 'content' in data.keys():
         
             filecontent = data['content']
-            f = open(self.filename, 'w')
+            f = open(filename, 'w')
             f.write(filecontent)
 
         if not self.paired:
@@ -578,19 +600,32 @@ class Page(Webnote):
         directory the target page is in.
         """
 
-#       To impliment: build this from parent_dir.model['pages'].
-#       Count through the page filenames, and make the url None if the
-#       file basename is the same as this one.
-        
         sibs = []
-        parent = self._get_parent_address()
-        if not baseurl:
-            if self.baseurl:
-                baseurl = self.baseurl
-            else:
-                baseurl = os.path.join(self.baseurl, parent)
+        basename = ''
+        address = ''
+        path = ''
+        filename = ''
+        
+        if self.address:
+            address = self.address
+        (path, basename) = os.path.split(address)
 
-        sibs = self.parent_directory.pages(baseurl)
+        baselink =os.path.join(self.baseurl, path)
+
+        if self.filename:
+            filename = self.filename
+    
+        (path, fname) = os.path.split(filename)
+
+        for page in self.parent_directory.model['page']:
+            (basename, ext) = os.path.splitext(page)
+
+            if page == fname:
+                link = None
+            else:
+                link = os.path.join(baselink, basename)
+                
+            sibs.append((link, basename.replace('_', ' ')))
 
         return sibs
 
@@ -628,6 +663,16 @@ class Page(Webnote):
 
         return "Title unknown"
 
+
+    def title_from_fname(self):
+
+        title = ''
+        if self.filename:
+            fname = os.path.basename(self.filename)
+            (basename, ext) = os.path.splitext(fname)
+            title = basename.replace(' ', '_')
+            
+        return title
 
     def unref_figs(self):
         """List of (link, text) tuples representing unreferenced figures.

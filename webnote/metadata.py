@@ -37,7 +37,7 @@ class Metadata():
         # END DC metadata
 
         # Page command options
-        sort-reverse:   false # true
+        sort:           true
         deny:           all
         allow:          staff
         status:         draft
@@ -112,6 +112,8 @@ class Metadata():
         if pagefile:
             self.pagefile = pagefile
             self.metafilename = self.locate_metafile()
+        else:
+            self.pagefile = ''
 
         if self.metafilename:
             self.filemodel = self.read_metafile()
@@ -202,13 +204,16 @@ class Metadata():
 
         return None
 
-    def formdata_dc(self):
+    def formdata(self):
         """Return a dictionary suitable for populating forms."""
 
         formdata = {}
+        
         for element in self.ELEMENTS:
             formdata[element] = '; '.join(self.metadata[element])
-        
+        for element in self.COMMANDS:
+            formdata[element] = '; '.join(self.metadata[element])
+
         return formdata
         
     def metafile_record(self, data=None):
@@ -388,6 +393,9 @@ class Metadata():
         
     def source(self):
         return '; '.join(self.metadata['dc_source'])
+
+    def sort(self):
+        return self.metadata['sort'][0]
 
     def subject(self):
         return ', '.join(self.metadata['dc_subject'])

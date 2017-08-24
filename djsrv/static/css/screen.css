@@ -24,6 +24,7 @@ a:hover {
 
 th, td {
     vertical-align: top;
+    text-align: left;
 }
 
 code {
@@ -40,7 +41,7 @@ pre {
 #header {
     background: white;
     font-family: sans-serif;
-    font-size: 80%;
+    font-size: 90%;
     position: fixed;
     height: 30px;
     width: 100%;

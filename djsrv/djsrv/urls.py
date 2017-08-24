@@ -22,6 +22,7 @@ urlpatterns = [
 
     url(r'^$', views.index, name='index'),
     url(r"^(['\.\w/-]+)/(edit)/$", views.page, name='edit'),
+    url(r"^(['\.\w/-]+)/(new)/$", views.page, name='new'),
     url(r"^(['\.\w/-]+)/$", views.page, name='page'),
     url(r'^admin/', admin.site.urls),
 ]

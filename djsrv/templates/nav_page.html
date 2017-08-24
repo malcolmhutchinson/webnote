@@ -14,7 +14,11 @@
 
         <ol>
 {% for item in page.siblings %}
+{% if item.0 %}          
             <li><a href='{{ item.0 }}'>{{ item.1 }}</a></li>
+{% else %}
+            <li>{{ item.1 }}</li>
+{% endif %}
 {% endfor %}
         </ol>
 

@@ -2,6 +2,20 @@
 
 from django import forms
 
+STATUS = (
+    ('draft', 'draft'),
+    ('revision', 'revision'),
+    ('complete', 'complete'),
+    ('standing', 'standing'),
+)
+
+
+class CommandForm(forms.Form):
+    filename = forms.FileField(required=False, label='Upload file')
+    sort = forms.CharField(max_length=255, required=False)
+    status = forms.ChoiceField(required=False, choices=STATUS)
+
+
 class ContentForm(forms.Form):
     content = forms.CharField(
         label='', required=False,
@@ -10,7 +24,6 @@ class ContentForm(forms.Form):
 
 
 class DublinCoreForm(forms.Form):
-    filename = forms.FileField(required=False, label='Upload file')
     dc_title = forms.CharField(
         max_length=255, required=False, label='title')
     dc_creator = forms.CharField(
@@ -40,5 +53,5 @@ class DublinCoreForm(forms.Form):
         max_length=255, required=False, label='type')
 
 
-
-    
+class NewfileForm(forms.Form):
+    newfilename = forms.CharField(max_length=255)
