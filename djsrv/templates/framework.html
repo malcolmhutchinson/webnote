@@ -30,7 +30,12 @@
 
         <ul>
 {% for crumb in breadcrumbs %}
-            <li><a href='{{ crumb.0 }}'>{{ crumb.1 }}</a></li>
+{% if crumb.0 %}
+<li><a href='{{ crumb.0 }}'>{{ crumb.1 }}</a></li>
+{% else %}
+<li>{{ crumb.1 }}</li>
+{% endif %}
+
 {% endfor %}
         </ul>
 

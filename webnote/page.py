@@ -97,7 +97,7 @@ class Page(Webnote):
 
         - Set globals for input variables.
         - Determine if the docroot exists. Exit with exception if not.
-        - Compute the addressed file & read it. 
+        - Compute the addressed file & read it.
         - Compute the parent and paired directories.
         - Create a Metadata object.
 
@@ -113,7 +113,7 @@ class Page(Webnote):
             docroot index.
 
             This looks for a file called 'index' with one of the
-            values in settings.SUFFIX['page']. 
+            values in settings.SUFFIX['page'].
 
         The data attribute is used to override content and metadata
         values, and can be supplied when saving an object.
@@ -128,7 +128,7 @@ class Page(Webnote):
         self.docroot = docroot
         self.baseurl = baseurl
         self.data = data
-        
+
         if docroot[-1] != '/':
             self.docroot = docroot + '/'
 
@@ -183,9 +183,9 @@ class Page(Webnote):
             return os.path.join(self.baseurl, self.address)
 
         return self.baseurl
-        
+
     url = property(get_absolute_url)
-    
+
     def _find_directories(self):
         """Find the parent and paired directory path names.
 
@@ -290,7 +290,7 @@ class Page(Webnote):
                     'No paired directory.')
 
         return(parent, paired)
-            
+
     def _read_target_file(self, filename):
 
         filecontent = ''
@@ -326,7 +326,7 @@ class Page(Webnote):
         if self.address:
 
             steps = self.address.split('/')
-  
+
             if len(steps) > 1:
                 parent = steps[:-1]
             else:
@@ -346,7 +346,7 @@ class Page(Webnote):
         """A list of (link, text) tuples climbing back up the hierachy.
 
         Start with the baseurl, then explode the address by slashes."""
-        
+
         link = self.baseurl
         text = self.baseurl
         crumbs = [(link, text)]
@@ -395,12 +395,12 @@ class Page(Webnote):
         file.
 
         If no file is found, or it is otherwise unreadable, return an
-        empty string. 
+        empty string.
 
         Computing the content necessarily computes unreferenced
         figures, and vice-versa. To prevent duplication, the results
         of the computation are stored, in store_content, and
-        store_unref_figs, respectively. 
+        store_unref_figs, respectively.
 
         """
 
@@ -408,14 +408,14 @@ class Page(Webnote):
             if not self.address:
                 return "<h1>Index " + self.baseurl + "</h1>"
             return "<h1>No file found " + self.address + "</h1>"
-        
+
         if self._store_content:
             return self._store_content
 
         content = self.filecontent
         if not content:
             content = ''
-            
+
         (basename, ext) = os.path.splitext(self.filename)
 
         source = content
@@ -440,20 +440,20 @@ class Page(Webnote):
             if figures:
                 (content, unref_figs) = self.reference_figures(
                     source, baseurl, figures=figures
-                )                
+                )
                 self._store_unref_figs = unref_figs
             else:
                 content = self.filecontent
-            
+
             content = markdown.markdown(content)
 
-#       Find the H1 line in the content string        
+#       Find the H1 line in the content string
         soup = BeautifulSoup(content, "html.parser")
         h1 = soup.find_all('h1')
         if not len(h1):
             content = ("<h1>" + self.title_from_fname().replace('_', ' ') +
                        "</h1>\n\n" + content)
-        
+
         self._store_content = content
 
         return content
@@ -498,13 +498,30 @@ class Page(Webnote):
     def nextpage(self):
 
         link = ''
-        text = "the next pages isn't named yet"
+        n = 0
+        siblings = self.parent_directory.model['page']
+        text = "The previous page has no name"
 
+        (path, fname) = os.path.split(self.filename)
+        if fname in siblings:
+            n = siblings.index(fname)
+
+        path, basename = os.path.split(self.address)
+        
+        if n+1 == len(siblings):
+            link = None
+            text = None
+
+        else:
+            print "NUMBER", n, len(siblings)
+            (basename, ext) = os.path.splitext(siblings[n+1])
+            link = os.path.join(self.baseurl, path, basename)
+            text = basename
+            
         nextpage = (link, text)
 
-
         return nextpage
-
+    
     def parent(self):
         """Compute a (link, text) tuble identifying the parent
 
@@ -545,8 +562,25 @@ class Page(Webnote):
     def previous(self):
 
         link = ''
+        n = 0
+        siblings = self.parent_directory.model['page']
         text = "The previous page has no name"
 
+        (path, fname) = os.path.split(self.filename)
+        if fname in siblings:
+            n = siblings.index(fname)
+
+        path, basename = os.path.split(self.address)
+        
+        if n == 0:
+            link = None
+            text = None
+
+        else:
+            (basename, ext) = os.path.splitext(siblings[n-1])
+            link = os.path.join(self.baseurl, path, basename)
+            text = basename
+            
         previous = (link, text)
 
         return previous
@@ -569,9 +603,9 @@ class Page(Webnote):
         filename = self.filename
         if not self.filename:
             filename = os.path.join(self.docroot, self.address + '.md')
-        
+
         if 'content' in data.keys():
-        
+
             filecontent = data['content']
             f = open(filename, 'w')
             f.write(filecontent)
@@ -600,12 +634,12 @@ class Page(Webnote):
         directory the target page is in.
         """
 
-        sibs = []
-        basename = ''
         address = ''
-        path = ''
+        basename = ''
         filename = ''
-        
+        path = ''
+        sibs = []
+
         if self.address:
             address = self.address
         (path, basename) = os.path.split(address)
@@ -614,7 +648,7 @@ class Page(Webnote):
 
         if self.filename:
             filename = self.filename
-    
+
         (path, fname) = os.path.split(filename)
 
         for page in self.parent_directory.model['page']:
@@ -624,7 +658,7 @@ class Page(Webnote):
                 link = None
             else:
                 link = os.path.join(baselink, basename)
-                
+
             sibs.append((link, basename.replace('_', ' ')))
 
         return sibs
@@ -649,7 +683,7 @@ class Page(Webnote):
             if self.metadata.title():
                 return self.metadata.title()
 
-#       Find the H1 line in the content string        
+#       Find the H1 line in the content string
         soup = BeautifulSoup(self.content(), "html.parser")
         h1 = soup.find_all('h1')
         for element in h1:
@@ -671,7 +705,7 @@ class Page(Webnote):
             fname = os.path.basename(self.filename)
             (basename, ext) = os.path.splitext(fname)
             title = basename.replace(' ', '_')
-            
+
         return title
 
     def unref_figs(self):
@@ -695,8 +729,3 @@ class Page(Webnote):
         # with the content value.
         content = self.content()
         return self._store_unref_figs
-
-
-
-
-
