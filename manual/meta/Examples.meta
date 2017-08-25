@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Webnote example archives
+DC.creator: M.G. Hutchinson
+DC.subject: Webnote, simple syntax
+DC.description: Examples of how files can be organised according to the simple syntax. This contains a fake blog, and a collection of erratic files (bad data).
+DC.contributor: 
+DC.coverage: 
+DC.date: 2017-08-26
+DC.type: 
+DC.format: text/markdown
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-25 20:54:15.753529

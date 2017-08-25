@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Blog
+DC.creator: M.G. Hutchinson
+DC.subject: Webnote, simple syntax
+DC.description: This blog illustrates the sinple syntax. It's structure is the same as the "example filestructure" given in the manual.
+DC.contributor: 
+DC.coverage: 
+DC.date: 2017-08-26
+DC.type: 
+DC.format: text/markdown
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-25 20:55:01.755403

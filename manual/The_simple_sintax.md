@@ -1,0 +1,5 @@
+The simple syntax
+=================
+
+Introduction
+------------

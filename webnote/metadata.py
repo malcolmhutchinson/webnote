@@ -331,6 +331,8 @@ class Metadata():
     def save(self, data=None):
         """Save a metarecord to file."""
 
+        metafilename = None
+        
         if data:
             self.metadata = self.process_data(data)
 
@@ -343,7 +345,7 @@ class Metadata():
                 metafilename = self.metafilename
 
         if not metafilename:
-            metafilename = self.preferred_filename(fname)
+            metafilename = self.preferred_filename()
             
         (path, fname) = os.path.split(metafilename)
 
