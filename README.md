@@ -97,3 +97,27 @@ And point your browser at localhost, port 8000:
 
     http://localhost:8000/
 
+You should see a page indexing pages in your own `~/www` folder, and a
+list of other users (if any) on the system. This will index any folder
+in `/home` which contains a folder called `www`.
+
+In order to see your figures and image files displayed inline on pages
+in the webserver, you will have to add a symlink in the Django
+project's `static` folder:
+
+    $ ln -s /home/malcolm/www ~/dev/webnote/code/djsrv/static/home/malcolm
+
+The structure of folders and symlinks in `static/` should echo the url
+structure. Since home folders are called with url's like :
+
+    http://localhost:8000/home/malcolm/
+
+There should be a folder `static/home/malcolm/`.
+
+
+
+
+
+
+
+
