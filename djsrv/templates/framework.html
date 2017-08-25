@@ -25,21 +25,17 @@
 <form action = '' method='post' enctype="multipart/form-data">
 {% csrf_token %}
 {% endif %}
-  
-    <div id='header'>
 
-        <ul>
-{% for crumb in breadcrumbs %}
-{% if crumb.0 %}
-<li><a href='{{ crumb.0 }}'>{{ crumb.1 }}</a></li>
-{% else %}
-<li>{{ crumb.1 }}</li>
+<div id='header'>
+
+    <ul>
+{% for crumb in breadcrumbs %}{% if crumb.0 %}        <li><a href='{{ crumb.0 }}'>{{ crumb.1 }}</a></li>
+{% else %}        <li>{{ crumb.1 }}</li>
 {% endif %}
-
 {% endfor %}
-        </ul>
+    </ul>
 
-    </div>
+</div>
 
     <div id='main'>
 {% block main %}{% endblock %}
@@ -55,10 +51,10 @@
 {% endfor %}
         </ol>
 {% if navtemplate %}
-{% include navtemplate %}        
+{% include navtemplate %}
 {% endif %}
 
-        
+
     </div>
 
 {% if dc_form or content_form %}

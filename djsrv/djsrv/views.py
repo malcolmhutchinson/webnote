@@ -72,7 +72,7 @@ def index(request):
 def page(request, url, command=None):
     """Display a requested page.."""
 
-    address = None
+    address = ''
     baseurl = None
     command_form = None
     content_form = None
@@ -98,7 +98,7 @@ def page(request, url, command=None):
             bits.pop(0)
             baseurl = '/home/' + bits[0]
             if len(bits) == 1:
-                address = None
+                address = ''
             elif len(bits) > 1:
                 bits.pop(0)
                 address = '/'.join(bits)
@@ -109,7 +109,7 @@ def page(request, url, command=None):
         for archive in ARCHIVES:
             if url == archive[0]:
                 docroot = archive[1]
-                address = None
+                address = ''
                 baseurl = archive[0]
             elif archive[0] in url:
                 docroot = archive[1]
@@ -154,6 +154,7 @@ def page(request, url, command=None):
 
     if request.POST:
         if 'newfilename' in request.POST.keys():
+
             address = os.path.join(
                 address,
                 request.POST['newfilename'].replace(' ', '_')

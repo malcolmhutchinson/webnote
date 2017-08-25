@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Download and install webnote
+DC.creator: M.G. Hutchinson
+DC.subject: 
+DC.description: How to download webnote source code from GitHub, and to get it working in a Django development project.
+DC.contributor: 
+DC.coverage: 
+DC.date: 
+DC.type: 
+DC.format: 
+DC.source: 
+DC.language: 
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-25 20:32:58.777991

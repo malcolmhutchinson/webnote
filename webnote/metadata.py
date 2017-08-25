@@ -251,17 +251,22 @@ class Metadata():
 
         return record
 
-    def preferred_filename(self):
+    def preferred_filename(self, fname=None):
         """Return the preferred filename for a new metadata file.
 
         """
 
         filename = ''
-
         (path, pagefile) = os.path.split(self.pagefile)
-        (basename, ext) = os.path.splitext(pagefile)
 
-        filename = os.path.join(path, settings.META[0], basename + '.meta')
+        if fname:
+            filename = os.path.join(
+                path, settings.META[0], fname.replace(' ', '_') + '.meta')
+        else:
+            (basename, ext) = os.path.splitext(pagefile)
+
+            filename = os.path.join(
+                path, settings.META[0], basename + '.meta')
 
         return filename
 
@@ -272,7 +277,7 @@ class Metadata():
         for element in metadata.keys():
             if element in data.keys():
                 metadata[element].append(data[element])
-                    
+
         return metadata
         
     def process_filemodel(self, filemodel):
@@ -302,7 +307,8 @@ class Metadata():
 
         """
 
-        record = [('filename', self.metafilename)]
+        metafilename = None
+        record = [('filename:', self.metafilename)]
 
         with open(self.metafilename) as f:
             contents = f.readlines()
@@ -326,19 +332,28 @@ class Metadata():
         """Save a metarecord to file."""
 
         if data:
-            self.metadata = self.process_data(data)    
+            self.metadata = self.process_data(data)
 
-        record = self.metafile_record()
+            if 'newfilename' in data.keys():
+                fname = data['newfilename']
+                metafilename = self.preferred_filename(fname)
 
-        metafilename = self.metafilename
-        if not self.metafilename:
-            metafilename = self.preferred_filename()
+        else:
+            if self.metafilename:
+                metafilename = self.metafilename
+
+        if not metafilename:
+            metafilename = self.preferred_filename(fname)
             
         (path, fname) = os.path.split(metafilename)
 
         if not os.path.isdir(path):
-            print "MAKING META DIRECTORY"
+            print "MAKING META DIRECTORY", path
             os.mkdir(path)
+
+        print "METAFILENAME", metafilename
+        
+        record = self.metafile_record()        
 
         f = open(metafilename,'w')
         f.write(record)

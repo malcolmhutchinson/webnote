@@ -144,10 +144,10 @@ class Page(Webnote):
             self.paired_dirname = docroot
             self.parent_dirname = docroot
 
-        if baseurl:
-            self.baseurl = baseurl
-        else:
-            self.baseurl = '/'
+        #if baseurl:
+        #    self.baseurl = baseurl
+        #else:
+        #    self.baseurl = '/'
 
         if staticroot:
             self.staticroot = staticroot
@@ -362,6 +362,29 @@ class Page(Webnote):
 
         return crumbs
 
+    def child_pages(self):
+        """Return a list of page objects comprising this page's siblings.
+        """
+
+        address = ''
+        if self.address:
+            address = self.address
+            
+        filename = ''
+        if self.filename:
+            filename = self.filename
+            
+        (path, fname) = os.path.split(filename)
+        children = []
+
+        for page in self.paired.model['page']:
+            (basename, ext) = os.path.splitext(page)
+            addr = os.path.join(address, basename)
+            p = Page(self.docroot, self.baseurl, addr)
+            children.append(p)
+
+        return children
+
     def children(self, baseurl=None):
         """Return a list of (link, text) tuples identifying children."""
 
@@ -445,14 +468,15 @@ class Page(Webnote):
             else:
                 content = self.filecontent
 
-            content = markdown.markdown(content)
+            if content:
+                content = markdown.markdown(content)
 
 #       Find the H1 line in the content string
-        soup = BeautifulSoup(content, "html.parser")
-        h1 = soup.find_all('h1')
-        if not len(h1):
-            content = ("<h1>" + self.title_from_fname().replace('_', ' ') +
-                       "</h1>\n\n" + content)
+                soup = BeautifulSoup(content, "html.parser")
+                h1 = soup.find_all('h1')
+                if not len(h1):
+                    content = ("<h1>" + self.title_from_fname().replace(
+                        '_', ' ') + "</h1>\n\n" + content)
 
         self._store_content = content
 
@@ -497,23 +521,29 @@ class Page(Webnote):
 
     def nextpage(self):
 
+        address = ''
+        if self.address:
+            address = self.address
+        filename = ''
+        if self.filename:
+            filename = self.filename
+            
         link = ''
         n = 0
         siblings = self.parent_directory.model['page']
         text = "The previous page has no name"
 
-        (path, fname) = os.path.split(self.filename)
+        (path, fname) = os.path.split(filename)
         if fname in siblings:
             n = siblings.index(fname)
 
-        path, basename = os.path.split(self.address)
+        path, basename = os.path.split(address)
         
-        if n+1 == len(siblings):
+        if n == len(siblings)-1:
             link = None
             text = None
 
         else:
-            print "NUMBER", n, len(siblings)
             (basename, ext) = os.path.splitext(siblings[n+1])
             link = os.path.join(self.baseurl, path, basename)
             text = basename
@@ -561,16 +591,24 @@ class Page(Webnote):
 
     def previous(self):
 
+        address = ''
+        if self.address:
+            address = self.address
+
+        filename = ''
+        if self.filename:
+            filename = self.filename
+            
         link = ''
         n = 0
         siblings = self.parent_directory.model['page']
         text = "The previous page has no name"
 
-        (path, fname) = os.path.split(self.filename)
+        (path, fname) = os.path.split(filename)
         if fname in siblings:
             n = siblings.index(fname)
 
-        path, basename = os.path.split(self.address)
+        path, basename = os.path.split(address)
         
         if n == 0:
             link = None
@@ -600,15 +638,29 @@ class Page(Webnote):
         Return True if everything goes according to plan.
 
         """
+        
+        address = self.address
+        if address == 'index':
+            address = ''
+
         filename = self.filename
-        if not self.filename:
-            filename = os.path.join(self.docroot, self.address + '.md')
+
+        if 'newfilename' in data.keys():
+            fname = data['newfilename'].replace(' ', '_')
+            filename = os.path.join(self.docroot, fname + '.md')
+        else:
+            filename = self.filename
+            
+        #if not self.filename:
+        #    filename = os.path.join(self.docroot, address + '.md')
+
 
         if 'content' in data.keys():
 
             filecontent = data['content']
             f = open(filename, 'w')
             f.write(filecontent)
+            self.filename = filename
 
         if not self.paired:
             path = os.path.join(self.docroot, self.address)
@@ -626,6 +678,23 @@ class Page(Webnote):
         self.metadata.save(data)
 
         return True
+
+    def sib_pages(self):
+        """Return a list of page objects comprising this page's siblings.
+        """
+
+        (path, fname) = os.path.split(self.filename)
+        siblings = []
+
+        for page in self.parent_directory.model['page']:
+            if fname == page:
+                pass
+            else:
+                (basename, ext) = os.path.splitext(page)
+                p = Page(self.docroot, self.baseurl, basename)
+                siblings.append(p)
+        
+        return siblings
 
     def siblings(self, baseurl=None):
         """Return a list of (link, text) tuples identifying siblings.
@@ -663,6 +732,21 @@ class Page(Webnote):
 
         return sibs
 
+    def thumbnail(self):
+        """Return a (src, alt) tuple for the page'sthumbnail file."""
+
+        if self.paired:
+            for item in self.paired.model['figs']:
+                (basename, ext) = os.path.splitext(item)
+                if basename.lower() == 'thumbnail':
+                    print "STATICROOT", self.staticroot
+                    src = os.path.join(
+                        self.staticroot + self.baseurl, self.address, item)
+                    alt = item
+                    return (src, item)
+                        
+        return False
+        
     def title(self):
         """Compute the title as a string.
 
@@ -684,10 +768,10 @@ class Page(Webnote):
                 return self.metadata.title()
 
 #       Find the H1 line in the content string
-        soup = BeautifulSoup(self.content(), "html.parser")
-        h1 = soup.find_all('h1')
-        for element in h1:
-            return element.string
+        #soup = BeautifulSoup(self.content(), "html.parser")
+        #h1 = soup.find_all('h1')
+        #for element in h1:
+        #    return element.string
 
 #       No h1 tag? Prettify the filename.
         if self.filename:
