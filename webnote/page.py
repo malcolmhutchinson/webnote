@@ -379,9 +379,12 @@ class Page(Webnote):
 
         for page in self.paired.model['page']:
             (basename, ext) = os.path.splitext(page)
-            addr = os.path.join(address, basename)
-            p = Page(self.docroot, self.baseurl, addr)
-            children.append(p)
+            if basename.lower() == 'index':
+                pass
+            else:
+                addr = os.path.join(address, basename)
+                p = Page(self.docroot, self.baseurl, addr)
+                children.append(p)
 
         return children
 
@@ -687,7 +690,11 @@ class Page(Webnote):
         siblings = []
 
         for page in self.parent_directory.model['page']:
+            (basename, ext) = os.path.splitext(fname)
+
             if fname == page:
+                pass
+            elif basename == 'index':
                 pass
             else:
                 (basename, ext) = os.path.splitext(page)
@@ -723,12 +730,16 @@ class Page(Webnote):
         for page in self.parent_directory.model['page']:
             (basename, ext) = os.path.splitext(page)
 
-            if page == fname:
-                link = None
+            if basename.lower() == 'index':
+                pass
             else:
-                link = os.path.join(baselink, basename)
 
-            sibs.append((link, basename.replace('_', ' ')))
+                if page == fname:
+                    link = None
+                else:
+                    link = os.path.join(baselink, basename)
+
+                sibs.append((link, basename.replace('_', ' ')))
 
         return sibs
 

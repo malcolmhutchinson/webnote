@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Configuring webnote
+DC.creator: M.G. Hutchinson
+DC.subject: Webnote, simple syntax
+DC.description: How to configure your webnote installation.
+DC.contributor: 
+DC.coverage: 
+DC.date: 2017-08-26
+DC.type: 
+DC.format: text/markdown
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-25 21:47:28.317340

@@ -145,6 +145,9 @@ def page(request, url, command=None):
             command_form = forms.CommandForm()
             dc_form = forms.DublinCoreForm()
             content_form.fields['content'].initial = ""
+            dc_form.fields['dc_creator'].initial = "M.G.Hutchinson"
+            dc_form.fields['dc_format'].initial = "text/markup"
+            dc_form.fields['dc_language'].initial = "en"
 
     else:
         breadcrumbs.append(('edit', 'edit this page'))

@@ -1,0 +1,2 @@
+Configuring your webnote installation
+=====================================
