@@ -547,9 +547,13 @@ class Page(Webnote):
             text = None
 
         else:
-            (basename, ext) = os.path.splitext(siblings[n+1])
-            link = os.path.join(self.baseurl, path, basename)
-            text = basename
+            try:
+                (basename, ext) = os.path.splitext(siblings[n+1])
+                link = os.path.join(self.baseurl, path, basename)
+                text = basename
+            except IndexError:
+                link = None
+                text = None
             
         nextpage = (link, text)
 
@@ -650,16 +654,11 @@ class Page(Webnote):
 
         if 'newfilename' in data.keys():
             fname = data['newfilename'].replace(' ', '_')
-            filename = os.path.join(self.docroot, fname + '.md')
+            filename = os.path.join(self.parent_directory.dirpath, fname + '.md')
         else:
             filename = self.filename
-            
-        #if not self.filename:
-        #    filename = os.path.join(self.docroot, address + '.md')
-
 
         if 'content' in data.keys():
-
             filecontent = data['content']
             f = open(filename, 'w')
             f.write(filecontent)

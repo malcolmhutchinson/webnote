@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Editing pages and metadata
+DC.creator: M.G.Hutchinson
+DC.subject: Webnote, simple syntax, editing
+DC.description: Editing page files and their metadata.
+DC.contributor: 
+DC.coverage: 
+DC.date: 2017-08-26
+DC.type: Manual
+DC.format: text/markup
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-25 23:14:05.736153

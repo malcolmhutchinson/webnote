@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Deploying a webnote server
+DC.creator: M.G.Hutchinson
+DC.subject: Webnote, simple syntax, deployment, Django
+DC.description: How to deploy a lightweight webnote server suing Django and Apache.
+DC.contributor: 
+DC.coverage: 
+DC.date: 2017-08-26
+DC.type: Manual
+DC.format: text/markup
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-25 22:02:03.836664

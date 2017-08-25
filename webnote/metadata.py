@@ -353,8 +353,6 @@ class Metadata():
             print "MAKING META DIRECTORY", path
             os.mkdir(path)
 
-        print "METAFILENAME", metafilename
-        
         record = self.metafile_record()        
 
         f = open(metafilename,'w')

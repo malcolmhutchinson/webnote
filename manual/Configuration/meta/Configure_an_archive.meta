@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Configure a webnote archive
+DC.creator: M.G.Hutchinson
+DC.subject: 
+DC.description: How to configure a webnote archive
+DC.contributor: 
+DC.coverage: 
+DC.date: 
+DC.type: 
+DC.format: text/markup
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-25 23:06:17.215917
