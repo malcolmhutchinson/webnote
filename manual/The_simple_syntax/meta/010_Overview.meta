@@ -1,11 +1,11 @@
 # Dublin core metadata.
-DC.title: The simple syntax
+DC.title: Overview
 DC.creator: M.G.Hutchinson
 DC.subject: Webnote, simple syntax
-DC.description: Introduction to the simple syntax, a set of filename conventions which can be used to automatically index text files and images within a filesystem, for presentation by a webserver.
+DC.description: Quick overview of the simple syntax; what it is, what it does.
 DC.contributor: 
 DC.coverage: 
-DC.date: 2017-08-26
+DC.date: 2017-08-27
 DC.type: Manual
 DC.format: text/markup
 DC.source: 
@@ -23,4 +23,4 @@ deny:
 allow: 
 embargo: 
 # End page commands.
-# Record written by webnote.metadata at 2017-08-27 00:05:59.744562
+# Record written by webnote.metadata at 2017-08-26 23:58:28.745693

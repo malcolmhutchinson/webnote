@@ -1,8 +1,10 @@
 @import url('/static/css/screen.css');
 
-page {
+body {
     margin: 1cm 1.5cm 2cm 2cm;
-    padding: 2cm 0 1cm 0;
+    padding: 0cm 0 1cm 0;
+    margin: 0;
+    font-size: 10pt;
 }
 
 h1, h2, h3 {
@@ -11,7 +13,9 @@ h1, h2, h3 {
 
 p, table {
     page-break-inside: avoid;
+    max-width: 100%;
 }
+
 
 table {
     max-width: 16cm;
@@ -24,4 +28,13 @@ table {
     width: 100%;
     margin: 0;
     padding: 0;
+}
+#pagecontent {
+    margin: 0;
+    padding: 0;
+}
+
+.noprint {
+    background: yellow;
+    display: none;
 }

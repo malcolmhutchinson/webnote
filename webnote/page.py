@@ -363,7 +363,7 @@ class Page(Webnote):
         return crumbs
 
     def child_pages(self):
-        """Return a list of page objects comprising this page's siblings.
+        """Return a list of page objects comprising this page's children.
         """
 
         address = ''
@@ -478,8 +478,13 @@ class Page(Webnote):
                 soup = BeautifulSoup(content, "html.parser")
                 h1 = soup.find_all('h1')
                 if not len(h1):
-                    content = ("<h1>" + self.title_from_fname().replace(
-                        '_', ' ') + "</h1>\n\n" + content)
+                    h1 = "<h1 class='noprint'>"
+                    h1 += self.title_from_fname().replace('_', ' ')
+                    h1 += "</h1>\n\n"
+                    content = h1 + content
+                    #content = ("<h1>"
+                    #+ self.title_from_fname().replace(
+                    #    '_', ' ') + "</h1>\n\n" + content)
 
         self._store_content = content
 

@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Image galleries
+DC.creator: M.G.Hutchinson
+DC.subject: Webnote, simple syntax, image galleries
+DC.description: An extension to the simple syntax designed to interpret collections of image files.
+DC.contributor: 
+DC.coverage: 
+DC.date: 
+DC.type: 
+DC.format: text/markup
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-27 00:00:35.590971

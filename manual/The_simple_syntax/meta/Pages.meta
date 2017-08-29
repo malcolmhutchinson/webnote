@@ -1,0 +1,26 @@
+# Dublin core metadata.
+DC.title: Pages
+DC.creator: M.G.Hutchinson
+DC.subject: Webnote, simple syntax, pages
+DC.description: What is a page in webnote? What is it related to?
+DC.contributor: 
+DC.coverage: 
+DC.date: 2017-08-27
+DC.type: Manual
+DC.format: text/markup
+DC.source: 
+DC.language: en
+DC.relation: 
+DC.identifier: 
+DC.publisher: 
+DC.rights: 
+# end Dublin core elements.
+
+# Page commands.
+status: draft
+sort: 
+deny: 
+allow: 
+embargo: 
+# End page commands.
+# Record written by webnote.metadata at 2017-08-27 00:03:14.096860
