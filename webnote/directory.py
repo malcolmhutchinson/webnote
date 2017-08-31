@@ -242,12 +242,6 @@ class Directory(Webnote):
             if self.baseurl:
                 baseurl = os.path.join(self.baseurl, address)
 
-
-
-
-                print "HERE", baseurl
-
-
             else:
                 baseurl = ''
 

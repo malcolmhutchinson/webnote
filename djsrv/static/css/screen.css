@@ -115,7 +115,6 @@ th, td {
     margin-right: auto;
     max-width: 40em;
     padding: 1em 2em 2em 2em;
-    font-family: serif;
     line-height: 1.5;
 }
 
@@ -138,11 +137,7 @@ th, td {
 
 .keypair th {
     text-align: right;
-    background: yellow;
 }
 
-.pagelist {
-    background: yellow;
-    background: yellow;
-}
+
 
