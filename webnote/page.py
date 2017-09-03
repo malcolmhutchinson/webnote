@@ -144,11 +144,6 @@ class Page(Webnote):
             self.paired_dirname = docroot
             self.parent_dirname = docroot
 
-        #if baseurl:
-        #    self.baseurl = baseurl
-        #else:
-        #    self.baseurl = '/'
-
         if staticroot:
             self.staticroot = staticroot
         else:
@@ -355,7 +350,7 @@ class Page(Webnote):
             steps = self.address.split('/')
             for item in steps:
                 link = os.path.join(link, item)
-                crumbs.append((link, item))
+                crumbs.append((link, item.replace('_', ' ')))
 
         crumbs.append((self.previous()[0], 'prev'))
         crumbs.append((self.nextpage()[0], 'next'))
@@ -377,7 +372,12 @@ class Page(Webnote):
         (path, fname) = os.path.split(filename)
         children = []
 
-        for page in self.paired.model['page']:
+        child_pages = self.paired.model['page']
+#       Handle the sort reverse command.
+        if self.metadata.metadata['sort'][0] == 'reverse':
+            child_pages = sorted(child_pages, reverse=True)
+
+        for page in child_pages:
             (basename, ext) = os.path.splitext(page)
             if basename.lower() == 'index':
                 pass
@@ -410,6 +410,10 @@ class Page(Webnote):
                 pass
             else:
                 kids.append(page)
+
+#       Handle the sort reverse command.
+        if self.metadata.metadata['sort'][0] == 'reverse':
+            kids = sorted(kids, reverse=True)
 
         return kids
 
