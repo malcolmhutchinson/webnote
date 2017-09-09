@@ -46,7 +46,6 @@ th, td {
     text-align: left;
 }
 
-
 #contents {
     font-size: 90%;
     margin-left: auto;
@@ -116,6 +115,10 @@ th, td {
     max-width: 40em;
     padding: 1em 2em 2em 2em;
     line-height: 1.5;
+}
+
+.caption {
+    font-size: 90%;
 }
 
 .figure-right {

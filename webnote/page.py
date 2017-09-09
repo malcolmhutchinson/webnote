@@ -82,7 +82,7 @@ class Page(Webnote):
 
     # These are internal (link, text) tuples, and lists of same.
     _store_content = None
-    _store_parent = None
+    #_store_parent = None
     _store_files = None
     _store_unref_figs = None
     _store_documents = None
@@ -374,8 +374,9 @@ class Page(Webnote):
 
         child_pages = self.paired.model['page']
 #       Handle the sort reverse command.
-        if self.metadata.metadata['sort'][0] == 'reverse':
-            child_pages = sorted(child_pages, reverse=True)
+        if len(self.metadata.metadata['sort']):
+            if self.metadata.metadata['sort'][0] == 'reverse':
+                child_pages = sorted(child_pages, reverse=True)
 
         for page in child_pages:
             (basename, ext) = os.path.splitext(page)
@@ -412,8 +413,9 @@ class Page(Webnote):
                 kids.append(page)
 
 #       Handle the sort reverse command.
-        if self.metadata.metadata['sort'][0] == 'reverse':
-            kids = sorted(kids, reverse=True)
+        if len(self.metadata.metadata['sort']):
+            if self.metadata.metadata['sort'][0] == 'reverse':
+                kids = sorted(kids, reverse=True)
 
         return kids
 
@@ -578,33 +580,33 @@ class Page(Webnote):
         -   Otherwise, return the address with the last element chopped off.
         """
 
-        if self._store_parent:
-            return self._store_parent
-
         link = ''
         text = ''
         baseurl = ''
+        
         if self.baseurl:
             baseurl = self.baseurl
 
         if not self.address:
-            self._store_parent = (baseurl, 'Index')
-            return self._store_parent
+            return (baseurl, 'Index')
 
         steps = self.address.split('/')
         if len(steps) == 1:
-            self._store_parent = (self.baseurl, 'Index')
-            return self._store_parent
+            return (self.baseurl, 'Index')
 
         junk = steps.pop()
         link = os.path.join(baseurl, '/'.join(steps))
         text = steps[-1]
 
-        par = (link, text)
-        self._store_parent = par
+        return (link, text)
 
-        return par
-
+    def parent_page(self):
+        """Return a Page object representing the parent."""
+ 
+        if not self.address:
+            return self
+        
+    
     def previous(self):
 
         address = ''
@@ -749,6 +751,7 @@ class Page(Webnote):
 
                 sibs.append((link, basename.replace('_', ' ')))
 
+        print self.parent()
         return sibs
 
     def thumbnail(self):
