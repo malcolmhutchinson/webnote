@@ -15,30 +15,31 @@
 
     <ol>
 
-        <li><a href='{{ page.parent.0 }}'>{{ page.parent.1 }}</a></li>
+        <li><a href='{{ page.parent.url }}'>{{ page.parent.title }}</a></li>
 
 
     </ol>
-
+{% if page.siblings %}
     <h3>siblings</h3>
 
         <ol>
 {% for item in page.siblings %}
-{% if item.0 %}
-            <li><a href='{{ item.0 }}'>{{ item.1 }}</a></li>
+{% if item.url %}
+            <li><a href='{{ item.url }}'>{{ item.title }}</a></li>
 {% else %}
             <li>{{ item.1 }}</li>
 {% endif %}
 {% endfor %}
-        </ol>
+        </ol>{% endif %}
 
+{% if page.children %}
         <h3>children</h3>
 
         <ol id='children'>
 {% for child in page.children %}
-            <li><a href='{{ child.0 }}'>{{ child.1 }}</a></li>
+            <li><a href='{{ child.url }}'>{{ child.title }}</a></li>
 {% endfor %}
-        </ol>
+        </ol>{% endif %}
 
 </div>
 <!-- end nav_page.html -->

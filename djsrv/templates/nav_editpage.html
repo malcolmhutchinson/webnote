@@ -22,7 +22,7 @@
 
     <ol>
 
-        <li><a href='{{ page.parent.0 }}'>{{ page.parent.1 }}</a></li>
+        <li><a href='{{ page.parent.url }}'>{{ page.parent.title }}</a></li>
 
 
     </ol>
@@ -31,7 +31,7 @@
 
         <ol>
 {% for item in page.siblings %}
-            <li><a href='{{ item.0 }}'>{{ item.1 }}</a></li>
+            <li><a href='{{ item.url }}'>{{ item.title }}</a></li>
 {% endfor %}
         </ol>
 
@@ -39,7 +39,7 @@
 
         <ol id='children'>
 {% for child in page.children %}
-            <li><a href='{{ child.0 }}'>{{ child.1 }}</a></li>
+            <li><a href='{{ child.url }}'>{{ child.title }}</a></li>
 {% endfor %}
         </ol>
 

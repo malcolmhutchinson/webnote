@@ -80,11 +80,13 @@ class Page(Webnote):
     filecontent = None
     unref_figs = None
 
-    # These are internal (link, text) tuples, and lists of same.
+    # Internal stores.
+    _parent = None
+    _siblings = None
     _store_content = None
-    #_store_parent = None
+
     _store_files = None
-    _store_unref_figs = None
+    _unref_figs = None
     _store_documents = None
 
     warnings = []
@@ -158,6 +160,7 @@ class Page(Webnote):
         self.link = self._get_link()
 
         self.metadata = Metadata(self.filename, data)
+        self.parent = self._find_parent()
 
     class DocrootNotFound(Exception):
         def __init__(self, value):
@@ -242,6 +245,17 @@ class Page(Webnote):
             filename = None
         return filename
 
+    def _find_parent(self):
+        """Return a Page object representing the parent."""
+
+        address = self.address
+        
+        if not self.address:
+            return None
+
+        address, fname = os.path.split(self.address)
+        return Page(self.docroot, self.baseurl, address)
+    
     def _parse_directories(self):
         """Create webnote directory structures for parent and paired dirs.
 
@@ -357,9 +371,12 @@ class Page(Webnote):
 
         return crumbs
 
-    def child_pages(self):
+    def children(self):
         """Return a list of page objects comprising this page's children.
         """
+
+        if not self.paired:
+            return None
 
         address = ''
         if self.address:
@@ -370,6 +387,7 @@ class Page(Webnote):
             filename = self.filename
             
         (path, fname) = os.path.split(filename)
+
         children = []
 
         child_pages = self.paired.model['page']
@@ -389,7 +407,7 @@ class Page(Webnote):
 
         return children
 
-    def children(self, baseurl=None):
+    def child_links(self, baseurl=None):
         """Return a list of (link, text) tuples identifying children."""
 
         if not self.paired:
@@ -473,7 +491,7 @@ class Page(Webnote):
                 (content, unref_figs) = self.reference_figures(
                     source, baseurl, figures=figures
                 )
-                self._store_unref_figs = unref_figs
+                self._unref_figs = unref_figs
             else:
                 content = self.filecontent
 
@@ -570,7 +588,7 @@ class Page(Webnote):
 
         return nextpage
     
-    def parent(self):
+    def parent_link(self):
         """Compute a (link, text) tuble identifying the parent
 
         The parent is found by this process:
@@ -600,13 +618,6 @@ class Page(Webnote):
 
         return (link, text)
 
-    def parent_page(self):
-        """Return a Page object representing the parent."""
- 
-        if not self.address:
-            return self
-        
-    
     def previous(self):
 
         address = ''
@@ -692,28 +703,43 @@ class Page(Webnote):
 
         return True
 
-    def sib_pages(self):
+    def siblings(self):
         """Return a list of page objects comprising this page's siblings.
         """
 
-        (path, fname) = os.path.split(self.filename)
+        # If this is the index, it has no siblings, only children.
+        if not self.address:
+            return None
+
+        # If we have been this way before...
+        if self._siblings:
+            return self._siblings
+
         siblings = []
+        steps = self.address.split('/')
 
-        for page in self.parent_directory.model['page']:
-            (basename, ext) = os.path.splitext(fname)
+        pages = self.parent_directory.model['page']
 
-            if fname == page:
-                pass
-            elif basename == 'index':
+        if self.parent.metadata.metadata['sort']:
+            if self.parent.metadata.metadata['sort'][0] == 'reverse':
+                pages = sorted(pages, reverse=True)
+        
+        for page in pages:
+            (basename, ext) = os.path.splitext(page)
+            path = '/'.join(steps[:-1])
+            address = os.path.join(path, basename)
+
+            if basename == steps[-1]:
                 pass
             else:
-                (basename, ext) = os.path.splitext(page)
-                p = Page(self.docroot, self.baseurl, basename)
-                siblings.append(p)
-        
+                sib = Page(self.docroot, self.baseurl, address)
+                siblings.append(sib)
+
+        # Store the result, so we don't have to compute it again.
+        self._siblings = siblings
         return siblings
 
-    def siblings(self, baseurl=None):
+    def sibling_links(self, baseurl=None):
         """Return a list of (link, text) tuples identifying siblings.
 
         Siblings are pages in the parent directory -- that is, the
@@ -737,7 +763,12 @@ class Page(Webnote):
 
         (path, fname) = os.path.split(filename)
 
-        for page in self.parent_directory.model['page']:
+        pages = self.parent_directory.model['page']
+
+        if self.parent.metadata.metadata['sort']:
+            pages = sorted(pages, reverse=True)
+        
+        for page in pages :
             (basename, ext) = os.path.splitext(page)
 
             if basename.lower() == 'index':
@@ -751,7 +782,6 @@ class Page(Webnote):
 
                 sibs.append((link, basename.replace('_', ' ')))
 
-        print self.parent()
         return sibs
 
     def thumbnail(self):
@@ -761,7 +791,6 @@ class Page(Webnote):
             for item in self.paired.model['figs']:
                 (basename, ext) = os.path.splitext(item)
                 if basename.lower() == 'thumbnail':
-                    print "STATICROOT", self.staticroot
                     src = os.path.join(
                         self.staticroot + self.baseurl, self.address, item)
                     alt = item
@@ -828,10 +857,10 @@ class Page(Webnote):
 
         """
 
-        if self._store_unref_figs:
-            return self._store_unref_figs
+        if self._unref_figs:
+            return self._unref_figs
 
         # This just calls the _get_content() method, and does nothing
         # with the content value.
         content = self.content()
-        return self._store_unref_figs
+        return self._unref_figs
