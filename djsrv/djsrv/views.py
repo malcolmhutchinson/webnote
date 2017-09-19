@@ -18,6 +18,10 @@ ARCHIVES = [
     ('/manual', os.path.join(settings.STATICFILES_DIRS[0], 'manual'),
      "Webnote manual and test pages"
     ),
+
+    ('/ruapehu', os.path.join(settings.STATICFILES_DIRS[0], 'ruapehu'),
+     "Notes held on the ruapehu server.",
+    ),
 ]
 
 
