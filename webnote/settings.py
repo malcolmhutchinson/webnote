@@ -92,6 +92,7 @@ SUFFIX = {
         '.pef', '.ptx', '.pxn', '.r3d', '.raf', '.raw', '.rw2', '.rwl',
         '.rzw', '.sr2'  '.srf', '.srw', '.tif', '.tiff', '.x3f',
     ),
+    'jupyter': ('.ipynb'),
     'meta': ('.meta'),
 
     'ms_access': (
