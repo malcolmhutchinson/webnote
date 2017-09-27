@@ -127,14 +127,13 @@ class Page(Webnote):
 
         self.warnings = []
 
-        self.docroot = docroot
+        self.address = address
         self.baseurl = baseurl
         self.data = data
+        self.docroot = docroot
 
         if docroot[-1] != '/':
             self.docroot = docroot + '/'
-
-        self.address = address
 
         if address:
             (self.paired_dirname,
@@ -393,7 +392,10 @@ class Page(Webnote):
         child_pages = self.paired.model['page']
 #       Handle the sort reverse command.
         if len(self.metadata.metadata['sort']):
+            print self.metadata.metadata['sort']
             if self.metadata.metadata['sort'][0] == 'reverse':
+                print "HERE"
+
                 child_pages = sorted(child_pages, reverse=True)
 
         for page in child_pages:

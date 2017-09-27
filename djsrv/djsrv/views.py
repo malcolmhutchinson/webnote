@@ -178,16 +178,12 @@ def page(request, url, command=None):
             return redirect(os.path.join(baseurl, address))
 
         page.save(request.POST, files=request.FILES)
-
+        # Is this necessary, given the save operation above?
         page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
 
-
         command_form = forms.CommandForm(initial=request.POST)
-        dc_form = forms.DublinCoreForm(initial=page.metadata.formdata())
-        #content_form.fields['content'].initial = page.filecontent
+        dc_form = forms.DublinCoreForm(initial=request.POST)
         content_form = forms.ContentForm(initial=request.POST)
-
-
 
     context = {
         'docroot': docroot,

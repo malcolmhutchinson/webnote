@@ -170,16 +170,25 @@ class Metadata():
         return title
 
     def liststyle(self):
-        """Determine the style of list from metafile """
-        print "HERE"
+        """Determine the style of list from metafile. 
+
+        At the moment, this is fragile and will break if there is no
+        template matching the value in the liststyle variable.
+
+        """
+        
+        if 'liststyle' not in self.metadata.keys():
+            return None
+        
+        if len(self.metadata['liststyle']) == 0:
+            return None
+
         style = 'liststyles/simple.html'
         dir = 'liststyles/'
         ext = '.html'
-
-        if 'list-style' in self.metadata.keys():
-            return dir + self.metadata['list-style'] + ext
-
-        return None
+        # This needs to test for a template at this address. If
+        # there is none, it returns 'default.html'.
+        return dir + self.metadata['liststyle'][0] + ext
 
     def locate_metafile(self):
         """Locate the metafile for the given address.

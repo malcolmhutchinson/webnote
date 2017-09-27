@@ -1,26 +1,12 @@
 <!-- Default list style children of a page. -->
-<div id='contents' liststyle='feature'>
+<div id='contents'>
 
-    <h2>Contents (default listing)</h2>
+    <h2>Contents</h2>
 
     <ol>{% for child in page.children %}
-        <li style='clear: left; margin-top: 1em;'>
-
-            <h3>
-            <a href='{{ child.url }}'>{{ child.title }}</a></h3>
-
-            {% if child.thumbnail %}
-
-            <img src='{{ child.thumbnail.0 }}' alt='{{ child.thumbnail.1 }}'
-                 class='fig-100px' />
-
-            {% endif %}
-          
-            <p>{{ child.metadata.description }}</p>
-
-        </li>{% endfor %}
+        <li><p><a href='{{ child.url }}'>{{ child.title }}</a></p></li>{% endfor %}
     </ol>
 </div>
 
-<!-- Default list style children of a page. -->
+<!-- end Default list style children of a page. -->
 

@@ -29,17 +29,16 @@
   
   <hr />
 
-
-
-
-  {{ page.content|safe }}
-
-
+<div id='pagecontent'>
+{{ page.content|safe }}
+</div>
+{% if page.children %}
+{% if liststyle %}
+{% include liststyle %}
+{% else %}
+{% include 'liststyles/default.html' %}
+{% endif %}
+{% endif %}
 
 </div>
-
-
-
-
-
 {% endblock %}

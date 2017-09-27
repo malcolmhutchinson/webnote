@@ -3,15 +3,15 @@
 from django import forms
 
 LISTSTYLE = (
-    ('simple', 'simple'),
-    ('standard', 'standard'),
-    ('feature', 'feature'),
     ('default', 'default'),
+    ('feature', 'feature'),
+    ('short', 'short'),
+    ('simple', 'simple'),
 )
 
 SORT = (
     ('forward', 'forward'),
-    ('reversee', 'reverse'),
+    ('reverse', 'reverse'),
 )
 
 STATUS = (
