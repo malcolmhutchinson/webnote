@@ -392,10 +392,7 @@ class Page(Webnote):
         child_pages = self.paired.model['page']
 #       Handle the sort reverse command.
         if len(self.metadata.metadata['sort']):
-            print self.metadata.metadata['sort']
             if self.metadata.metadata['sort'][0] == 'reverse':
-                print "HERE"
-
                 child_pages = sorted(child_pages, reverse=True)
 
         for page in child_pages:
