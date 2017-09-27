@@ -120,20 +120,20 @@ SUFFIX = {
 }
 
 # The SUFFIX structure also holds composite lists.
-# A page file is identified as any member of html, text, markdown. 
+# A page file is identified as any member of html, text, or markdown. 
 SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html'] + SUFFIX['markdown']
 
-SUFFIX['microsoft_office'] = (
+SUFFIX['msoffice'] = (
     SUFFIX['ms_access'] + SUFFIX['ms_excel'] + SUFFIX['ms_word'])
 
-SUFFIX['opendocument'] = (
+SUFFIX['opendoc'] = (
     SUFFIX['opendoc_base'] + SUFFIX['opendoc_formulae'] +
     SUFFIX['opendoc_graphics'] + SUFFIX['opendoc_presentation'] +
     SUFFIX['opendoc_spreadsheet'] + SUFFIX['opendoc_writer']
     )
 
-SUFFIX['documents'] = (SUFFIX['docs'] + SUFFIX['microsoft_office'] +
-                       SUFFIX['opendocument'])
+SUFFIX['document'] = (SUFFIX['docs'] + SUFFIX['msoffice'] +
+                       SUFFIX['opendoc'])
 
 # DOCTYPE describes the category of document a given page is.
 DOCTYPE = (

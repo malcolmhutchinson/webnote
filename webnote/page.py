@@ -533,22 +533,11 @@ class Page(Webnote):
         documents = self.paired.link_docs(baseurl)
         return documents
 
-    def form_data(self):
+    def formdata(self):
         """Return a dictionary suitable for populating the page forms."""
 
-        data = {
-            'filecontent': self.filecontent,
-            'dc_title': self.metadata.title,
-            'dc_creator': self.metadata.author,
-            'dc_date': self.metadata.date,
-            'dc_subject': self.metadata.subject,
-            'dc_description': self.metadata.description,
-            'dc_contributor': self.metadata.contributor,
-            'dc_coverage': self.metadata.location,
-            'dc_rights': self.metadata.rights,
-            'dc_source': self.metadata.source,
-        }
-
+        data = self.metadata.formdata()
+        data['content'] = self.filecontent
         return data
 
     def nextpage(self):

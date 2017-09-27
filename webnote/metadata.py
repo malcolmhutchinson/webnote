@@ -77,6 +77,7 @@ class Metadata():
     COMMANDS = (
         'status',
         'sort',
+        'liststyle',
         'deny',
         'allow',
         'embargo',
@@ -167,7 +168,18 @@ class Metadata():
         title = basename.replace('_', ' ')
 
         return title
-    
+
+    def liststyle(self):
+        """Determine the style of list from metafile """
+        print "HERE"
+        style = 'liststyles/simple.html'
+        dir = 'liststyles/'
+        ext = '.html'
+
+        if 'list-style' in self.metadata.keys():
+            return dir + self.metadata['list-style'] + ext
+
+        return None
 
     def locate_metafile(self):
         """Locate the metafile for the given address.
@@ -286,13 +298,22 @@ class Metadata():
         """
 
         metadata = self.build_empty_metadata()
-        
+
         for line in self.filemodel:
-            
-            if line[0].lower().replace('.', '_') in metadata.keys():
+
+            if line[0].lower() == 'comment':
+                pass
+
+            # Is the first element of the line a metadata key?
+            elif line[0].lower().replace('.', '_') in metadata.keys():
                 metadata[line[0].lower().replace('.', '_')].append(line[1])
 
+            # Is it a command?
             elif line[0].lower() in self.COMMANDS:
+                metadata[line[0]] = line[1]
+
+            # Include one which isn't either a metadata element or a command.
+            else:
                 metadata[line[0]] = line[1]
 
         return metadata

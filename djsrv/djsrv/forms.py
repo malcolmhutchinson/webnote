@@ -2,6 +2,18 @@
 
 from django import forms
 
+LISTSTYLE = (
+    ('simple', 'simple'),
+    ('standard', 'standard'),
+    ('feature', 'feature'),
+    ('default', 'default'),
+)
+
+SORT = (
+    ('forward', 'forward'),
+    ('reversee', 'reverse'),
+)
+
 STATUS = (
     ('draft', 'draft'),
     ('revision', 'revision'),
@@ -10,13 +22,22 @@ STATUS = (
 )
 
 
+
 class CommandForm(forms.Form):
-    filename = forms.FileField(required=False, label='Upload file')
-    sort = forms.CharField(max_length=255, required=False)
+    dc_title = forms.CharField(
+        max_length=255, required=False, label='title')
+    dc_subject = forms.CharField(
+        max_length=255, required=False, label='keywords')
+    sort = forms.ChoiceField(required=False, choices=SORT)
+    liststyle = forms.ChoiceField(required=False, choices=LISTSTYLE)
     status = forms.ChoiceField(required=False, choices=STATUS)
+    filename = forms.FileField(required=False, label='Upload file')
 
 
 class ContentForm(forms.Form):
+    
+    dc_description = forms.CharField(
+        max_length=255, required=False, label='description')
     content = forms.CharField(
         label='', required=False,
         widget=forms.Textarea(attrs={'rows': 10, 'cols': 80,})
@@ -24,15 +45,9 @@ class ContentForm(forms.Form):
 
 
 class DublinCoreForm(forms.Form):
-    dc_title = forms.CharField(
-        max_length=255, required=False, label='title')
     dc_creator = forms.CharField(
         max_length=255, required=False, label='author')
-    dc_subject = forms.CharField(
-        max_length=255, required=False, label='keywords')
     dc_date = forms.DateField(label='date', required=False)
-    dc_description = forms.CharField(
-        max_length=255, required=False, label='description')
     dc_coverage = forms.CharField(
         max_length=255, required=False, label='location')
     dc_type = forms.CharField(

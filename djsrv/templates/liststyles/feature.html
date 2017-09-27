@@ -1,0 +1,26 @@
+<!-- Default list style children of a page. -->
+<div id='contents' liststyle='feature'>
+
+    <h2>Contents (feature listing)</h2>
+
+    <ol>{% for child in page.children %}
+        <li style='clear: left; margin-top: 1em;'>
+
+            <h3>
+            <a href='{{ child.url }}'>{{ child.title }}</a></h3>
+
+            {% if child.thumbnail %}
+
+            <img src='{{ child.thumbnail.0 }}' alt='{{ child.thumbnail.1 }}'
+                 class='fig-100px' />
+
+            {% endif %}
+          
+            <p>{{ child.metadata.description }}</p>
+
+        </li>{% endfor %}
+    </ol>
+</div>
+
+<!-- Default list style children of a page. -->
+

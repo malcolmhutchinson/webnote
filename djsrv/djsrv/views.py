@@ -134,14 +134,14 @@ def page(request, url, command=None):
         template = 'editpage.html'
         navtemplate = 'nav_editpage.html'
 
-        formdata = page.metadata.formdata()
+        formdata = page.formdata()
         sort = None
         if page.metadata.sort:
             sort = page.metadata.sort
 
         dc_form = forms.DublinCoreForm(initial=formdata)
         command_form = forms.CommandForm(initial=formdata)
-        content_form = forms.ContentForm()
+        content_form = forms.ContentForm(initial=formdata)
         content_form.fields['content'].initial = page.filecontent
 
         if command == 'new':
@@ -178,11 +178,15 @@ def page(request, url, command=None):
             return redirect(os.path.join(baseurl, address))
 
         page.save(request.POST, files=request.FILES)
+
         page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
 
-        command_form = forms.CommandForm(initial=formdata)
+
+        command_form = forms.CommandForm(initial=request.POST)
         dc_form = forms.DublinCoreForm(initial=page.metadata.formdata())
-        content_form.fields['content'].initial = page.filecontent
+        #content_form.fields['content'].initial = page.filecontent
+        content_form = forms.ContentForm(initial=request.POST)
+
 
 
     context = {
@@ -201,6 +205,7 @@ def page(request, url, command=None):
 
         'breadcrumbs': breadcrumbs,
         'navtemplate': navtemplate,
+        'liststyle': page.metadata.liststyle(),
 
         'content_form': content_form,
         'command_form': command_form,
