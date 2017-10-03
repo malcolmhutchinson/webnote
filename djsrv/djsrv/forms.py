@@ -24,10 +24,6 @@ STATUS = (
 
 
 class CommandForm(forms.Form):
-    dc_title = forms.CharField(
-        max_length=255, required=False, label='title')
-    dc_subject = forms.CharField(
-        max_length=255, required=False, label='keywords')
     sort = forms.ChoiceField(required=False, choices=SORT)
     liststyle = forms.ChoiceField(required=False, choices=LISTSTYLE)
     status = forms.ChoiceField(required=False, choices=STATUS)
@@ -36,6 +32,10 @@ class CommandForm(forms.Form):
 
 class ContentForm(forms.Form):
     
+    dc_title = forms.CharField(
+        max_length=255, required=False, label='title')
+    dc_subject = forms.CharField(
+        max_length=255, required=False, label='keywords')
     dc_description = forms.CharField(
         max_length=255, required=False, label='description')
     content = forms.CharField(
