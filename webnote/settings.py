@@ -81,6 +81,7 @@ SUFFIX = {
     'data': ('.csv', '.data', '.dat', '.dbf',),
     'docs': ('.pdf',),
     'figs': ('.png', '.jpg', '.jpeg', '.gif', '.svg',),
+    'gpx': ('.gpx',),
     'geovector': (
         '.gml', '.gpx', '.kml', '.shp', '.tab',
     ),
