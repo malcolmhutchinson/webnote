@@ -480,7 +480,7 @@ class Page(Webnote):
         figures = None
 
         if self.paired:
-            figures = self.paired.model['figs']
+            figures = self.paired.model['figures']
             directory = None
 
         if ext in settings.SUFFIX['html']:
@@ -776,7 +776,7 @@ class Page(Webnote):
         """Return a (src, alt) tuple for the page'sthumbnail file."""
 
         if self.paired:
-            for item in self.paired.model['figs']:
+            for item in self.paired.model['figures']:
                 (basename, ext) = os.path.splitext(item)
                 if basename.lower() == 'thumbnail':
                     src = os.path.join(
