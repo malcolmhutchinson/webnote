@@ -77,16 +77,16 @@ CONTROL_ELEMENTS = (
 SUFFIX = {
     'archive': ('.gz', '.tar', '.zip',),
     'audio': ('.flac', '.mp2', '.mp3', '.wav', '.wma',),
-    'code': ('.c', '.cpp', '.py', ),
+    'code': ('.c', '.cpp', '.py', '.js',),
     'data': ('.csv', '.data', '.dat', '.dbf',),
     'docs': ('.pdf',),
-    'figs': ('.png', '.jpg', '.jpeg', '.gif', '.svg',),
+    'figures': ('.png', '.jpg', '.jpeg', '.gif', '.svg',),
     'gpx': ('.gpx',),
     'geovector': (
         '.gml', '.gpx', '.kml', '.shp', '.tab',
     ),
     'html': ('.html', '.htm', '.xhtml', '.xhtm'),
-    'image': (
+    'images': (
         '.3fr', '.ari', '.arw', '.bay', '.cap', '.cr2', '.crw', '.dcr',
         '.dcs', '.dng', '.drf', '.eip', '.erf', '.fff', '.iiq', '.k25',
         '.kdc', '.mdc', '.mef', '.mos', '.mrw', '.nef', '.nrw', '.orf',
@@ -94,6 +94,7 @@ SUFFIX = {
         '.rzw', '.sr2'  '.srf', '.srw', '.tif', '.tiff', '.x3f',
     ),
     'jupyter': ('.ipynb'),
+    'markdown': ('.mkd', '.md',),
     'meta': ('.meta'),
 
     'ms_access': (
@@ -116,14 +117,14 @@ SUFFIX = {
     'opendoc_spreadsheet': ('.ods', '.fods', ),
     'opendoc_writer': ('.odt', '.fodt', ),
 
-    'markdown': ('.mkd', '.md',),
     'text': ('.txt', ),
 }
 
+# This is depreciated.
+SUFFIX['fig'] = SUFFIX['figures']
+
 # The SUFFIX structure also holds composite lists.
 # A page file is identified as any member of html, text, or markdown. 
-SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html'] + SUFFIX['markdown']
-
 SUFFIX['msoffice'] = (
     SUFFIX['ms_access'] + SUFFIX['ms_excel'] + SUFFIX['ms_word'])
 
@@ -131,10 +132,13 @@ SUFFIX['opendoc'] = (
     SUFFIX['opendoc_base'] + SUFFIX['opendoc_formulae'] +
     SUFFIX['opendoc_graphics'] + SUFFIX['opendoc_presentation'] +
     SUFFIX['opendoc_spreadsheet'] + SUFFIX['opendoc_writer']
-    )
+)
 
-SUFFIX['document'] = (SUFFIX['docs'] + SUFFIX['msoffice'] +
-                       SUFFIX['opendoc'])
+SUFFIX['documents'] = SUFFIX['docs'] + SUFFIX['msoffice'] + SUFFIX['opendoc']
+
+SUFFIX['page'] = SUFFIX['text'] + SUFFIX['html'] + SUFFIX['markdown']
+
+SUFFIX['pictures'] = SUFFIX['figures'] + SUFFIX['images']
 
 # DOCTYPE describes the category of document a given page is.
 DOCTYPE = (
@@ -158,7 +162,7 @@ TRUE = (
     'right',
     'sure',
     'true', 't',
-    'up', 'white',
+    'up', 
     'y', 'ya', 'yah', 'yeah', 'yes', 'yip', 'yep',
 )
 

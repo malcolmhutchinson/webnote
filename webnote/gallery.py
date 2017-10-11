@@ -1,3 +1,8 @@
+"""webnote.Gallery classes to handle directories of picture files.
+
+Probably obsolete.
+"""
+
 import os
 
 class Gallery():
