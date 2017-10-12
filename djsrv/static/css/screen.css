@@ -148,9 +148,28 @@ th, td {
     float: left;
 }
 
+.fig-150px {
+    width: 150px;
+    margin: 0 1em 1em 0;
+    float: left;
+}
+
+.fig-320px {
+    width: 320px;
+    margin: 0 1em 1em 0;
+    float: left;
+}
+
 .keypair th {
     text-align: right;
 }
 
 
+.tile640 {
+    border: 1px black solid;
+    width: 640px;
+    height: 100%;
+    padding: 1em;
+    clear: both;
+}
 

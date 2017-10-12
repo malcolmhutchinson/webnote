@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 import markdown2 as markdown
 
 from directory import Directory
+from gallery import Gallery
 from metadata import Metadata
 import settings
 from webnote import Webnote
@@ -160,6 +161,10 @@ class Page(Webnote):
 
         self.metadata = Metadata(self.filename, data)
         self.parent = self._find_parent()
+
+        if self.metadata.pagetype() == 'gallery':
+            self.gallery = Gallery(
+                docroot=docroot, baseurl=baseurl, address=address)
 
     class DocrootNotFound(Exception):
         def __init__(self, value):

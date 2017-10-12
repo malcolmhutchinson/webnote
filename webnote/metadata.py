@@ -199,7 +199,7 @@ class Metadata():
         -   metafile in the meta directory.
         -   metafile in the paired directory.
 
-        Return None if no file found.
+        Return None if not file found.
         """
 
         (basename, ext) = os.path.splitext(self.pagefile)
@@ -445,3 +445,9 @@ class Metadata():
     def subject(self):
         return ', '.join(self.metadata['dc_subject'])
 
+
+    def pagetype(self):
+        if 'type' in self.metadata.keys():
+            return self.metadata['type']
+
+        return None

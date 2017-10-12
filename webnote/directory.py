@@ -25,11 +25,6 @@ class Directory(Webnote):
     baseurl = None
     sort = None
 
-    FILEMAP_PICTURES = {
-        'original': ('.', 'raw',),
-        '1024px': ('1024px', 'view',),
-        '512px': ('512px', ),
-    }
 
     def __init__(self, dirpath, docroot=None, baseurl=None, sort=True):
         """Create a Directory object from a string path to directory.
@@ -263,7 +258,6 @@ class Directory(Webnote):
 
         return targets
 
-
     def tempfiles(self, baseurl=None):
         """Return a list of (link, text) tuples identifying temporary files."""
 
@@ -299,47 +293,6 @@ class Directory(Webnote):
             targets.append((link, text))
 
         return targets
-  
-
-    def accession_pictures(self):
-        """Process pictures into thumbnails.
-
-        For each picture file 
-        """
-
-        FILEMAP_PICTURES = {
-            'original': ('.', 'raw',),
-            '1024px': ('1024px', 'view',),
-            '512px': ('512px', ),
-        }
-
-        if not os.path.isdir(self.d1024()):
-            os.mkdir(self.d1024())
-        
-        if not os.path.isdir(self.d512()):
-            os.mkdir(self.d512())
-
-#        for picture in self.model['pictures']:
-#            path = os.path.join(self.dirpath, picture)
-#            if os.path.isfile(path):
-#                print 'got one', path
-
-    def d1024(self):
-        return os.path.join(self.dirpath, self.FILEMAP_PICTURES['1024px'][0])
-
-    def d512(self):
-        return os.path.join(self.dirpath, self.FILEMAP_PICTURES['512px'][0])
-
-    def pictures(self):
-        """Return a list of picture objects.
-        """
-
-        pictures = []
-        return pictures
-        
-    def process_gps(self):
-        """Run gpscorrelate against gpx files found in this directory.
-        """
 
         
 

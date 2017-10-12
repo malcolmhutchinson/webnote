@@ -1,0 +1,35 @@
+{% extends 'framework.html' %}{% block main %}{% load staticfiles %}
+
+<div id='pagecontent'>
+
+  <h1>Picture {{ picture.title }}</h2>
+
+
+<p>Processed? {{ parent.processed }}</p>
+
+
+
+<img src='{{ picture.src }}' alt='{{ picture.alt }}' /> 
+
+
+<h3>Inputs</h3>
+
+<p>URL {{ url }}<br />
+  PICID {{ picid }}<br />
+</p>
+
+
+
+<h3>Computed</h3>
+  <p>
+PICTURE {{ picture }}<br />
+FILENAME {{ filename }}
+</p>
+
+
+
+
+
+</div><!-- Close pagecontent -->
+
+{% endblock %}

@@ -68,6 +68,13 @@ CONTROL_ELEMENTS = (
     'status',
 )
 
+FILEMAP_PICTURES = {
+    'original': ('.', 'raw',),
+    '1024px': ('1024px', 'view',),
+    '512px': ('512px', ),
+}
+
+
 # The SUFFIX dictionary identifies file type from the filename
 # suffix. Each key points to a list of string values, including the
 # dot prefix.

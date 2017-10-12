@@ -126,6 +126,10 @@ def page(request, url, command=None):
         title = page.title
         breadcrumbs.extend(page.breadcrumbs())
         navtemplate = 'nav_page.html'
+        
+        if 'type' in page.metadata.metadata.keys():
+            template = page.metadata.metadata['type'] + '.html'
+
     except webnote.page.Page.DocrootNotFound:
         template = 'warning_NotArchive.html'
 
@@ -214,3 +218,68 @@ def page(request, url, command=None):
     }
 
     return render(request, template, context)
+
+
+def picture(request, url, picid):
+
+    template = 'picture.html'
+    navtemplate = 'nav_picture.html'
+    h1 = 'Picture file'
+    dirpath = None
+    docroot = None
+    baseurl = None
+
+    if picid[-1] =='/':
+        picid = picid[:-1]
+
+#   Process the address into a docroot.
+    bits = url.split('/')
+
+    if bits[0] == 'home':
+        dirname = os.path.join('/home', bits[1], 'www')
+        if os.path.isdir(dirname):
+            docroot = dirname
+            bits.pop(0)
+            baseurl = '/home/' + bits[0]
+            if len(bits) == 1:
+                address = ''
+            elif len(bits) > 1:
+                bits.pop(0)
+                address = '/'.join(bits)
+
+    dirpath = os.path.join(docroot, address)
+
+    parent = webnote.directory.Directory(
+        dirpath=dirpath, docroot=docroot, baseurl=baseurl,
+    )
+
+    for f in parent.model['pictures']:
+        if picid in f:
+            filename = os.path.join(dirpath, f) 
+
+    picture = webnote.picture.Picture(
+        filename, docroot=docroot, baseurl=baseurl)
+    
+    context = {
+        'h1': h1,
+        'template': template,
+        'navtemplate': navtemplate,
+        'stylesheets': {
+            'app': None,
+            'screen': 'css/screen.css',
+            'printer': 'css/print.css',
+        },
+        'picture': picture,
+
+        
+        'url': url,
+        'parent': parent,
+        'address': address,
+        'picid': picid,
+        'filename': filename,
+
+        
+    }
+    return render(request, template, context)
+
+    

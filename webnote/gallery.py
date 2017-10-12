@@ -5,73 +5,97 @@ Probably obsolete.
 
 import os
 
+from directory import Directory
+from picture import Picture
+
 class Gallery():
-    
+
+    dirpath = None
     docroot = None
     baseurl = None
     address = None
     gallery = None
     
-    FILEMAP = {
-        'original': ('raw',),
-        '1024px': ('view',)
-    }
-    
     def __init__(self, docroot, baseurl, address):
         """Build the data structure describing this gallery."""
-        
-        directory = os.path.join(docroot, address)
-        url = os.path.join(baseurl, address)
-        
-        if not os.path.isdir(directory):
-            raise self.DocrootNotFound(docroot)
-            
-        self.gallery = self._scan_directory(directory)
-        
-    class DocrootNotFound(Exception):
+
+        dirpath = os.path.join(docroot, address)
+
+        if not os.path.isdir(dirpath):
+            raise self.DirectoryNotFound(dirpath)
+
+        self.address = address
+        self.baseurl = baseurl
+        self.dirpath = dirpath
+        self.docroot = docroot
+
+        self.paired = Directory(dirpath, docroot=docroot, baseurl=baseurl)
+
+    class DirectoryNotFound(Exception):
         def __init__(self, value):
             self.value = value
 
         def __str__(self):
             return repr(self.value)
         
-    def get_absolute_url(self):
+    def __get_absolute_url__(self):
         return os.path.join(self.baseurl, self.address)
 
-    url = property(get_absolute_url)
+    url = property(__get_absolute_url__)
+
+
+    def pictures(self, docroot=None, baseurl=None):
+        """Return a list of picture objects."""
+
+        pictures = []
+        if not docroot:
+            docroot = self.docroot
+        if not baseurl:
+            baseurl = self.baseurl
+        
+        for pic in self.paired.model['pictures']:
+            fname = os.path.join(self.dirpath, pic)
+            picture = Picture(fname, docroot=docroot, baseurl=baseurl)
+            pictures.append(picture)
+
+        return pictures
+
     
-    def _scan_directory(self, path):
-        if not os.path.isdir(path):
-            return None
+    def accession_pictures(self):
+        """Process pictures into thumbnails.
 
-        result = {}
-        for item in os.listdir(path):            
-            itempath = os.path.join(path, item)
+        For each picture file 
+        """
 
-            if os.path.isfile(itempath):
-                (path, fname) = os.path.split(itempath)
-                (basename, ext) = os.path.splitext(fname)
-                (discard, parent) = os.path.split(path)
+        if not os.path.isdir(self.d1024()):
+            os.mkdir(self.d1024())
+        
+        if not os.path.isdir(self.d512()):
+            os.mkdir(self.d512())
 
-                copy = None
-                for thing in self.FILEMAP:
-                    if parent in self.FILEMAP[thing]:
-                        copy = thing
-                
-                if basename in result.keys():
-                    result[basename] = itempath
-                else:
-                    result[basename] = {copy: itempath}
-                                        
-            elif os.path.isdir(itempath):
-                    
-                nextdir = self._scan_directory(itempath)
+#        for picture in self.model['pictures']:
+#            path = os.path.join(self.dirpath, picture)
+#            if os.path.isfile(path):
+#                print 'got one', path
 
-                # Iterate the resulting dictionary of basenames.
-                for key in nextdir.keys():
-                    if key in result.keys():
-                        result[key].update(nextdir[key])
-                    else:
-                        result[key] = nextdir[key]
+    def gallery_processed(self):
+        """True or false. Have the pictures here been processed?
 
-        return result   
+        """
+
+        for item in self.model['dirs']:
+            print item
+
+    def d1024(self):
+        return os.path.join(
+            self.dirpath, settings.FILEMAP_PICTURES['1024px'][0],
+        )
+    def d512(self):
+        return os.path.join(
+            self.dirpath, ssettings.FILEMAP_PICTURES['512px'][0],
+        )
+
+    def process_gps(self):
+        """Run gpscorrelate against gpx files found in this directory.
+        """
+
