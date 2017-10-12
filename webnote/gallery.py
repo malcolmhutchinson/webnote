@@ -67,17 +67,25 @@ class Gallery():
         For each picture file 
         """
 
+        warnings = []
+        
         if not os.path.isdir(self.d1024()):
+            warnings.append("Creating directory at " + self.d1024())
             os.mkdir(self.d1024())
         
         if not os.path.isdir(self.d512()):
+            warnings.append("Creating directory at " + self.d512())
             os.mkdir(self.d512())
+
+        warnings.extend(self.process_gps())
 
 #        for picture in self.model['pictures']:
 #            path = os.path.join(self.dirpath, picture)
 #            if os.path.isfile(path):
 #                print 'got one', path
 
+        return warnings
+    
     def gallery_processed(self):
         """True or false. Have the pictures here been processed?
 

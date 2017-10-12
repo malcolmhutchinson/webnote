@@ -4,8 +4,8 @@
 import exifread
 import os
 
-#from directory import Directory
-#import settings
+from directory import Directory
+
 
 
 from metadata import Metadata
@@ -45,9 +45,9 @@ class Picture():
         self.docroot = docroot
         self.baseurl = baseurl
 
-        #self.parent = Directory(
-        #    self.parentpath, docroot=docroot, baseurl=baseurl
-        #)
+        self.parent = Directory(
+            self.parentpath, docroot=docroot, baseurl=baseurl
+        )
 
         if not staticroot:
             staticroot = settings.STATIC_URL
@@ -110,6 +110,12 @@ class Picture():
             settings.FILEMAP_PICTURES['512px'][0])
 
         return d
+
+    def gpxfiles(self):
+        print "HERE"
+        return self.parent.model['gpx']
+
+
         
     def make_thumbnails(self):
         """Create thumbnail copies at 512 and 1024 pix."""

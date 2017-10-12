@@ -9,6 +9,12 @@ LISTSTYLE = (
     ('simple', 'simple'),
 )
 
+PAGETYPE = (
+    ('gallery', 'gallery',),
+    ('page', 'page'),
+    (None, '-'),
+)
+
 SORT = (
     ('forward', 'forward'),
     ('reverse', 'reverse'),
@@ -27,6 +33,7 @@ class CommandForm(forms.Form):
     sort = forms.ChoiceField(required=False, choices=SORT)
     liststyle = forms.ChoiceField(required=False, choices=LISTSTYLE)
     status = forms.ChoiceField(required=False, choices=STATUS)
+    pagetype = forms.ChoiceField(required=False, choices=PAGETYPE)
     filename = forms.FileField(required=False, label='Upload file')
 
 
@@ -70,3 +77,12 @@ class DublinCoreForm(forms.Form):
 
 class NewfileForm(forms.Form):
     newfilename = forms.CharField(max_length=255)
+
+
+class PictureForm(forms.Form):
+
+    title = forms.CharField(
+        max_length=255, required=False,)
+    filename = forms.FileField(required=False, label='Upload file')
+
+    gpstime = forms.TimeField(required=False)

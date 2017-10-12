@@ -11,7 +11,14 @@
     <p>{{ picture.metadata.description }}</p>
 
 
+    <h3>GPX files in this folder</h3>
 
+    <ol>
+{% for gpx in picture.gpxfiles %}
+        <li>{{ gpx }}</li>
+{% endfor %}
+    </ol>
 
+    
 </div>
 <!-- end nav_picture.html -->
