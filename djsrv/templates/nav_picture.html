@@ -1,15 +1,28 @@
 <!-- nav_picture.html -->
 <div id='navcontent'>
 
-    <h3>subject</h3>
 
-    <p>{{ p.metadata.subject }}</p>
+{% if gpsform %}
+    <h3>To correlate the pictures against gps files...</h3>
 
 
-    <h3>description</h3>
+    <p>Look at a picture of the GPS handset displaying the time. Type
+    the time visible on the handset in 24-hour notation
+    (<em>YYYY-MM-DD hh:mm:ss</em>). Also type the timezone offset from
+    UTC (usually +12 in NZ, or +13 during daylight saving time).
 
-    <p>{{ picture.metadata.description }}</p>
+    <table>
+      {{ gpsform }}
+    </table>
 
+    <p>Clicking the correlate button will run <tt>gpscorrelate</tt>
+    over all the image files in this directory, for each gps file
+    found. This will affect the EXIF data in the image files.</p>
+
+    <input type='submit', name='command' value='correlate' />
+
+
+{% endif %}
 
     <h3>GPX files in this folder</h3>
 
@@ -19,6 +32,13 @@
 {% endfor %}
     </ol>
 
+    <table>
+      {{ fileform }}
+    </table>
+
+    <p>Upload a GPX file, or any other kind of file.</p>
     
+    <input type='submit', name='command' value='upload' />
+
 </div>
 <!-- end nav_picture.html -->

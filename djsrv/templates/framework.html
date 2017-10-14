@@ -21,7 +21,7 @@
 </head>
 <body>
 
-{% if dc_form or content_form %}
+{% if formsOn %}
 <form action = '' method='post' enctype="multipart/form-data">
 {% csrf_token %}
 {% endif %}

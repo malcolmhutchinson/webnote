@@ -82,6 +82,7 @@ def page(request, url, command=None):
     content_form = None
     dc_form = None
     docroot = None
+    formsOn = None
     navtemplate = None
     newfile_form = None
     page = None
@@ -137,6 +138,7 @@ def page(request, url, command=None):
 
         template = 'editpage.html'
         navtemplate = 'nav_editpage.html'
+        formsOn = True
 
         formdata = page.formdata()
         sort = None
@@ -207,6 +209,7 @@ def page(request, url, command=None):
         'navtemplate': navtemplate,
         'liststyle': page.metadata.liststyle(),
 
+        'formsOn': formsOn,
         'content_form': content_form,
         'command_form': command_form,
         'dc_form': dc_form,
@@ -228,7 +231,12 @@ def picture(request, url, picid):
     dirpath = None
     docroot = None
     baseurl = None
+    gpsform = None
+    fileform = None
+    formsOn = None
 
+    warnings = []
+    
     if picid[-1] =='/':
         picid = picid[:-1]
 
@@ -249,16 +257,56 @@ def picture(request, url, picid):
 
     dirpath = os.path.join(docroot, address)
 
-    parent = webnote.directory.Directory(
-        dirpath=dirpath, docroot=docroot, baseurl=baseurl,
+#   The parent is a Gallery object.
+    parent = webnote.gallery.Gallery(
+        docroot=docroot, baseurl=baseurl,address=address,
     )
 
-    for f in parent.model['pictures']:
+#   Find the filename with extension, from the basename picture id
+#   (picid).
+    for f in parent.paired.model['pictures']:
         if picid in f:
             filename = os.path.join(dirpath, f) 
 
     picture = webnote.picture.Picture(
         filename, docroot=docroot, baseurl=baseurl)
+
+    fileform = forms.FileForm()
+
+
+    if request.POST:
+
+        if request.POST['command'] == 'correlate':
+
+            pictime = picture.EXIFdatetime()
+            gpstime = request.POST['gpstime']
+            tzoffset = request.POST['tzoffset']
+
+            warnings.extend(parent.process_gps(pictime, gpstime, tzoffset))
+
+        
+        if request.POST['command'] == 'upload':
+            if request.FILES:
+                fname = str(request.FILES['filename'])
+                filepath = os.path.join(
+                    picture.parent.dirpath, fname
+                )
+
+                f = request.FILES['filename']
+
+                with open(filepath, 'wb') as destination:
+                    for chunk in f.chunks():
+                        destination.write(chunk)
+
+                warnings.append("Uploading file " + fname)
+    
+        picture = webnote.picture.Picture(
+            filename, docroot=docroot, baseurl=baseurl)
+
+#   Determine if an accession form is necessary.
+    if not parent.processed() and len(parent.gpxfiles()) > 0:
+        formsOn = True
+        gpsform = forms.PictureForm()
     
     context = {
         'h1': h1,
@@ -270,13 +318,10 @@ def picture(request, url, picid):
             'printer': 'css/print.css',
         },
         'picture': picture,
-
-        
-        'url': url,
-        'parent': parent,
-        'address': address,
-        'picid': picid,
-        'filename': filename,
+        'formsOn': forms,
+        'fileform': fileform,
+        'gpsform': gpsform,
+        'warnings': warnings,
 
         
     }

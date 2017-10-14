@@ -75,14 +75,13 @@ class DublinCoreForm(forms.Form):
         max_length=255, required=False, label='source')
 
 
-class NewfileForm(forms.Form):
-    newfilename = forms.CharField(max_length=255)
+class FileForm(forms.Form):
+    filename = forms.CharField(max_length=255)
+    filename = forms.FileField(required=False, label='Upload file')
 
 
 class PictureForm(forms.Form):
 
-    title = forms.CharField(
-        max_length=255, required=False,)
-    filename = forms.FileField(required=False, label='Upload file')
+    gpstime = forms.DateTimeField(required=False, label='GPS datetime')
+    tzoffset = forms.IntegerField(required=False, label='Timezone offset (hrs)')
 
-    gpstime = forms.TimeField(required=False)

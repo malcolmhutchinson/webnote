@@ -1,12 +1,13 @@
 """webnote.Gallery classes to handle directories of picture files.
 
-Probably obsolete.
 """
 
 import os
 
 from directory import Directory
 from picture import Picture
+
+import settings
 
 class Gallery():
 
@@ -43,6 +44,11 @@ class Gallery():
 
     url = property(__get_absolute_url__)
 
+
+    def gpxfiles(self):
+        """Return the list of GPX file filenames."""
+
+        return self.paired.model['gpx']
 
     def pictures(self, docroot=None, baseurl=None):
         """Return a list of picture objects."""
@@ -86,14 +92,19 @@ class Gallery():
 
         return warnings
     
-    def gallery_processed(self):
+    def processed(self):
         """True or false. Have the pictures here been processed?
 
         """
 
-        for item in self.model['dirs']:
-            print item
+        for item in self.paired.model['dirs']:
+            if item in settings.FILEMAP_PICTURES['1024px']:
+                return True
+            if item in settings.FILEMAP_PICTURES['512px']:
+                return True
 
+        return False
+            
     def d1024(self):
         return os.path.join(
             self.dirpath, settings.FILEMAP_PICTURES['1024px'][0],
@@ -103,7 +114,17 @@ class Gallery():
             self.dirpath, ssettings.FILEMAP_PICTURES['512px'][0],
         )
 
-    def process_gps(self):
+    def process_gps(self, pictime, gpstime, tzoffset):
         """Run gpscorrelate against gpx files found in this directory.
         """
 
+        warnings = []
+
+        warnings.append(
+            "pictime " + str(pictime) + " " +
+            str(gpstime) + " " + str(tzoffset))
+
+        return warnings
+
+
+        
