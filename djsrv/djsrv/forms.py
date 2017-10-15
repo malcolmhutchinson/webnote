@@ -27,6 +27,12 @@ STATUS = (
     ('standing', 'standing'),
 )
 
+TZOFFSET = (
+    ('0000', '0000',),
+    ('+1200', '+1200',),
+    ('+1245', '+1245',),
+    ('+1300', '+1300',),
+)
 
 
 class CommandForm(forms.Form):
@@ -80,8 +86,9 @@ class FileForm(forms.Form):
     filename = forms.FileField(required=False, label='Upload file')
 
 
-class PictureForm(forms.Form):
+class GPSForm(forms.Form):
 
     gpstime = forms.DateTimeField(required=False, label='GPS datetime')
-    tzoffset = forms.IntegerField(required=False, label='Timezone offset (hrs)')
+    tzoffset = forms.ChoiceField(
+        required=False, choices=TZOFFSET, label='Timezone offset (hrs)')
 

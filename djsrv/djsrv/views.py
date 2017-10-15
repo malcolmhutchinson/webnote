@@ -3,8 +3,10 @@
 Basic views providing the index and viewing pages.
 """
 
+import datetime
 import getpass
 import os
+import pytz
 import socket
 
 from django.shortcuts import render, redirect
@@ -274,15 +276,31 @@ def picture(request, url, picid):
     fileform = forms.FileForm()
 
 
+#   Determine if an accession form is necessary.
+    if not parent.processed() and len(parent.gpxfiles()) > 0:
+        formsOn = True
+        gpsform = forms.GPSForm(initial={'tzoffset': '+1300'})
+    
     if request.POST:
 
         if request.POST['command'] == 'correlate':
+            gpsform = forms.GPSForm(request.POST)
+            if gpsform.is_valid():
 
-            pictime = picture.EXIFdatetime()
-            gpstime = request.POST['gpstime']
-            tzoffset = request.POST['tzoffset']
+                pictime = picture.EXIFdatetime()
 
-            warnings.extend(parent.process_gps(pictime, gpstime, tzoffset))
+                gpstime = request.POST['gpstime']
+
+                UTC = pytz.timezone('UTC')
+                gpstime = datetime.datetime.strptime(
+                    request.POST['gpstime'],
+                    "%Y-%m-%d %H:%M:%S", 
+                )
+
+                #gpstime = UTC.localize(gpstime)
+                tzoffset = request.POST['tzoffset']
+
+                warnings.extend(parent.process_gps(pictime, gpstime, tzoffset))
 
         
         if request.POST['command'] == 'upload':
@@ -303,11 +321,6 @@ def picture(request, url, picid):
         picture = webnote.picture.Picture(
             filename, docroot=docroot, baseurl=baseurl)
 
-#   Determine if an accession form is necessary.
-    if not parent.processed() and len(parent.gpxfiles()) > 0:
-        formsOn = True
-        gpsform = forms.PictureForm()
-    
     context = {
         'h1': h1,
         'template': template,

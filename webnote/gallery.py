@@ -2,7 +2,10 @@
 
 """
 
+import datetime
 import os
+import pytz
+import subprocess
 
 from directory import Directory
 from picture import Picture
@@ -95,6 +98,9 @@ class Gallery():
     def processed(self):
         """True or false. Have the pictures here been processed?
 
+        This looks for the presence of subdirectories with names
+        appearing in settings.FILEMAP_PICTURES.
+
         """
 
         for item in self.paired.model['dirs']:
@@ -106,6 +112,7 @@ class Gallery():
         return False
             
     def d1024(self):
+        """Pathname to 1024px directory."""
         return os.path.join(
             self.dirpath, settings.FILEMAP_PICTURES['1024px'][0],
         )
@@ -116,15 +123,95 @@ class Gallery():
 
     def process_gps(self, pictime, gpstime, tzoffset):
         """Run gpscorrelate against gpx files found in this directory.
+
+        pictime will be naive, gpstime will be UTC.
+        
+        First, convert the picture time to UTC using the timezone
+        offset. Then compute the difference in time between the photo
+        and gps time signatures. With these data, you can compose the
+        gpscorrelate command to be run in a shell.
+
+        The variable tzoffset is expected as a string in the manner of
+        '+1200'.
+
+        From the man gpscorrelate page:
+
+        gpscorrelate [-z | --timeadd +/-HH[:MM]] [-O | --photooffset seconds]
+                    [-i | --no-interpolation] [-v | --verbose] [-d |
+                    --datum datum] [-n | --no-write] [-m | --max-dist time]
+                    [-t | --ignore-tracksegs] [-M | --no-mtime] [-f |
+                    --fix-timestamps] [-p | --degmins] -g file.gpx
+                    image.jpg...
+
+       -O, --photooffset seconds
+           time in seconds to add to the photo timestamp to make it match the
+           GPS timestamp. To determine the amount of seconds needed, just
+           create a picture of your GPS device showing the current time and
+           compare it with the timestamp of your photo file.
+
         """
 
         warnings = []
 
-        warnings.append(
-            "pictime " + str(pictime) + " " +
-            str(gpstime) + " " + str(tzoffset))
+        if not gpstime:
+            warnings.append("GPS time required.")
+            warnings.append("No correlation performed.")
+            return warnings
 
-        return warnings
+        if not tzoffset:
+            warnings.append("Timezone offset required.")
+            warnings.append("No correlation performed.")
+            return warnings
+
+        photooffset = pictime - gpstime
+        photooffset = photooffset.seconds
+        
+        if gpstime < pictime:
+            photooffset = photooffset * -1
+            
+#       Process tzoffset into HH:MM.
+
+        h = tzoffset[:3]
+        m = tzoffset[-2:]
+
+        Z = h + ':' + m
+
+#       Provide a list of picture file extensions.
+        extensions = []
+        for thing in self.paired.model['pictures']:
+            (basename, ext) = os.path.splitext(thing)
+            if ext not in extensions:
+                extensions.append(ext)
+        
+#       Compile a list of gpscorrelate commands.
+        precom = "gpscorrelate -M -z " + Z + " "
+        precom += "-O " + str(photooffset) + " "
+        precom += "-g "
+
+        commands = []
+        for gpxfile in self.gpxfiles():
+            
+            gpxfname = os.path.join(
+                self.dirpath, gpxfile.replace(' ', '\ ')
+            )
+            command = precom + gpxfname
+
+            for ext in extensions:
+                fullcommand = command + " " + self.dirpath +"/*" + ext 
+            
+                commands.append(fullcommand )
+        
+#       Execute the commands and return the output.
+        outputs = []
+        os.chdir(self.dirpath)
+        for line in commands:
+            print "COMMAND", line
+            outputs.append(
+                "<pre>" + subprocess.check_output(line, shell=True) +
+                "</pre>"
+            )
+        
+        return outputs
 
 
         

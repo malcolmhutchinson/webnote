@@ -68,6 +68,9 @@ CONTROL_ELEMENTS = (
     'status',
 )
 
+#   Used to detect folders storing thumbnail copies of images. The [0]
+#   element is the preferred one, used by methods which create
+#   thumbnail copies.
 FILEMAP_PICTURES = {
     'original': ('.', 'raw',),
     '1024px': ('1024px', 'view',),

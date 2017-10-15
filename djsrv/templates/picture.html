@@ -6,7 +6,7 @@
 
     <ol>
 {% for warning in warnings %}
-        <li>{{ warning }}</li>
+        <li>{{ warning|safe }}</li>
 {% endfor %}
     </ol>
 

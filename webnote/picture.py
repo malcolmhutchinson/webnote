@@ -142,10 +142,6 @@ class Picture():
 
             return dt
 
-        
-
-        
-        
     def GPSaltitude(self):
         """Integer representation of the GPS altitudce from EXIF."""
         
