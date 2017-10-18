@@ -82,7 +82,7 @@ You will have to install Django, and a number of other dependencies,
 into the environment:
 
     $ source env/bin/activate
-    (env) $ pip install django markdown2 bs4
+    (env) $ pip install django markdown2 bs4 exifread pillow
 
 You will have to put the webnote package onto your path. I've done
 this by placing a simlink in my virtual environment at
