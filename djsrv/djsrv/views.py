@@ -131,7 +131,9 @@ def page(request, url, command=None):
         navtemplate = 'nav_page.html'
         
         if 'type' in page.metadata.metadata.keys():
-            template = page.metadata.metadata['type'] + '.html'
+            template = page.metadata.metadata['type'][0] + '.html'
+
+        print "PAGE.gallery", page.gallery
 
     except webnote.page.Page.DocrootNotFound:
         template = 'warning_NotArchive.html'
@@ -273,37 +275,32 @@ def picture(request, url, picid):
     picture = webnote.picture.Picture(
         filename, docroot=docroot, baseurl=baseurl)
 
+    formsOn = True
     fileform = forms.FileForm()
 
-
-#   Determine if an accession form is necessary.
-    if not parent.processed() and len(parent.gpxfiles()) > 0:
-        formsOn = True
-        gpsform = forms.GPSForm(initial={'tzoffset': '+1300'})
-    
     if request.POST:
 
-        if request.POST['command'] == 'correlate':
+        if request.POST['command'] == 'accession':
+            warnings.extend(parent.accession_pictures())
+
+        elif request.POST['command'] == 'correlate':
             gpsform = forms.GPSForm(request.POST)
             if gpsform.is_valid():
 
                 pictime = picture.EXIFdatetime()
-
                 gpstime = request.POST['gpstime']
-
                 UTC = pytz.timezone('UTC')
                 gpstime = datetime.datetime.strptime(
                     request.POST['gpstime'],
                     "%Y-%m-%d %H:%M:%S", 
                 )
 
-                #gpstime = UTC.localize(gpstime)
                 tzoffset = request.POST['tzoffset']
 
                 warnings.extend(parent.process_gps(pictime, gpstime, tzoffset))
-
         
-        if request.POST['command'] == 'upload':
+        elif request.POST['command'] == 'upload':
+
             if request.FILES:
                 fname = str(request.FILES['filename'])
                 filepath = os.path.join(
@@ -318,9 +315,25 @@ def picture(request, url, picid):
 
                 warnings.append("Uploading file " + fname)
     
+        parent = webnote.gallery.Gallery(
+            docroot=docroot, baseurl=baseurl,address=address,
+        )
         picture = webnote.picture.Picture(
             filename, docroot=docroot, baseurl=baseurl)
 
+#   Determine if accession and gps forms sre necessary.
+    accession = False
+    gpsform = False
+
+    if not parent.processed():
+        accession = True
+        
+    if not picture.GPSdatetime() and len(parent.gpxfiles()) > 0:
+        gpsform = forms.GPSForm(initial={'tzoffset': '+1300'})
+
+    if gpsform:
+        accession = False
+        
     context = {
         'h1': h1,
         'template': template,
@@ -331,7 +344,8 @@ def picture(request, url, picid):
             'printer': 'css/print.css',
         },
         'picture': picture,
-        'formsOn': forms,
+        'accession': accession,
+        'formsOn': formsOn,
         'fileform': fileform,
         'gpsform': gpsform,
         'warnings': warnings,

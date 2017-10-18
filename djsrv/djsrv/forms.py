@@ -39,7 +39,7 @@ class CommandForm(forms.Form):
     sort = forms.ChoiceField(required=False, choices=SORT)
     liststyle = forms.ChoiceField(required=False, choices=LISTSTYLE)
     status = forms.ChoiceField(required=False, choices=STATUS)
-    pagetype = forms.ChoiceField(required=False, choices=PAGETYPE)
+    type = forms.ChoiceField(required=False, choices=PAGETYPE)
     filename = forms.FileField(required=False, label='Upload file')
 
 
@@ -82,13 +82,14 @@ class DublinCoreForm(forms.Form):
 
 
 class FileForm(forms.Form):
-    filename = forms.CharField(max_length=255)
-    filename = forms.FileField(required=False, label='Upload file')
+    filename = forms.FileField(
+        required=False, label='Upload file',
+    )
 
 
 class GPSForm(forms.Form):
 
-    gpstime = forms.DateTimeField(required=False, label='GPS datetime')
+    gpstime = forms.DateTimeField(label='GPS datetime')
     tzoffset = forms.ChoiceField(
         required=False, choices=TZOFFSET, label='Timezone offset (hrs)')
 

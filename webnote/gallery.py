@@ -9,8 +9,10 @@ import subprocess
 
 from directory import Directory
 from picture import Picture
+from PIL import Image
 
 import settings
+
 
 class Gallery():
 
@@ -86,12 +88,23 @@ class Gallery():
             warnings.append("Creating directory at " + self.d512())
             os.mkdir(self.d512())
 
-        warnings.extend(self.process_gps())
+        for picture in self.paired.model['pictures']:
+            path = os.path.join(self.dirpath, picture)
+            (basename, ext) = os.path.splitext(picture)
+            f1024 = basename + '_1024px' + ext.lower()
+            path1024 = os.path.join(self.dirpath, self.d1024(), f1024)
+            f512 = basename + '_512px' + ext.lower()
+            path512 = os.path.join(self.dirpath, self.d512(), f512)
+            if os.path.isfile(path):
+                i =  Image.open(path)
+                i.thumbnail((1024, 1024))
+                i.save(path1024, "jpeg")
+                i.thumbnail((512, 512))
+                i.save(path512, "jpeg")
+                
+        warnings.append("Creating thumbnail copies.")
 
-#        for picture in self.model['pictures']:
-#            path = os.path.join(self.dirpath, picture)
-#            if os.path.isfile(path):
-#                print 'got one', path
+                
 
         return warnings
     
@@ -118,7 +131,7 @@ class Gallery():
         )
     def d512(self):
         return os.path.join(
-            self.dirpath, ssettings.FILEMAP_PICTURES['512px'][0],
+            self.dirpath, settings.FILEMAP_PICTURES['512px'][0],
         )
 
     def process_gps(self, pictime, gpstime, tzoffset):
@@ -170,7 +183,6 @@ class Gallery():
             photooffset = photooffset * -1
             
 #       Process tzoffset into HH:MM.
-
         h = tzoffset[:3]
         m = tzoffset[-2:]
 
@@ -205,11 +217,14 @@ class Gallery():
         outputs = []
         os.chdir(self.dirpath)
         for line in commands:
-            print "COMMAND", line
-            outputs.append(
-                "<pre>" + subprocess.check_output(line, shell=True) +
-                "</pre>"
-            )
+
+            try:
+                output = subprocess.check_output(line, shell=True)
+
+            except subprocess.CalledProcessError:
+                output = "Something went wrong. No correlation was performed."
+
+            outputs.append("<pre>" + output + "</pre>")
         
         return outputs
 

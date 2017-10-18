@@ -37,7 +37,8 @@ class Metadata():
         # END DC metadata
 
         # Page command options
-        sort:           true
+        sort:           forward | reverse
+        type:           gallery | page
         deny:           all
         allow:          staff
         status:         draft
@@ -75,6 +76,7 @@ class Metadata():
     )
 
     COMMANDS = (
+        'type',
         'status',
         'sort',
         'liststyle',

@@ -162,9 +162,10 @@ class Page(Webnote):
         self.metadata = Metadata(self.filename, data)
         self.parent = self._find_parent()
 
-        if self.metadata.pagetype() == 'gallery':
-            self.gallery = Gallery(
-                docroot=docroot, baseurl=baseurl, address=address)
+        if len(self.metadata.pagetype()) > 0:
+            if self.metadata.pagetype()[0] == 'gallery':
+                self.gallery = Gallery(
+                    docroot=docroot, baseurl=baseurl, address=address)
 
     class DocrootNotFound(Exception):
         def __init__(self, value):

@@ -2,7 +2,7 @@
 
 <div id='pagecontent'>
 
-  <h1>Picture {{ picture.title }}</h2>
+  <h1>{{ picture.title }}</h1>
 
     <ol>
 {% for warning in warnings %}
@@ -11,84 +11,6 @@
     </ol>
 
     <img src='{{ picture.src }}' alt='{{ picture.alt }}' />
-
-
-    <table>
-
-        <tr>
-            <th colspan='2' style='border-top: black 1px solid'>EXIF</th>
-        </tr>
-
-        <tr>
-            <th>time</th>
-            <td>{{ picture.EXIFdatetime|date:"Y-m-d H:i:s" }}</td>
-        </tr>
-
-        <tr>
-            <th>format</th>
-            <td>{{ picture.img.format }}</td>
-        </tr>
-
-        <tr>
-            <th>mode</th>
-            <td>{{ picture.img.mode }}</td>
-        </tr>
-
-        <tr>
-            <th>layers</th>
-            <td>{{ picture.img.layer|length }}</td>
-        </tr>
-
-        <tr>
-            <th>bits</th>
-            <td>{{ picture.img.bits }}</td>
-
-        </tr>
-        <tr>
-            <th colspan='2' style='border-top: black 1px solid'>GPS</th>
-        </tr>
-
-        <tr>
-            <th>date</th>
-            <td>{{ picture.GPSdatetime|date:"Y-m-d H:i:s T" }} </td> 
-        </tr>
-
-        <tr>
-            <th>lon lat</th>
-            <td>
-              {{ picture.GPSlongitude }} 
-              {{ picture.GPSlatitude }} 
-            </td>
-        </tr>
-
-        <tr>
-            <th>altitude</th>
-            <td>{{ picture.GPSaltitude }} m</td> 
-        </tr>
-
-        <tr>
-            <th>size</th>
-            <td>{{ picture.img.width }} x {{picture.img.height }} px</td>
-
-        </tr>
-
-
-
-    </table>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 </div><!-- Close pagecontent -->

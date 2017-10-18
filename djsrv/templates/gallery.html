@@ -13,7 +13,7 @@
   
     <h3>{{ picture.title }}</h3>
 
-    <img src='{{ picture.src }}' class='fig-150px' alt='{{ picture.alt }}' />
+    <img src='{{ picture.src512 }}' class='fig-150px' alt='{{ picture.alt }}' />
 
     <table>
         <tr>
@@ -21,12 +21,12 @@
             <td><a href='{{ picture.url }}'>{{ picture.fname }}</a></td>    
         </tr>
         <tr>
-            <th>dim (px)</th>
-            <td>{{ picture.img.size }}</td>    
+            <th>dim</th>
+            <td>{{ picture.img.width }} x {{ picture.img.height }} px</td>    
         </tr>
         <tr>
-            <th>layer</th>
-            <td>{{ picture.img.layer }}</td>    
+            <th>mode</th>
+            <td>{{ picture.mode }}</td>    
         </tr>
         <tr>
             <th></th>

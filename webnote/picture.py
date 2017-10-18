@@ -144,7 +144,7 @@ class Picture():
 
     def GPSaltitude(self):
         """Integer representation of the GPS altitudce from EXIF."""
-        
+
         if 'GPS GPSAltitude' in self.read_exif().keys():
             
             (num, denom) = self.read_exif(
@@ -188,6 +188,12 @@ class Picture():
         
         return None
 
+    def fname1024(self):
+        """Return a string filename to the 512px copy."""
+
+        (basename, ext) = os.path.splitext(self.fname)
+        return os.path.join(self.d1024(), basename + '_1024px' + ext.lower())
+        
     def fname512(self):
         """Return a string filename to the 512px copy."""
 
@@ -242,20 +248,35 @@ class Picture():
         
         return self.exif_store
         
+    def src1024(self):
+        """Return a url to the 1024 px copy. """
+
+        if os.path.isfile(self.fname1024()):
+            url = os.path.join(
+                self.staticroot,
+                self.fname1024().replace(self.docroot, self.baseurl)[1:],
+            )
+                    
+            return url
+
+        return self.src
+
+    def src512(self):
+        """Return a url to the 512 px copy. """
+
+        if os.path.isfile(self.fname512()):
+            url = os.path.join(
+                self.staticroot,
+                self.fname512().replace(self.docroot, self.baseurl)[1:],
+            )
+                    
+            return url
+
+        return self.src
+
     def title(self):
         """A string containing a title."""
 
         return self.fname
 
-    def url512(self):
-        """Return a url to the 512 px copy. """
-
-        if os.path.isfile(self.fname512):
-            url = os.path.join(
-
-            )
-            return url
-
-
-        return self.url
-
+ 
