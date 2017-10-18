@@ -130,10 +130,9 @@ def page(request, url, command=None):
         breadcrumbs.extend(page.breadcrumbs())
         navtemplate = 'nav_page.html'
         
-        if 'type' in page.metadata.metadata.keys():
-            template = page.metadata.metadata['type'][0] + '.html'
-
-        print "PAGE.gallery", page.gallery
+        if len(page.metadata.metadata['type']) > 0:
+            if len(page.metadata.metadata['type'][0]) > 0:
+                template = page.metadata.metadata['type'][0] + '.html'
 
     except webnote.page.Page.DocrootNotFound:
         template = 'warning_NotArchive.html'
