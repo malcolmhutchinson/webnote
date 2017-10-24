@@ -129,14 +129,19 @@ def page(request, url, command=None):
         title = page.title
         breadcrumbs.extend(page.breadcrumbs())
         navtemplate = 'nav_page.html'
+        
+        if len(page.metadata.metadata['type']) > 0:
+            if len(page.metadata.metadata['type'][0]) > 0:
+                template = page.metadata.metadata['type'][0] + '.html'
+
 
 #   Page type is difficult, because it was added as an attribute
 #   later, not all metadata files have it. I actually need a generic
 #   method of dealing with this.
-        if ('type' in page.metadata.metadata.keys()and
-            len(page.metadata.metadata['type']) > 0):
-            if page.metadata.metadata['type'][0]:
-                template = page.metadata.metadata['type'][0] + '.html'
+        #if ('type' in page.metadata.metadata.keys()and
+        #    len(page.metadata.metadata['type']) > 0):
+        #    if page.metadata.metadata['type'][0]:
+        #        template = page.metadata.metadata['type'][0] + '.html'
             
     except webnote.page.Page.DocrootNotFound:
         template = 'warning_NotArchive.html'
