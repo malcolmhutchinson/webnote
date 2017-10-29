@@ -163,7 +163,8 @@ def page(request, url, command=None):
         content_form.fields['content'].initial = page.filecontent
 
         if command == 'new':
-            newfile_form = forms.NewfileForm()
+            template = 'newpage.html'
+            newfile_form = forms.ContentForm()
             command_form = forms.CommandForm()
             dc_form = forms.DublinCoreForm()
             content_form.fields['content'].initial = ""
