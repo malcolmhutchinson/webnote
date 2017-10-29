@@ -2,6 +2,8 @@
 
     Padding a number with leading zeros.
 """
+
+
 def pad(input, length):
     """Pad a number with leading zeros.
 

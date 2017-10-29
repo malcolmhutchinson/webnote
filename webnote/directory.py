@@ -25,7 +25,6 @@ class Directory(Webnote):
     baseurl = None
     sort = None
 
-
     def __init__(self, dirpath, docroot=None, baseurl=None, sort=True):
         """Create a Directory object from a string path to directory.
 
@@ -45,7 +44,7 @@ class Directory(Webnote):
                 self.docroot = docroot
 
                 self.address = dirpath.replace(docroot, '')
-        
+
         if baseurl:
             self.baseurl = baseurl
 
@@ -138,7 +137,7 @@ class Directory(Webnote):
 
         if last == 'www':
             name = '/home/' + getpass.getuser() + '/www/'
-            
+
         return name
 
     def datafiles(self, baseurl=None):
@@ -238,7 +237,7 @@ class Directory(Webnote):
         address = ''
         if self.address:
             address = self.address
-            
+
         if not baseurl:
             if self.baseurl:
                 baseurl = os.path.join(self.baseurl, address)
@@ -293,8 +292,3 @@ class Directory(Webnote):
             targets.append((link, text))
 
         return targets
-
-        
-
-
-

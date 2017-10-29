@@ -6,6 +6,7 @@ import datetime
 import os
 import settings
 
+
 class Metadata():
     """Provide services for dealing with metadata.
 
@@ -129,12 +130,12 @@ class Metadata():
         if data:
             self.data = data
             self.metadata = self.process_data(data)
-        
+
     def build_empty_metadata(self):
-        """Return an empty metadata structure dictionary. 
+        """Return an empty metadata structure dictionary.
 
         This is a dictionary of lists, keyed by ELEMENTS and COMMANDS."""
-        
+
         metadata = {}
         for element in self.ELEMENTS:
             metadata[element] = []
@@ -172,16 +173,16 @@ class Metadata():
         return title
 
     def liststyle(self):
-        """Determine the style of list from metafile. 
+        """Determine the style of list from metafile.
 
         At the moment, this is fragile and will break if there is no
         template matching the value in the liststyle variable.
 
         """
-        
+
         if 'liststyle' not in self.metadata.keys():
             return None
-        
+
         if len(self.metadata['liststyle']) == 0:
             return None
 
@@ -231,14 +232,14 @@ class Metadata():
         """Return a dictionary suitable for populating forms."""
 
         formdata = {}
-        
+
         for element in self.ELEMENTS:
             formdata[element] = '; '.join(self.metadata[element])
         for element in self.COMMANDS:
             formdata[element] = '; '.join(self.metadata[element])
 
         return formdata
-        
+
     def metafile_record(self, data=None):
         """Return a string containing a metadata record in text format.
 
@@ -254,11 +255,11 @@ class Metadata():
         record = '# Dublin core metadata.\n'
 
         metadata = self.metadata
-        
+
         for element in self.ELEMENTS:
             if element in metadata.keys():
                 key = element.replace('dc_', 'DC.')
-                record +=  key + ": "
+                record += key + ": "
                 record += '; '.join(metadata[element]) + '\n'
 
         record += "# end Dublin core elements.\n\n"
@@ -302,7 +303,7 @@ class Metadata():
                 metadata[element].append(data[element])
 
         return metadata
-        
+
     def process_filemodel(self, filemodel):
         """Convert a filemodel into metadata structure.
 
@@ -364,7 +365,7 @@ class Metadata():
         """Save a metarecord to file."""
 
         metafilename = None
-        
+
         if data:
             self.metadata = self.process_data(data)
 
@@ -378,20 +379,20 @@ class Metadata():
 
         if not metafilename:
             metafilename = self.preferred_filename()
-            
+
         (path, fname) = os.path.split(metafilename)
 
         if not os.path.isdir(path):
             print "MAKING META DIRECTORY", path
             os.mkdir(path)
 
-        record = self.metafile_record()        
+        record = self.metafile_record()
 
-        f = open(metafilename,'w')
+        f = open(metafilename, 'w')
         f.write(record)
         f.close()
-        
-#   Methods to return individual field values.    
+
+#   Methods to return individual field values.
     def title(self):
         return '\n'. join(self.metadata['dc_title'])
 
@@ -427,7 +428,7 @@ class Metadata():
 
     def rights(self):
         return '; '.join(self.metadata['dc_rights'])
-    
+
     def rights_markup(self):
         """Return marked-up code for rights. """
         rights = None
@@ -437,7 +438,7 @@ class Metadata():
             rights += settings.LICENSES[right][1] + "</a>"
 
         return rights
-        
+
     def source(self):
         return '; '.join(self.metadata['dc_source'])
 
@@ -446,7 +447,6 @@ class Metadata():
 
     def subject(self):
         return ', '.join(self.metadata['dc_subject'])
-
 
     def pagetype(self):
         if 'type' in self.metadata.keys():

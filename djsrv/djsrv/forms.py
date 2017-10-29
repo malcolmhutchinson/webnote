@@ -53,7 +53,7 @@ class ContentForm(forms.Form):
         max_length=255, required=False, label='description')
     content = forms.CharField(
         label='', required=False,
-        widget=forms.Textarea(attrs={'rows': 10, 'cols': 80,})
+        widget=forms.Textarea(attrs={'rows': 10, 'cols': 80, })
     )
 
 

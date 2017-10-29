@@ -17,12 +17,14 @@ import webnote
 
 # (url prefix, docroot, link text).
 ARCHIVES = [
-    ('/manual', os.path.join(settings.STATICFILES_DIRS[0], 'manual'),
-     "Webnote manual and test pages"
+    (
+        '/manual', os.path.join(settings.STATICFILES_DIRS[0], 'manual'),
+        "Webnote manual and test pages"
     ),
 
-    ('/ruapehu', os.path.join(settings.STATICFILES_DIRS[0], 'ruapehu'),
-     "Notes held on the ruapehu server.",
+    (
+        '/ruapehu', os.path.join(settings.STATICFILES_DIRS[0], 'ruapehu'),
+        "Notes held on the ruapehu server.",
     ),
 ]
 
@@ -129,20 +131,13 @@ def page(request, url, command=None):
         title = page.title
         breadcrumbs.extend(page.breadcrumbs())
         navtemplate = 'nav_page.html'
-        
+
+#   If a value for type is in the metadata, set a template for it.
+#   This permits pages being diesplayed differently to galleries.
         if len(page.metadata.metadata['type']) > 0:
             if len(page.metadata.metadata['type'][0]) > 0:
                 template = page.metadata.metadata['type'][0] + '.html'
 
-
-#   Page type is difficult, because it was added as an attribute
-#   later, not all metadata files have it. I actually need a generic
-#   method of dealing with this.
-        #if ('type' in page.metadata.metadata.keys()and
-        #    len(page.metadata.metadata['type']) > 0):
-        #    if page.metadata.metadata['type'][0]:
-        #        template = page.metadata.metadata['type'][0] + '.html'
-            
     except webnote.page.Page.DocrootNotFound:
         template = 'warning_NotArchive.html'
 
@@ -163,7 +158,6 @@ def page(request, url, command=None):
         content_form.fields['content'].initial = page.filecontent
 
         if command == 'new':
-            #template = 'newpage.html'
             newfile_form = forms.NewfileForm()
             content_form = forms.ContentForm()
             command_form = forms.CommandForm()
@@ -176,8 +170,6 @@ def page(request, url, command=None):
     else:
         breadcrumbs.append(('edit', 'edit this page'))
         breadcrumbs.append(('new', 'new page'))
-
-
 
     if request.POST:
         if 'newfilename' in request.POST.keys():
@@ -251,8 +243,8 @@ def picture(request, url, picid):
     formsOn = None
 
     warnings = []
-    
-    if picid[-1] =='/':
+
+    if picid[-1] == '/':
         picid = picid[:-1]
 
 #   Process the address into a docroot.
@@ -274,14 +266,14 @@ def picture(request, url, picid):
 
 #   The parent is a Gallery object.
     parent = webnote.gallery.Gallery(
-        docroot=docroot, baseurl=baseurl,address=address,
+        docroot=docroot, baseurl=baseurl, address=address,
     )
 
 #   Find the filename with extension, from the basename picture id
 #   (picid).
     for f in parent.paired.model['pictures']:
         if picid in f:
-            filename = os.path.join(dirpath, f) 
+            filename = os.path.join(dirpath, f)
 
     picture = webnote.picture.Picture(
         filename, docroot=docroot, baseurl=baseurl)
@@ -303,13 +295,13 @@ def picture(request, url, picid):
                 UTC = pytz.timezone('UTC')
                 gpstime = datetime.datetime.strptime(
                     request.POST['gpstime'],
-                    "%Y-%m-%d %H:%M:%S", 
+                    "%Y-%m-%d %H:%M:%S",
                 )
 
                 tzoffset = request.POST['tzoffset']
 
                 warnings.extend(parent.process_gps(pictime, gpstime, tzoffset))
-        
+
         elif request.POST['command'] == 'upload':
 
             if request.FILES:
@@ -325,9 +317,9 @@ def picture(request, url, picid):
                         destination.write(chunk)
 
                 warnings.append("Uploading file " + fname)
-    
+
         parent = webnote.gallery.Gallery(
-            docroot=docroot, baseurl=baseurl,address=address,
+            docroot=docroot, baseurl=baseurl, address=address,
         )
         picture = webnote.picture.Picture(
             filename, docroot=docroot, baseurl=baseurl)
@@ -338,13 +330,13 @@ def picture(request, url, picid):
 
     if not parent.processed():
         accession = True
-        
+
     if not picture.GPSdatetime() and len(parent.gpxfiles()) > 0:
         gpsform = forms.GPSForm(initial={'tzoffset': '+1300'})
 
     if gpsform:
         accession = False
-        
+
     context = {
         'h1': h1,
         'template': template,
@@ -361,8 +353,6 @@ def picture(request, url, picid):
         'gpsform': gpsform,
         'warnings': warnings,
 
-        
+
     }
     return render(request, template, context)
-
-    

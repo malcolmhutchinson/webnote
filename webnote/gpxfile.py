@@ -13,11 +13,11 @@ class GPXFile():
     routes, tracks, and waypoints.
 
     """
-    
+
     gpx = None    # Parsed gpxpy object.
     warnings = []
-    
-    def __init__(self,gpxfile):
+
+    def __init__(self, gpxfile):
         """Parse the file with gpxpy.
 
         Consumes an element from gpxpy, or an opened file. Returns a
@@ -89,4 +89,3 @@ class GPXFile():
             result.append(point)
 
         return result
-

@@ -26,7 +26,7 @@ https://en.wikipedia.org/wiki/List_of_file_formats
 
 """
 
-#DEBUG = True
+DEBUG = True
 
 META = ('meta/', )
 
@@ -134,7 +134,7 @@ SUFFIX = {
 SUFFIX['fig'] = SUFFIX['figures']
 
 # The SUFFIX structure also holds composite lists.
-# A page file is identified as any member of html, text, or markdown. 
+# A page file is identified as any member of html, text, or markdown.
 SUFFIX['msoffice'] = (
     SUFFIX['ms_access'] + SUFFIX['ms_excel'] + SUFFIX['ms_word'])
 
@@ -172,7 +172,7 @@ TRUE = (
     'right',
     'sure',
     'true', 't',
-    'up', 
+    'up',
     'y', 'ya', 'yah', 'yeah', 'yes', 'yip', 'yep',
 )
 

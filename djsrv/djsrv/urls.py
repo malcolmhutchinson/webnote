@@ -18,6 +18,7 @@ from django.contrib import admin
 
 import views
 
+
 urlpatterns = [
 
     url(r'^$', views.index, name='index'),
@@ -27,6 +28,6 @@ urlpatterns = [
     url(r"^(['\.\w/-]+)/picture/([\.\w/-]+)$", views.picture, name='picture'),
     url(r"^(['\.\w/-]+)/$", views.page, name='page'),
 
-    
+
     url(r'^admin/', admin.site.urls),
 ]

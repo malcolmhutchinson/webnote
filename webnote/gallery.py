@@ -21,7 +21,7 @@ class Gallery():
     baseurl = None
     address = None
     gallery = None
-    
+
     def __init__(self, docroot, baseurl, address):
         """Build the data structure describing this gallery."""
 
@@ -43,12 +43,11 @@ class Gallery():
 
         def __str__(self):
             return repr(self.value)
-        
+
     def __get_absolute_url__(self):
         return os.path.join(self.baseurl, self.address)
 
     url = property(__get_absolute_url__)
-
 
     def gpxfiles(self):
         """Return the list of GPX file filenames."""
@@ -63,7 +62,7 @@ class Gallery():
             docroot = self.docroot
         if not baseurl:
             baseurl = self.baseurl
-        
+
         for pic in self.paired.model['pictures']:
             fname = os.path.join(self.dirpath, pic)
             picture = Picture(fname, docroot=docroot, baseurl=baseurl)
@@ -71,19 +70,18 @@ class Gallery():
 
         return pictures
 
-    
     def accession_pictures(self):
         """Process pictures into thumbnails.
 
-        For each picture file 
+        For each picture file
         """
 
         warnings = []
-        
+
         if not os.path.isdir(self.d1024()):
             warnings.append("Creating directory at " + self.d1024())
             os.mkdir(self.d1024())
-        
+
         if not os.path.isdir(self.d512()):
             warnings.append("Creating directory at " + self.d512())
             os.mkdir(self.d512())
@@ -96,18 +94,16 @@ class Gallery():
             f512 = basename + '_512px' + ext.lower()
             path512 = os.path.join(self.dirpath, self.d512(), f512)
             if os.path.isfile(path):
-                i =  Image.open(path)
+                i = Image.open(path)
                 i.thumbnail((1024, 1024))
                 i.save(path1024, "jpeg")
                 i.thumbnail((512, 512))
                 i.save(path512, "jpeg")
-                
+
         warnings.append("Creating thumbnail copies.")
 
-                
-
         return warnings
-    
+
     def processed(self):
         """True or false. Have the pictures here been processed?
 
@@ -123,12 +119,13 @@ class Gallery():
                 return True
 
         return False
-            
+
     def d1024(self):
         """Pathname to 1024px directory."""
         return os.path.join(
             self.dirpath, settings.FILEMAP_PICTURES['1024px'][0],
         )
+
     def d512(self):
         return os.path.join(
             self.dirpath, settings.FILEMAP_PICTURES['512px'][0],
@@ -138,7 +135,7 @@ class Gallery():
         """Run gpscorrelate against gpx files found in this directory.
 
         pictime will be naive, gpstime will be UTC.
-        
+
         First, convert the picture time to UTC using the timezone
         offset. Then compute the difference in time between the photo
         and gps time signatures. With these data, you can compose the
@@ -178,10 +175,10 @@ class Gallery():
 
         photooffset = pictime - gpstime
         photooffset = photooffset.seconds
-        
+
         if gpstime < pictime:
             photooffset = photooffset * -1
-            
+
 #       Process tzoffset into HH:MM.
         h = tzoffset[:3]
         m = tzoffset[-2:]
@@ -194,7 +191,7 @@ class Gallery():
             (basename, ext) = os.path.splitext(thing)
             if ext not in extensions:
                 extensions.append(ext)
-        
+
 #       Compile a list of gpscorrelate commands.
         precom = "gpscorrelate -M -z " + Z + " "
         precom += "-O " + str(photooffset) + " "
@@ -202,17 +199,17 @@ class Gallery():
 
         commands = []
         for gpxfile in self.gpxfiles():
-            
+
             gpxfname = os.path.join(
                 self.dirpath, gpxfile.replace(' ', '\ ')
             )
             command = precom + gpxfname
 
             for ext in extensions:
-                fullcommand = command + " " + self.dirpath +"/*" + ext 
-            
-                commands.append(fullcommand )
-        
+                fullcommand = command + " " + self.dirpath + "/*" + ext
+
+                commands.append(fullcommand)
+
 #       Execute the commands and return the output.
         outputs = []
         os.chdir(self.dirpath)
@@ -225,8 +222,5 @@ class Gallery():
                 output = "Something went wrong. No correlation was performed."
 
             outputs.append("<pre>" + output + "</pre>")
-        
+
         return outputs
-
-
-        

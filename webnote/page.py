@@ -165,7 +165,7 @@ class Page(Webnote):
         if len(self.metadata.pagetype()) > 0:
             if self.metadata.pagetype()[0] == 'gallery':
 
-                try:                
+                try:
                     self.gallery = Gallery(
                         docroot=docroot, baseurl=baseurl, address=address,
                     )
@@ -244,7 +244,7 @@ class Page(Webnote):
         if self.parent_directory:
             for item in self.parent_directory.model['page']:
                 (basename, ext) = os.path.splitext(item)
-                if basename =='index':
+                if basename == 'index':
                     filename = os.path.join(docroot, address) + item
                     return filename
 
@@ -259,13 +259,13 @@ class Page(Webnote):
         """Return a Page object representing the parent."""
 
         address = self.address
-        
+
         if not self.address:
             return None
 
         address, fname = os.path.split(self.address)
         return Page(self.docroot, self.baseurl, address)
-    
+
     def _parse_directories(self):
         """Create webnote directory structures for parent and paired dirs.
 
@@ -391,11 +391,11 @@ class Page(Webnote):
         address = ''
         if self.address:
             address = self.address
-            
+
         filename = ''
         if self.filename:
             filename = self.filename
-            
+
         (path, fname) = os.path.split(filename)
 
         children = []
@@ -516,9 +516,6 @@ class Page(Webnote):
                     h1 += self.title_from_fname().replace('_', ' ')
                     h1 += "</h1>\n\n"
                     content = h1 + content
-                    #content = ("<h1>"
-                    #+ self.title_from_fname().replace(
-                    #    '_', ' ') + "</h1>\n\n" + content)
 
         self._store_content = content
 
@@ -558,7 +555,7 @@ class Page(Webnote):
         filename = ''
         if self.filename:
             filename = self.filename
-            
+
         link = ''
         n = 0
         siblings = self.parent_directory.model['page']
@@ -569,7 +566,7 @@ class Page(Webnote):
             n = siblings.index(fname)
 
         path, basename = os.path.split(address)
-        
+
         if n == len(siblings)-1:
             link = None
             text = None
@@ -582,11 +579,11 @@ class Page(Webnote):
             except IndexError:
                 link = None
                 text = None
-            
+
         nextpage = (link, text)
 
         return nextpage
-    
+
     def parent_link(self):
         """Compute a (link, text) tuble identifying the parent
 
@@ -600,7 +597,7 @@ class Page(Webnote):
         link = ''
         text = ''
         baseurl = ''
-        
+
         if self.baseurl:
             baseurl = self.baseurl
 
@@ -626,7 +623,7 @@ class Page(Webnote):
         filename = ''
         if self.filename:
             filename = self.filename
-            
+
         link = ''
         n = 0
         siblings = self.parent_directory.model['page']
@@ -637,7 +634,7 @@ class Page(Webnote):
             n = siblings.index(fname)
 
         path, basename = os.path.split(address)
-        
+
         if n == 0:
             link = None
             text = None
@@ -646,7 +643,7 @@ class Page(Webnote):
             (basename, ext) = os.path.splitext(siblings[n-1])
             link = os.path.join(self.baseurl, path, basename)
             text = basename
-            
+
         previous = (link, text)
 
         return previous
@@ -666,7 +663,7 @@ class Page(Webnote):
         Return True if everything goes according to plan.
 
         """
-        
+
         address = self.address
         if address == 'index':
             address = ''
@@ -675,7 +672,8 @@ class Page(Webnote):
 
         if 'newfilename' in data.keys():
             fname = data['newfilename'].replace(' ', '_')
-            filename = os.path.join(self.parent_directory.dirpath, fname + '.md')
+            filename = os.path.join(
+                self.parent_directory.dirpath, fname + '.md')
         else:
             filename = self.filename
 
@@ -722,7 +720,7 @@ class Page(Webnote):
         if self.parent.metadata.metadata['sort']:
             if self.parent.metadata.metadata['sort'][0] == 'reverse':
                 pages = sorted(pages, reverse=True)
-        
+
         for page in pages:
             (basename, ext) = os.path.splitext(page)
             path = '/'.join(steps[:-1])
@@ -755,7 +753,7 @@ class Page(Webnote):
             address = self.address
         (path, basename) = os.path.split(address)
 
-        baselink =os.path.join(self.baseurl, path)
+        baselink = os.path.join(self.baseurl, path)
 
         if self.filename:
             filename = self.filename
@@ -766,8 +764,8 @@ class Page(Webnote):
 
         if self.parent.metadata.metadata['sort']:
             pages = sorted(pages, reverse=True)
-        
-        for page in pages :
+
+        for page in pages:
             (basename, ext) = os.path.splitext(page)
 
             if basename.lower() == 'index':
@@ -794,9 +792,9 @@ class Page(Webnote):
                         self.staticroot + self.baseurl, self.address, item)
                     alt = item
                     return (src, item)
-                        
+
         return False
-        
+
     def title(self):
         """Compute the title as a string.
 
@@ -817,11 +815,11 @@ class Page(Webnote):
             if self.metadata.title():
                 return self.metadata.title()
 
-#       Find the H1 line in the content string
-        #soup = BeautifulSoup(self.content(), "html.parser")
-        #h1 = soup.find_all('h1')
-        #for element in h1:
-        #    return element.string
+#       Find the H1 line in the content string.
+        soup = BeautifulSoup(self.content(), "html.parser")
+        h1 = soup.find_all('h1')
+        for element in h1:
+            return element.string
 
 #       No h1 tag? Prettify the filename.
         if self.filename:
@@ -830,7 +828,6 @@ class Page(Webnote):
             return basename.replace('_', ' ')
 
         return "Title unknown"
-
 
     def title_from_fname(self):
 
