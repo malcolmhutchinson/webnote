@@ -816,10 +816,10 @@ class Page(Webnote):
                 return self.metadata.title()
 
 #       Find the H1 line in the content string.
-        soup = BeautifulSoup(self.content(), "html.parser")
-        h1 = soup.find_all('h1')
-        for element in h1:
-            return element.string
+#        soup = BeautifulSoup(self.content(), "html.parser")
+#        h1 = soup.find_all('h1')
+#        for element in h1:
+#            return element.string
 
 #       No h1 tag? Prettify the filename.
         if self.filename:
