@@ -7,12 +7,16 @@
 
 {{ newfile_form.as_p }}
 
+{{ content_form.as_p }}
+
+
 {% else %}
   <h3>Edit this page</h3>
-{% endif %}
 
 
 {{ content_form.as_p }}
+
+
 
   {% if page.unref_figs %}
   <h3>Unreferenced figures</h3>
@@ -28,6 +32,8 @@
   <div style='clear: both;'></div>{% endif %}
   
   <hr />
+
+{% endif %}
 
 <div id='pagecontent'>
 {{ page.content|safe }}

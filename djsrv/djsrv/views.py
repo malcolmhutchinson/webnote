@@ -163,8 +163,9 @@ def page(request, url, command=None):
         content_form.fields['content'].initial = page.filecontent
 
         if command == 'new':
-            template = 'newpage.html'
-            newfile_form = forms.ContentForm()
+            #template = 'newpage.html'
+            newfile_form = forms.NewfileForm()
+            content_form = forms.ContentForm()
             command_form = forms.CommandForm()
             dc_form = forms.DublinCoreForm()
             content_form.fields['content'].initial = ""
@@ -189,6 +190,7 @@ def page(request, url, command=None):
             newfile_form.fields['newfilename'].initial = (
                 request.POST['newfilename'])
 
+            print "PAGE", docroot, address, baseurl
             page = webnote.page.Page(
                 docroot, address=address, baseurl=baseurl,
                 data=request.POST,

@@ -44,7 +44,7 @@ class CommandForm(forms.Form):
 
 
 class ContentForm(forms.Form):
-    
+
     dc_title = forms.CharField(
         max_length=255, required=False, label='title')
     dc_subject = forms.CharField(
@@ -55,6 +55,11 @@ class ContentForm(forms.Form):
         label='', required=False,
         widget=forms.Textarea(attrs={'rows': 10, 'cols': 80,})
     )
+
+
+class NewfileForm(forms.Form):
+
+    newfilename = forms.CharField(label='Name', max_length=255)
 
 
 class DublinCoreForm(forms.Form):
@@ -92,4 +97,3 @@ class GPSForm(forms.Form):
     gpstime = forms.DateTimeField(label='GPS datetime')
     tzoffset = forms.ChoiceField(
         required=False, choices=TZOFFSET, label='Timezone offset (hrs)')
-
