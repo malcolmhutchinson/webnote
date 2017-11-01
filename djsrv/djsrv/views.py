@@ -232,6 +232,7 @@ def page(request, url, command=None):
 
 def picture(request, url, picid):
 
+    print "HERE", url, picid
     template = 'picture.html'
     navtemplate = 'nav_picture.html'
     h1 = 'Picture file'
@@ -241,7 +242,9 @@ def picture(request, url, picid):
     gpsform = None
     fileform = None
     formsOn = None
-
+    filename = None
+    picture = None
+    
     warnings = []
 
     if picid[-1] == '/':
@@ -275,8 +278,12 @@ def picture(request, url, picid):
         if picid in f:
             filename = os.path.join(dirpath, f)
 
-    picture = webnote.picture.Picture(
-        filename, docroot=docroot, baseurl=baseurl)
+
+    if filename:
+        picture = webnote.picture.Picture(
+            filename, docroot=docroot, baseurl=baseurl)
+    else:
+        warnings.append("No picture file found at " + picid)
 
     formsOn = True
     fileform = forms.FileForm()
@@ -331,8 +338,9 @@ def picture(request, url, picid):
     if not parent.processed():
         accession = True
 
-    if not picture.GPSdatetime() and len(parent.gpxfiles()) > 0:
-        gpsform = forms.GPSForm(initial={'tzoffset': '+1300'})
+    if picture:
+        if not picture.GPSdatetime() and len(parent.gpxfiles()) > 0:
+            gpsform = forms.GPSForm(initial={'tzoffset': '+1300'})
 
     if gpsform:
         accession = False

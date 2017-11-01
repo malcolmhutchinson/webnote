@@ -34,7 +34,8 @@
     <input type='submit', name='command' value='accession' />
 
 {% endif %}
-    
+
+{% if picture %}
     <h3>Picture metadata</h3>
 
     <table>
@@ -100,7 +101,7 @@
         </tr>
 
     </table>
-
+{% endif %}
     
     <h3>GPX files in this folder</h3>
 
