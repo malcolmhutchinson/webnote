@@ -228,7 +228,7 @@ def page(request, url, command=None):
     }
 
     if page:
-        context['liststyle'] = page.metadata.liststyle(),
+        context['liststyle'] = page.metadata.liststyle()
 
     return render(request, template, context)
 
