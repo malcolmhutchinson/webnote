@@ -99,9 +99,10 @@ def page(request, url, command=None):
 
 #   Process the url: is is a username?
     bits = url.split('/')
-
     if bits[0] == 'home':
         dirname = os.path.join('/home', bits[1], 'www')
+        print "DIRNAME", dirname
+        
         if os.path.isdir(dirname):
             docroot = dirname
             bits.pop(0)
@@ -125,21 +126,22 @@ def page(request, url, command=None):
                 address = url.replace(archive[0] + '/', '')
                 baseurl = archive[0]
 
+    if docroot:
 #   Now try to find a page object from the docroot and address.
-    try:
-        page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
-        title = page.title
-        breadcrumbs.extend(page.breadcrumbs())
-        navtemplate = 'nav_page.html'
+        try:
+            page = webnote.page.Page(docroot, address=address, baseurl=baseurl)
+            title = page.title
+            breadcrumbs.extend(page.breadcrumbs())
+            navtemplate = 'nav_page.html'
 
 #   If a value for type is in the metadata, set a template for it.
 #   This permits pages being diesplayed differently to galleries.
-        if len(page.metadata.metadata['type']) > 0:
-            if len(page.metadata.metadata['type'][0]) > 0:
-                template = page.metadata.metadata['type'][0] + '.html'
+            if len(page.metadata.metadata['type']) > 0:
+                if len(page.metadata.metadata['type'][0]) > 0:
+                    template = page.metadata.metadata['type'][0] + '.html'
 
-    except webnote.page.Page.DocrootNotFound:
-        template = 'warning_NotArchive.html'
+        except webnote.page.Page.DocrootNotFound:
+            template = 'warning_NotArchive.html'
 
     if command == 'edit' or command == 'new':
 
@@ -182,7 +184,6 @@ def page(request, url, command=None):
             newfile_form.fields['newfilename'].initial = (
                 request.POST['newfilename'])
 
-            print "PAGE", docroot, address, baseurl
             page = webnote.page.Page(
                 docroot, address=address, baseurl=baseurl,
                 data=request.POST,
@@ -214,7 +215,6 @@ def page(request, url, command=None):
 
         'breadcrumbs': breadcrumbs,
         'navtemplate': navtemplate,
-        'liststyle': page.metadata.liststyle(),
 
         'formsOn': formsOn,
         'content_form': content_form,
@@ -227,12 +227,14 @@ def page(request, url, command=None):
 
     }
 
+    if page:
+        context['liststyle'] = page.metadata.liststyle()
+
     return render(request, template, context)
 
 
 def picture(request, url, picid):
 
-    print "HERE", url, picid
     template = 'picture.html'
     navtemplate = 'nav_picture.html'
     h1 = 'Picture file'

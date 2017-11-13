@@ -123,6 +123,8 @@ class Page(Webnote):
 
         """
 
+        #print "HERE"
+
         if not os.path.isdir(docroot):
             raise self.DocrootNotFound(docroot)
 
