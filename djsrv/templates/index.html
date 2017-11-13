@@ -20,13 +20,14 @@
 {% endfor %}
 </ol>
 
+{% if archives %}
 <h2>Archives</h2>
 
 <ol>
 {% for item in archives %}
     <li><a href='{{ item.0 }}'>{{ item.2 }}</a></li>
 {% endfor %}
-</ol>
+</ol>{% endif %}
 
 <h2>Home directories</h2>
 

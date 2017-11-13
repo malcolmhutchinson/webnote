@@ -27,7 +27,7 @@ ARCHIVES = [
         "Notes held on the ruapehu server.",
     ),
 ]
-
+ARCHIVES = []
 
 def index(request):
     """List the users on the host machine, and archives from the ARCHIVES
