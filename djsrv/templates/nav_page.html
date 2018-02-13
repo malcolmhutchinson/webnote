@@ -1,4 +1,5 @@
 <!-- nav_page.html -->
+{% load humanize %}
 <div id='navcontent'>
 
     <h3>subject</h3>
@@ -41,5 +42,7 @@
 {% endfor %}
         </ol>{% endif %}
 
+
+ <p>Word count: {{ page.wordcount|intcomma }}</p>
 </div>
 <!-- end nav_page.html -->

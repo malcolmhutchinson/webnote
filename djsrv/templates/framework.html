@@ -1,3 +1,4 @@
+{% load humanize %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -33,6 +34,8 @@
 {% else %}        <li>{{ crumb.1 }}</li>
 {% endif %}
 {% endfor %}
+{% if page.wordcount %}
+        <li>Word count: {{ page.wordcount|intcomma }}</li>{% endif %}
     </ul>
 
 </div>
@@ -60,6 +63,8 @@
 {% if dc_form or content_form %}
 </form>
 {% endif %}
+
+
 
 </body>
 </html>

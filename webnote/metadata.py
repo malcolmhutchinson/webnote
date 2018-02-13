@@ -318,7 +318,7 @@ class Metadata():
 
             # Is the first element of the line a metadata key?
             elif line[0].lower().replace('.', '_') in metadata.keys():
-                metadata[line[0].lower().replace('.', '_')].append(line[1])
+                metadata[line[0].lower().replace('.', '_')]#.append(line[1])
 
             # Is it a command?
             elif line[0].lower() in self.COMMANDS:

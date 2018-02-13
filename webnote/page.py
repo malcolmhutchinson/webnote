@@ -123,8 +123,6 @@ class Page(Webnote):
 
         """
 
-        #print "HERE"
-
         if not os.path.isdir(docroot):
             raise self.DocrootNotFound(docroot)
 
@@ -862,3 +860,15 @@ class Page(Webnote):
         # with the content value.
         content = self.content()
         return self._unref_figs
+
+    def wordcount(self):
+        """Return the number of words in a text file."""
+
+        words = 0
+        if self.filecontent:
+            lines = self.filecontent.split('\n')
+            for line in lines:
+                words_in_line = line.split(' ')
+                words += len(words_in_line)
+
+        return words

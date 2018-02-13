@@ -75,6 +75,28 @@ th, td {
     padding: 0;
 }
 
+#footer {
+    background: white;
+    font-family: sans-serif;
+    font-size: 90%;
+    position: fixed;
+    bottom: 3px;
+    height: 30px;
+    width: 100%;
+}
+
+#footer ul {
+    display: inline;
+    margin: 0px 0 0 -2em;
+    padding-top: 5px;
+}
+
+#footer ul li {
+    display: inline;
+    padding: 3px;
+    border-right: black solid 1px;
+}
+
 #header {
     background: white;
     font-family: sans-serif;
