@@ -864,11 +864,4 @@ class Page(Webnote):
     def wordcount(self):
         """Return the number of words in a text file."""
 
-        words = 0
-        if self.filecontent:
-            lines = self.filecontent.split('\n')
-            for line in lines:
-                words_in_line = line.split(' ')
-                words += len(words_in_line)
-
-        return words
+        return len(self.filecontent.split())
