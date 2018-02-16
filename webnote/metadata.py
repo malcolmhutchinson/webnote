@@ -313,12 +313,14 @@ class Metadata():
 
         for line in self.filemodel:
 
+            key = line[0].lower().replace('.', '_')
             if line[0].lower() == 'comment':
                 pass
 
             # Is the first element of the line a metadata key?
-            elif line[0].lower().replace('.', '_') in metadata.keys():
-                metadata[line[0].lower().replace('.', '_')]#.append(line[1])
+            elif key in metadata.keys():
+                if len(key):
+                    metadata[key].append(line[1])
 
             # Is it a command?
             elif line[0].lower() in self.COMMANDS:
