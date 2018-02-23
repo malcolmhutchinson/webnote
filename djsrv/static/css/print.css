@@ -26,6 +26,9 @@ p, table {
     page-break-inside: avoid;
     max-width: 100%;
 }
+blockquote {
+    font-family: sans-serif;
+}
 
 pre {
     font-size: 8pt;
@@ -35,7 +38,7 @@ table {
     max-width: 16cm;
 }    
 
-#header, #navigation {
+#header, #navigation, #contentse {
     display: none;
 }
 #main {
