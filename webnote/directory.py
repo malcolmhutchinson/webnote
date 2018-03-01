@@ -175,7 +175,7 @@ class Directory(Webnote):
             else:
                 baseurl = ''
 
-        for item in self.model['figs']:
+        for item in self.model['figures']:
             link = os.path.join(baseurl, self.address, item)
             text = item
             targets.append((link, text))
@@ -256,6 +256,27 @@ class Directory(Webnote):
             targets.append((link, text))
 
         return targets
+
+    def reference_text(self, text, baseurl=None):
+        """Return an alterted text, and unreferenced figures.
+
+        Return a tuple: reftext, unref_figs, using the
+        reference_figures() method in the superclass. Requires only
+        the text to be processed, if the directory object has been
+        created with a baseurl.
+
+        """
+        reftext = text
+        figures = []
+        if not baseurl:
+            baseurl = self.baseurl
+            
+        for t in self.figures():
+            figures.append(t[0])
+
+        reftext, unref_figs = self.reference_figures(text, baseurl, figures)
+        
+        return reftext, unref_figs
 
     def tempfiles(self, baseurl=None):
         """Return a list of (link, text) tuples identifying temporary files."""

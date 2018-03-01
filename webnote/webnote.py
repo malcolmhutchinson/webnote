@@ -84,14 +84,14 @@ class Webnote():
 #       To begin with, all figures are unreferenced.
 #       Build the (link, text) tuples for the images list.
         for figure in figures:
-            link = os.path.join(baseurl, figure)
-            caption = figure
+            path, basename = os.path.split(figure)
+            link = os.path.join(baseurl, basename)
+            caption = basename
             unref.append((link, caption))
 
         for match in result:
             (link, html) = self._figure_html(match, baseurl)
             output = output.replace(match, html)
-
             links.append(link)
 
 #           Pop the figure off the unreferenced list.

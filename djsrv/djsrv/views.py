@@ -101,7 +101,6 @@ def page(request, url, command=None):
     bits = url.split('/')
     if bits[0] == 'home':
         dirname = os.path.join('/home', bits[1], 'www')
-        print "DIRNAME", dirname
         
         if os.path.isdir(dirname):
             docroot = dirname
