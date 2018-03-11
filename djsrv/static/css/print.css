@@ -3,14 +3,14 @@
 @page {
     size: A4 landscape;
     margin: 2cm;
-    margin-left: 4cm;
+    margin-bottom: 3cm;
     margin-top: 3cm;
 }
 html {
 
 }
 body {
-    font-size: 10pt;
+    font-size: 12pt;
     font-family: serif;
 }
 
@@ -25,6 +25,12 @@ h1 {
 p, table {
     page-break-inside: avoid;
     max-width: 100%;
+}
+p {
+    text-align: justify;
+    text-indent: 0.5cm;
+    margin: 0;
+    padding: 0;
 }
 blockquote {
     font-family: sans-serif;

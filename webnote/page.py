@@ -5,6 +5,8 @@ import os
 
 from bs4 import BeautifulSoup
 import markdown2 as markdown
+import re
+import smartypants
 
 from directory import Directory
 from gallery import Gallery
@@ -517,9 +519,10 @@ class Page(Webnote):
                     h1 += "</h1>\n\n"
                     content = h1 + content
 
-        self._store_content = content
+        
+        self._store_content = self.replacements(content)
 
-        return content
+        return self._store_content
 
     def documents(self):
         """Return a list of the documents in the paired directory. """
@@ -647,6 +650,12 @@ class Page(Webnote):
         previous = (link, text)
 
         return previous
+
+    def replacements(self, content):
+        """Replace quote characters and the like.
+        """
+
+        return smartypants.smartypants(content)
 
     def save(self, data, files=None):
         """Replace the contents of the file with the supplied data.
