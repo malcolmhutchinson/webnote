@@ -1,43 +1,29 @@
-@import url('/static/css/screen.css');
+@import url('/static/css/typescript-screen.css');
+/* css/typescript-printer.css
+
+*/
 
 @page {
     size: A4 landscape;
     margin: 2cm;
     margin-bottom: 3cm;
-    margin-top: 3cm;
 }
 
 body {
-    font-size: 12pt;
-    font-family: serif;
+    font-size: 10pt;
 }
 
 h1, h2, h3 {
     page-break-after: avoid;
 }
-h1 {
-    font-weight: normal;
-    font-size: 24pt;
-}
 
-p, table {
-    page-break-inside: avoid;
-    max-width: 100%;
-}
 p {
-    text-align: justify;
-    text-indent: 0.5cm;
-    margin: 0;
-    padding: 0;
+    page-break-inside: avoid;
 }
 
 pre {
     font-size: 8pt;
 }
-
-table {
-    max-width: 16cm;
-}    
 
 #header, #navigation, #contentse {
     display: none;
@@ -47,11 +33,17 @@ table {
     margin: 0;
     padding: 0;
 }
+
 #pagecontent {
     margin: 0;
     padding: 0;
+}
+#pagecontent h3 {
+    margin-top: 0;
+    margin-bottom: 3em;
 }
 
 .noprint {
     display: none;
 }
+

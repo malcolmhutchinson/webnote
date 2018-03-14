@@ -1,0 +1,47 @@
+@import url('/static/css/screen.css');
+/* css/typescript-screen.css
+
+*/
+
+#pagecontent {
+    font-family: serif;
+
+}
+
+#pagecontent h1 {
+    font-size: 100%;
+    font-weight: normal;
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: .5em;
+    margin-top: 5em;
+    margin-bottom: 5em;
+}
+
+#pagecontent h2 {
+    font-size: 90%;
+    font-weight: normal;
+    text-align: center;
+    margin-bottom: 5em;
+}
+
+#pagecontent h3 {
+    font-weight: normal;
+    text-transform: uppercase;
+    text-align: center;
+    margin-top: 5em;
+    page-break-before: always;
+}
+
+#pagecontent p {
+    line-height: 150%;
+    text-align: justify;
+    margin: 0;
+    text-indent: 1em;
+}
+
+#pagecontent hr {
+    margin-top: 5em;
+    margin-bottom: 5em;
+    page-break-before: avoid;
+}

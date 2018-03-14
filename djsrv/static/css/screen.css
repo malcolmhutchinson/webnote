@@ -1,3 +1,7 @@
+/*  css/screen.css
+
+*/
+
 html {
     font-family: sans-serif;
     margin: 0px;
@@ -23,8 +27,9 @@ a:hover {
 }
 
 blockquote {
-    
+    font-family: sans-serif;
 }
+
 blockquote p {
     font-size: 90%;
     margin: 0;
@@ -45,10 +50,10 @@ img {
 }
 
 pre, code {
-    background: #eee;
+    background: none;
 }
 pre {
-    padding: 1em;
+    padding: 0em 0 1em 0;
 }
 
 th, td {

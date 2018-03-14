@@ -15,7 +15,7 @@ import forms
 import settings
 import webnote
 
-# (url prefix, docroot, link text).
+# (url_prefix, docroot, link text).
 ARCHIVES = [
     (
         '/manual', os.path.join(settings.STATICFILES_DIRS[0], 'manual'),
@@ -198,6 +198,18 @@ def page(request, url, command=None):
         dc_form = forms.DublinCoreForm(initial=request.POST)
         content_form = forms.ContentForm(initial=request.POST)
 
+    css_app =''
+    css_screen = 'css/screen.css'
+    css_printer = 'css/print.css'
+
+    if page.metadata.metadata['stylesheet']:
+        print "HERE", page.metadata.metadata['stylesheet']
+        if not page.metadata.metadata['stylesheet'][0] == 'normal':
+            css_screen = 'css/' + page.metadata.metadata['stylesheet'][0]
+            css_screen += '-screen.css'
+            css_printer = 'css/' + page.metadata.metadata['stylesheet'][0]
+            css_printer += '-printer.css'
+    
     context = {
         'docroot': docroot,
         'address': address,
@@ -207,9 +219,9 @@ def page(request, url, command=None):
         'url': url,
 
         'stylesheets': {
-            'app': None,
-            'screen': 'css/screen.css',
-            'printer': 'css/print.css',
+            'app': css_app,
+            'screen': css_screen,
+            'printer': css_printer,
         },
 
         'breadcrumbs': breadcrumbs,

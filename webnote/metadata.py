@@ -76,14 +76,16 @@ class Metadata():
         "dc_rights",
     )
 
+    # This should be in a view or something, abstracted from here.
     COMMANDS = (
-        'type',
-        'status',
-        'sort',
-        'liststyle',
-        'deny',
         'allow',
+        'deny',
         'embargo',
+        'liststyle',
+        'sort',
+        'status',
+        'stylesheet',
+        'type',
     )
 
     warnings = []

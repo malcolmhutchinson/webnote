@@ -1,0 +1,60 @@
+@import url('/static/css/book-screen.css');
+/* css/book-printer.css
+
+*/
+
+@page {
+    size: A4;
+    margin: 3cm;
+}
+
+body {
+    font-size: 12pt;
+}
+
+h1 {
+    margin-top: 10em;
+}
+
+h1, h2, h3 {
+    page-break-after: avoid;
+}
+
+p {
+    page-break-inside: avoid;
+}
+
+hr {
+    page-break-before: avoid;
+}
+
+pre {
+    font-size: 8pt;
+}
+
+#header, #navigation, #contentse {
+    display: none;
+}
+#main {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+#contents {
+    display: none;
+}
+
+#pagecontent {
+    margin: 0;
+    padding: 0;
+}
+#pagecontent h3 {
+    margin-top: 0;
+    margin-bottom: 3em;
+}
+
+.noprint {
+    display: none;
+}
+

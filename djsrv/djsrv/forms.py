@@ -27,6 +27,14 @@ STATUS = (
     ('standing', 'standing'),
 )
 
+STYLESHEET = (
+    ('normal', 'normal'),
+    ('book', 'book'),
+    ('letter', 'letter'),
+    ('manuscript', 'manuscript'),
+    ('typescript', 'typescript'),
+)
+
 TZOFFSET = (
     ('0000', '0000',),
     ('+1200', '+1200',),
@@ -38,6 +46,7 @@ TZOFFSET = (
 class CommandForm(forms.Form):
     sort = forms.ChoiceField(required=False, choices=SORT)
     liststyle = forms.ChoiceField(required=False, choices=LISTSTYLE)
+    stylesheet = forms.ChoiceField(required=False, choices=STYLESHEET)
     status = forms.ChoiceField(required=False, choices=STATUS)
     type = forms.ChoiceField(required=False, choices=PAGETYPE)
     filename = forms.FileField(required=False, label='Upload file')
