@@ -134,7 +134,7 @@ def page(request, url, command=None):
             navtemplate = 'nav_page.html'
 
 #   If a value for type is in the metadata, set a template for it.
-#   This permits pages being diesplayed differently to galleries.
+#   This permits pages being displayed differently to galleries.
             if len(page.metadata.metadata['type']) > 0:
                 if len(page.metadata.metadata['type'][0]) > 0:
                     template = page.metadata.metadata['type'][0] + '.html'
