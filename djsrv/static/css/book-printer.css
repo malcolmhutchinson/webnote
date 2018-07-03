@@ -16,12 +16,12 @@ h1 {
     margin-top: 10em;
 }
 
-h1, h2, h3 {
+h1, h3 {
     page-break-after: avoid;
 }
 
 p {
-    page-break-inside: avoid;
+
 }
 
 hr {
@@ -48,6 +48,9 @@ pre {
 #pagecontent {
     margin: 0;
     padding: 0;
+}
+#pagecontent h2 {
+   padding-top: 15em;
 }
 #pagecontent h3 {
     margin-top: 0;
