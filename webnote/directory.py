@@ -267,10 +267,11 @@ class Directory(Webnote):
 
         """
         reftext = text
+        
         figures = []
         if not baseurl:
             baseurl = self.baseurl
-            
+
         for t in self.figures():
             figures.append(t[0])
 
