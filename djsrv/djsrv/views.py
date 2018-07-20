@@ -202,8 +202,10 @@ def page(request, url, command=None):
     css_screen = 'css/screen.css'
     css_printer = 'css/print.css'
 
-    if page.metadata.metadata['stylesheet']:
+    # This is tracking an error at startup.
+    if not page.metadata:
         print "views.page.HERE", page.metadata.metadata['stylesheet']
+    if page.metadata.metadata['stylesheet']:        
         if not page.metadata.metadata['stylesheet'][0] == 'normal':
             css_screen = 'css/' + page.metadata.metadata['stylesheet'][0]
             css_screen += '-screen.css'
