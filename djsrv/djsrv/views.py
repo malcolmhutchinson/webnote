@@ -203,7 +203,7 @@ def page(request, url, command=None):
     css_printer = 'css/print.css'
 
     if page.metadata.metadata['stylesheet']:
-        print "HERE", page.metadata.metadata['stylesheet']
+        print "views.page.HERE", page.metadata.metadata['stylesheet']
         if not page.metadata.metadata['stylesheet'][0] == 'normal':
             css_screen = 'css/' + page.metadata.metadata['stylesheet'][0]
             css_screen += '-screen.css'
