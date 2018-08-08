@@ -519,8 +519,9 @@ class Page(Webnote):
                     h1 += "</h1>\n\n"
                     content = h1 + content
 
-        
-        self._store_content = self.replacements(content)
+        if content:
+            content = self.replacements(content)
+        self._store_content = content
 
         return self._store_content
 
@@ -654,7 +655,7 @@ class Page(Webnote):
     def replacements(self, content):
         """Replace quote characters and the like.
         """
-
+        #if content:
         return smartypants.smartypants(content)
 
     def save(self, data, files=None):
