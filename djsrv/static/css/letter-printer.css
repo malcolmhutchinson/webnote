@@ -1,0 +1,65 @@
+@import url('/static/css/screen.css');
+/* css/letter-screen.css
+
+*/
+
+@page {
+    size: A4 landscape;
+    margin: 2cm;
+    margin-bottom: 2cm;
+    margin-top: 2cm;
+}
+
+body {
+    font-size: 12pt;
+    font-family: serif;
+}
+
+h1, h2, h3 {
+    page-break-after: avoid;
+}
+h1 {
+    font-weight: normal;
+    font-size: 20pt;
+}
+
+h2 {
+    font-size: 110%;
+}
+
+p, table {
+    page-break-inside: avoid;
+    max-width: 100%;
+}
+p {
+    text-align: left;
+    text-indent: 0;
+    margin: 0;
+    margin-top: 0.7em;
+    padding: 0;
+}
+
+pre {
+    font-size: 8pt;
+}
+
+table {
+    max-width: 16cm;
+}    
+
+#header, #navigation, #contentse {
+    display: none;
+}
+#main {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+#pagecontent {
+    margin: 0;
+    padding: 0;
+}
+
+.noprint {
+    display: none;
+}
