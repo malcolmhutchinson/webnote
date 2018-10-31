@@ -203,14 +203,14 @@ def page(request, url, command=None):
     css_printer = 'css/print.css'
 
     # This is tracking an error at startup.
-    if not page.metadata:
-        print "views.page.HERE", page.metadata.metadata['stylesheet']
-    if page.metadata.metadata['stylesheet']:        
-        if not page.metadata.metadata['stylesheet'][0] == 'normal':
-            css_screen = 'css/' + page.metadata.metadata['stylesheet'][0]
-            css_screen += '-screen.css'
-            css_printer = 'css/' + page.metadata.metadata['stylesheet'][0]
-            css_printer += '-printer.css'
+
+    if page:
+        if page.metadata.metadata['stylesheet']:        
+            if not page.metadata.metadata['stylesheet'][0] == 'normal':
+                css_screen = 'css/' + page.metadata.metadata['stylesheet'][0]
+                css_screen += '-screen.css'
+                css_printer = 'css/' + page.metadata.metadata['stylesheet'][0]
+                css_printer += '-printer.css'
     
     context = {
         'docroot': docroot,
