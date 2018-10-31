@@ -101,7 +101,7 @@ def page(request, url, command=None):
     bits = url.split('/')
     if bits[0] == 'home':
         dirname = os.path.join('/home', bits[1], 'www')
-        
+
         if os.path.isdir(dirname):
             docroot = dirname
             bits.pop(0)
@@ -205,13 +205,13 @@ def page(request, url, command=None):
     # This is tracking an error at startup.
 
     if page:
-        if page.metadata.metadata['stylesheet']:        
+        if page.metadata.metadata['stylesheet']:
             if not page.metadata.metadata['stylesheet'][0] == 'normal':
                 css_screen = 'css/' + page.metadata.metadata['stylesheet'][0]
                 css_screen += '-screen.css'
                 css_printer = 'css/' + page.metadata.metadata['stylesheet'][0]
                 css_printer += '-printer.css'
-    
+
     context = {
         'docroot': docroot,
         'address': address,
@@ -259,7 +259,7 @@ def picture(request, url, picid):
     formsOn = None
     filename = None
     picture = None
-    
+
     warnings = []
 
     if picid[-1] == '/':
