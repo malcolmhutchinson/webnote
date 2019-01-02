@@ -164,7 +164,7 @@ class Directory(Webnote):
 
         return targets
 
-    def figures(self, baseurl=None):
+    def figures(self, baseurl=''):
         """Return a list of (link, text) tuples identifying figure files."""
 
         targets = []
@@ -172,8 +172,6 @@ class Directory(Webnote):
         if not baseurl:
             if self.baseurl:
                 baseurl = self.baseurl
-            else:
-                baseurl = ''
 
         for item in self.model['figures']:
             link = os.path.join(baseurl, self.address, item)
