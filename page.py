@@ -510,20 +510,55 @@ class Page(Webnote):
             if content:
                 content = markdown.markdown(content)
 
-#       Find the H1 line in the content string
-                soup = BeautifulSoup(content, "html.parser")
-                h1 = soup.find_all('h1')
-                if not len(h1):
-                    h1 = "<h1 class='noprint'>"
-                    h1 += self.title_from_fname().replace('_', ' ')
-                    h1 += "</h1>\n\n"
-                    content = h1 + content
+        # Find the H1 line in the content string
+        soup = BeautifulSoup(content, "html.parser")
+        h1 = soup.find_all('h1')
+        if not len(h1):
+            h1 = "<h1 class='noprint'>"
+            h1 += self.title_from_fname().replace('_', ' ')
+            h1 += "</h1>\n\n"
+            content = h1 + content
 
-        if content:
-            content = self.replacements(content)
+        # Compile a headings index.
+        heading_index = []
+        headings = soup.find_all(['h2', 'h3', 'h4'])
+        count2 = 0
+        count3 = 0
+        count4 = 0
+
+        for h in headings:
+            if h.name == 'h2':
+                count2 +=1
+                link = h.name + '-' + str(count2)
+            elif h.name == 'h3':
+                count3 +=1
+                link = h.name + '-' + str(count3)
+            elif h.name == 'h4':
+                count4 +=1
+                link = h.name + '-' + str(count4)
+
+            for f in h.descendants:
+                text = f
+
+            heading_index.append((link, text))
+            h['id'] = link
+
+        self.heading_index = heading_index
+
+        content = str(soup)
+
+        content = self.replacements(content)
+
         self._store_content = content
 
         return self._store_content
+
+    def heading_index(self):
+        if self.heading_index:
+            return self.heading_index
+
+        self.content()
+        return self.heading_index
 
     def documents(self):
         """Return a list of the documents in the paired directory. """
