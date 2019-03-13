@@ -460,8 +460,6 @@ class Page(Webnote):
         h.ignore_links = True
         source = h.handle(self.content().decode('utf8'))
 
-        #source = html2text.html2text(self.content)
-
         words = source.split()
 
         for word in words:
@@ -497,13 +495,12 @@ class Page(Webnote):
                 else:
                     concordance[word] += 1
 
+        # Cnvert the dictionary into a sorted list.
         data = []
         for item in sorted(concordance.keys()):
             data.append((item, concordance[item]))
-
                     
         return data
-        
 
     def content(self):
         """Compute the content string.
