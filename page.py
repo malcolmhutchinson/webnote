@@ -4,6 +4,7 @@
 import os
 
 from bs4 import BeautifulSoup
+import html2text
 import markdown2 as markdown
 import re
 import smartypants
@@ -91,6 +92,7 @@ class Page(Webnote):
     _store_files = None
     _unref_figs = None
     _store_documents = None
+    _store_heading_index = None
 
     warnings = []
 
@@ -449,6 +451,60 @@ class Page(Webnote):
 
         return kids
 
+    def concordance(self):
+        """List words and word counts, in a table."""
+
+        concordance = {}
+
+        h = html2text.HTML2Text()
+        h.ignore_links = True
+        source = h.handle(self.content().decode('utf8'))
+
+        #source = html2text.html2text(self.content)
+
+        words = source.split()
+
+        for word in words:
+            word = word.lower()
+            word = word.replace('_', '')
+            word = word.replace('(', '')
+            word = word.replace(')', '')
+            word = word.replace('#', '')
+            word = word.replace('.', '')
+            word = word.replace(',', '')
+            word = word.replace('?', '')
+            word = word.replace('"', '')
+            word = word.replace('--', '')
+            word = word.replace('*', '')
+            word = word.replace('!', '')
+
+            if len(word) > 0:
+                
+                if word[0] == "'":
+                    word = word[1:]
+
+                if word[-1] == "'":
+                    word = word[:-1]
+
+                if word[0] == "`":
+                    word = word[1:]
+
+                if word[-1] == "`":
+                    word = word[:-1]
+
+                if word not in concordance.keys():
+                    concordance[word] = 1
+                else:
+                    concordance[word] += 1
+
+        data = []
+        for item in sorted(concordance.keys()):
+            data.append((item, concordance[item]))
+
+                    
+        return data
+        
+
     def content(self):
         """Compute the content string.
 
@@ -520,30 +576,32 @@ class Page(Webnote):
             content = h1 + content
 
         # Compile a headings index.
-        heading_index = []
+        heading_index = None
         headings = soup.find_all(['h2', 'h3', 'h4'])
-        count2 = 0
-        count3 = 0
-        count4 = 0
+        if len(headings) > 0:
+            heading_index = []
+            count2 = 0
+            count3 = 0
+            count4 = 0
 
-        for h in headings:
-            if h.name == 'h2':
-                count2 +=1
-                link = h.name + '-' + str(count2)
-            elif h.name == 'h3':
-                count3 +=1
-                link = h.name + '-' + str(count3)
-            elif h.name == 'h4':
-                count4 +=1
-                link = h.name + '-' + str(count4)
+            for h in headings:
+                if h.name == 'h2':
+                    count2 +=1
+                    link = h.name + '-' + str(count2)
+                elif h.name == 'h3':
+                    count3 +=1
+                    link = h.name + '-' + str(count3)
+                elif h.name == 'h4':
+                    count4 +=1
+                    link = h.name + '-' + str(count4)
 
-            for f in h.descendants:
-                text = f
+                for f in h.descendants:
+                    text = f
 
-            heading_index.append((link, text))
-            h['id'] = link
+                heading_index.append((link, text))
+                h['id'] = link
 
-        self.heading_index = heading_index
+            self._store_heading_index = heading_index
 
         content = str(soup)
 
@@ -552,13 +610,6 @@ class Page(Webnote):
         self._store_content = content
 
         return self._store_content
-
-    def heading_index(self):
-        if self.heading_index:
-            return self.heading_index
-
-        self.content()
-        return self.heading_index
 
     def documents(self):
         """Return a list of the documents in the paired directory. """
@@ -585,6 +636,13 @@ class Page(Webnote):
         data = self.metadata.formdata()
         data['content'] = self.filecontent
         return data
+
+    def heading_index(self):
+        if self._store_heading_index:
+            return self._store_heading_index
+
+        self.content()
+        return self._store_heading_index
 
     def nextpage(self):
 
