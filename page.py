@@ -444,7 +444,7 @@ class Page(Webnote):
             else:
                 kids.append(page)
 
-#       Handle the sort reverse command.
+        # Handle the sort reverse command.
         if len(self.metadata.metadata['sort']):
             if self.metadata.metadata['sort'][0] == 'reverse':
                 kids = sorted(kids, reverse=True)
@@ -495,7 +495,7 @@ class Page(Webnote):
                 else:
                     concordance[word] += 1
 
-        # Cnvert the dictionary into a sorted list.
+        # Convert the dictionary into a sorted list.
         data = []
         for item in sorted(concordance.keys()):
             data.append((item, concordance[item]))
