@@ -616,10 +616,23 @@ class Page(Webnote):
 
         """
 
-        content = ""
+        body = ''
 
-        for child in self.children:
-            content += "\n\n<!-- ------------------- -->\n" + child.content
+        # Stitch content for all the children together into one string.
+        for child in self.children():
+            body += "\n\n<!-- ------------------- -->\n" + child.content()
+
+        # Step all the headings down a level.
+        soup = BeautifulSoup(body, "html.parser")
+        h1 = soup.find_all('h1')
+        for i in h1:
+            #print i
+            i.name = 'h2'
+
+
+        body = str(soup)
+        
+        content = self.content() + body
 
         return content
 
