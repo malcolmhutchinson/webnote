@@ -566,6 +566,7 @@ class Page(Webnote):
         # Find the H1 line in the content string
         soup = BeautifulSoup(content, "html.parser")
         h1 = soup.find_all('h1')
+        # If it's not there, insert one created from the filename.
         if not len(h1):
             h1 = "<h1 class='noprint'>"
             h1 += self.title_from_fname().replace('_', ' ')
@@ -607,6 +608,20 @@ class Page(Webnote):
         self._store_content = content
 
         return self._store_content
+
+    def content_novel(self):
+        """Stitch all the siblings together into a single document.
+
+        Move all the headings one level down, so H1 becomes H2 and so on.
+
+        """
+
+        content = ""
+
+        for child in self.children:
+            content += "\n\n<!-- ------------------- -->\n" + child.content
+
+        return content
 
     def documents(self):
         """Return a list of the documents in the paired directory. """
@@ -745,7 +760,7 @@ class Page(Webnote):
     def replacements(self, content):
         """Replace quote characters and the like.
         """
-        #if content:
+
         return smartypants.smartypants(content)
 
     def save(self, data, files=None):
@@ -966,4 +981,5 @@ class Page(Webnote):
 
         if not self.filecontent:
             return 0
+
         return len(self.filecontent.split())
